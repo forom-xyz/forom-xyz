@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Play } from 'lucide-react'
+import { X } from 'lucide-react'
 import { extractYouTubeId, hasVideo, updateMemory } from '../data/memories'
 import type { Memory, WhQuestion, CategoryType } from '../data/memories'
 
