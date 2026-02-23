@@ -76,6 +76,10 @@ export const MemoryBox = memo(function MemoryBox({
       // Navigate to this box
       onClick()
     }
+    if (isFilled && onInfoClick) {
+      // Filled box - open modal to view memory
+      onInfoClick()
+    }
   }
 
   // Font size for question text based on size

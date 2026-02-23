@@ -69,6 +69,8 @@ const customStyles: Modal.Styles = {
     padding: '2rem',
   },
   content: {
+    display: 'flex', 
+    flexDirection: 'column', 
     position: 'relative',
     inset: 'auto',
     width: '75vw',
@@ -186,9 +188,9 @@ export function MemoryModal({
 
   // Render the filled memory view (display mode)
   const renderFilledView = () => (
-    <div className="relative w-full h-full flex flex-col overflow-hidden rounded-xl">
+    <div className="relative w-full h-full flex flex-coloverflow-hidden rounded-xl">
       {/* Background - Video Thumbnail or Embed */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 w-full h-full">
         {memoryHasVideo && videoId ? (
           <>
             <img
@@ -196,7 +198,6 @@ export function MemoryModal({
               alt={memory.title}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
           </>
         ) : (
           <div 
@@ -229,7 +230,7 @@ export function MemoryModal({
         </div>
 
         {/* Center: Play Button */}
-        {memoryHasVideo && (
+        {/*memoryHasVideo && (
           <div className="flex-1 flex items-center justify-center">
             <a
               href={memory.videoUrl?.startsWith('http') ? memory.videoUrl : `https://www.youtube.com/watch?v=${memory.videoUrl}`}
@@ -240,7 +241,7 @@ export function MemoryModal({
               <Play size={40} className="text-black ml-1" fill="currentColor" />
             </a>
           </div>
-        )}
+        )*/}
 
         {/* Bottom: Question & Response */}
         <div className="mt-auto">
@@ -510,45 +511,60 @@ export function MemoryModal({
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="w-full h-full relative"
+            className="relative h-full" 
             style={{
               backgroundColor: isEditing ? '#D9D9D9' : 'transparent',
               border: isEditing ? '6px solid #000000' : `6px solid ${borderColor}`,
               borderRadius: '16px',
               boxShadow: '0 0 40px rgba(0,0,0,0.3)',
               overflow: 'hidden',
+              width: '100%',
+              minWidth: '100%',
+              display: 'block' 
             }}
           >
-            {/* Close Button - Top Right */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={onClose}
-              className="absolute top-4 right-4 w-10 h-10 bg-[#FF3B30] rounded-full flex items-center justify-center shadow-lg z-50 cursor-pointer"
-              aria-label="Close modal"
-              type="button"
-            >
-              <X size={24} strokeWidth={3} className="text-white" />
-            </motion.button>
-
-            {/* Edit Button - Only show for filled memories in view mode */}
+            {/* Button Modifier */}
             {memory.isFilled && !isEditing && (
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setIsEditing(true)}
-                className="absolute top-4 left-4 px-4 py-2 bg-white/90 hover:bg-white rounded-full shadow-lg z-50 cursor-pointer text-sm font-semibold"
-                style={{ fontFamily: "'Montserrat', sans-serif" }}
+                className="absolute z-50 cursor-pointer bg-white/95 hover:bg-white text-black shadow-xl rounded-full border border-black/10"
+                style={{ 
+                  top: '18px',     
+                  left: '18px', 
+                  padding: '8px 20px',   
+                  fontSize: '0.95rem',   
+                  fontWeight: '600',     
+                  fontFamily: "'Montserrat', sans-serif",
+                }}
                 type="button"
               >
                 Modifier
               </motion.button>
             )}
 
-            {isEditing ? renderEditView() : (memory.isFilled ? renderFilledView() : renderEditView())}
+            {/* Button Close Modal*/}
+            <motion.button
+              onClick={onClose}
+              className="absolute z-50 cursor-pointer bg-[#FF3B30] w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+              style={{ 
+                  top: '16px', 
+                  right: '16px' 
+              }}
+              aria-label="Close modal"
+              type="button"
+            >
+              <X size={24} strokeWidth={3} className="text-white" />
+            </motion.button>
+            
+            {/* Contenu */}
+            <div className="w-full h-full">
+              {isEditing ? renderEditView() : (memory.isFilled ? renderFilledView() : renderEditView())}
+            </div>
           </motion.div>
         </Modal>
       )}
     </AnimatePresence>
-  )
+  );
 }
