@@ -7,8 +7,6 @@ import { CarouselGrid } from './components/CarouselGrid'
 import { SupportModal } from './components/SupportModal'
 
 // Import Icons
-import userIcon from './assets/icons/user.png'
-import etsIcon from './assets/icons/ets.jpg'
 import wikiIcon from './assets/icons/wiki.png'
 
 // =============================================================================
@@ -39,7 +37,8 @@ const tokenModalStyles: ReactModal.Styles = {
     position: 'relative',
     inset: 'auto',
     width: '600px',
-    height: '400px',
+    height: 'auto',
+    maxHeight: '90vh',
     padding: 0,
     border: 'none',
     background: 'transparent',
@@ -108,26 +107,28 @@ function Modal({
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="w-full h-full rounded-xl shadow-2xl p-8 flex flex-col border-4 transition-colors duration-300"
+            className="w-full h-full rounded-none shadow-2xl flex flex-col transition-colors duration-300"
             style={{ 
               backgroundColor: 'var(--color-surface)', 
-              borderColor: 'var(--color-border)',
+              border: '1px solid var(--color-border)',
               color: 'var(--color-text)'
             }}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold font-['Montserrat']">{title}</h2>
+            <div className="flex justify-between items-center p-8 pb-4">
+              <h2 className="text-2xl font-bold font-['Montserrat']">{title}</h2>
               <button 
                 onClick={onClose}
-                className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl transition-colors cursor-pointer"
-                style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer text-zinc-500 hover:bg-black/5 dark:text-zinc-400 dark:hover:bg-white/10 border border-zinc-300 dark:border-zinc-600"
                 type="button"
                 aria-label="Close modal"
               >
-                ✕
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
               </button>
             </div>
-            <div className="flex-1 overflow-auto text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+            <div className="flex-1 overflow-auto text-base p-8 pt-4" style={{ color: 'var(--color-text-secondary)' }}>
               {children}
             </div>
           </motion.div>
@@ -225,34 +226,6 @@ function App() {
           Corner Icons
       -------------------------------------------------------------------------- */}
 
-      {/* Top Left - ETS */}
-      <motion.a
-        href="https://www.etsmtl.ca/experience-etudiante/clubs-etudiants"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`absolute z-50 ${cornerIconStyle}`}
-        style={{ ...cornerIconSize, top: '32px', left: '32px', backgroundColor: 'transparent', borderColor: 'transparent' }}
-        whileHover={{ scale: 1.1, rotate: -5 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <img src={etsIcon} alt="ÉTS Montréal" className="w-3/4 h-3/4 object-contain" />
-      </motion.a>
-
-      {/* Top Right - User */}
-      <motion.div
-        className={`absolute z-50 ${cornerIconStyle}`}
-        style={{ ...cornerIconSize, top: '32px', right: '32px', backgroundColor: 'transparent', borderColor: 'transparent' }}
-        whileHover={{ scale: 1.1, rotate: 5 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <img
-          src={userIcon}
-          alt="User Profile"
-          className="w-3/4 h-3/4 object-contain"
-          style={{ filter: isDarkMode ? 'invert(1)' : 'none' }}
-        />
-      </motion.div>
-
       {/* Bottom Left - Wiki */}
       <motion.a
         href="https://wiki.etsmtl.club/share/8cnz7bzxf3/p/services-offerts-j8LxYBFxrs"
@@ -293,31 +266,21 @@ function App() {
         onClose={() => setActiveModal(null)}
         title="The FOROM Ecosystem"
       >
-        <div className="flex flex-col gap-4">
-          <p className="text-lg font-medium text-zinc-600 dark:text-zinc-300">Learn to earn. Support to build.</p>
-
-          <section className="pt-2 pb-2">
-            <h3 className="text-xl font-semibold text-black dark:text-white">How to Earn</h3>
-            <p className="mt-2 text-zinc-500 dark:text-zinc-400">
-              Knowledge is currency here. For every tutorial you complete, you automatically earn <span className="font-semibold">1,000 Tokens</span>.
-              The more you learn, the more you collect.
+        <main className="flex-1 space-y-6">
+          {/* Section Pixels */}
+          <section>
+            <div className="flex items-center space-x-2 mb-2">
+              <span className="text-2xl font-bold font-jersey text-[#FFD700]">$</span>
+              <h3 className="text-xl font-semibold text-black dark:text-white">Les Pixels (Monnaie)</h3>
+            </div>
+            <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed text-sm">
+              Les Pixels sont la devise transactionnelle de FOROM. Vous gagnez des Pixels pour 
+              chaque mémo que vous contribuez à la grille. C'est le moteur de notre économie 
+              interactive : utilisez-les pour soutenir des projets, interagir avec la communauté 
+              ou débloquer de futures fonctionnalités.
             </p>
           </section>
-
-          <section className="pt-2 pb-2">
-            <h3 className="text-xl font-semibold text-black dark:text-white">How to Support</h3>
-            <p className="mt-2 text-zinc-500 dark:text-zinc-400">
-              Want to push the project further? You can acquire tokens to directly finance the development team.
-              Your contributions help us create new iterations, fund new projects, and improve the application faster.
-            </p>
-          </section>
-
-          <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-            <p className="text-sm italic text-zinc-500 dark:text-zinc-400">
-              Whether you earn them or buy them, your tokens fuel the collective. Use them to vote on the next big update.
-            </p>
-          </div>
-        </div>
+        </main>
       </Modal>
 
       <SupportModal 
