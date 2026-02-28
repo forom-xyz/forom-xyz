@@ -405,10 +405,10 @@ export function CarouselGrid({
             whileTap={{ scale: 0.9 }}
             onClick={handlePrevCategory}
             className="nav-button"
-            style={getNavButtonStyle(isDark)}
+            style={{ ...getNavButtonStyle(isDark), transform: 'rotate(90deg)' }}
             aria-label="Previous category"
           >
-            ^
+            {'<'}
           </motion.button>
 
           {/* Vertical Slider Track */}
@@ -451,10 +451,10 @@ export function CarouselGrid({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleNextCategory}
-            style={getNavButtonStyle(isDark)}
+            style={{ ...getNavButtonStyle(isDark), transform: 'rotate(90deg)' }}
             aria-label="Next category"
           >
-            v
+            {'>'}
           </motion.button>
         </nav>
       </div>
@@ -462,7 +462,7 @@ export function CarouselGrid({
       {/* Horizontal Navigation - Below Grid */}
       <nav
         className="fixed flex items-center justify-center pointer-events-auto z-50"
-        style={{ bottom: '48px', left: '50%', transform: 'translateX(-50%)', gap: '30px' }}
+        style={{ bottom: '48px', left: 'calc(50% + 40px)', transform: 'translateX(-50%)', gap: '30px' }}
         aria-label="Video navigation"
       >
         <motion.button

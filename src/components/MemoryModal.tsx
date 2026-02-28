@@ -60,9 +60,7 @@ const customStyles: Modal.Styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
     zIndex: 9998,
     display: 'flex',
     alignItems: 'center',
@@ -71,10 +69,10 @@ const customStyles: Modal.Styles = {
   content: {
     position: 'relative',
     inset: 'auto',
-    width: '80vw',
+    width: '90vw',
     maxWidth: 'none',
-    maxHeight: '70vh',
-    height: '70vh',
+    maxHeight: '85vh',
+    height: '85vh',
     padding: 0,
     border: 'none',
     background: 'transparent',
@@ -91,18 +89,16 @@ const customStyles: Modal.Styles = {
 // =============================================================================
 
 const modalVariants = {
-  hidden: { opacity: 0, scale: 0.95, y: 20 },
+  hidden: { opacity: 0, scale: 0.97 },
   visible: { 
     opacity: 1, 
-    scale: 1, 
-    y: 0,
-    transition: { type: 'spring' as const, damping: 25, stiffness: 300 },
+    scale: 1,
+    transition: { duration: 0.12, ease: 'easeOut' as const },
   },
   exit: { 
     opacity: 0, 
-    scale: 0.95, 
-    y: 20,
-    transition: { duration: 0.2 },
+    scale: 0.97,
+    transition: { duration: 0.08, ease: 'easeIn' as const },
   },
 }
 
@@ -174,7 +170,7 @@ export function MemoryModal({
   // FILLED VIEW
   // ===========================================================================
   const renderFilledView = () => (
-    <div className="relative w-full flex flex-col" style={{ height: '70vh', overflow: 'hidden' }}>
+    <div className="relative w-full flex flex-col" style={{ height: '85vh', overflow: 'hidden' }}>
 
       {/* Background layer: thumbnail stretched to full container */}
       {memoryHasVideo && videoId ? (
@@ -277,60 +273,63 @@ export function MemoryModal({
     const wordCount = formData.description.split(/\s+/).filter(Boolean).length;
     
     return (
-      <div className="w-full h-full flex flex-col pt-12 pb-10 px-[10%] overflow-y-auto bg-[#D9D9D9]" style={{ overflowX: 'hidden', boxSizing: 'border-box' }}>
-        
-        {/* MEMO Header */}
-        <h2 className="text-6xl md:text-7xl text-white mb-8 text-center uppercase tracking-widest drop-shadow-sm font-bold" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
-          MEMO
-        </h2>
+      <div className="w-full h-full bg-[#D9D9D9] relative" style={{ boxSizing: 'border-box', overflow: 'hidden' }}>
 
-        {/* Categories - Added gap-4 md:gap-6 for spacing */}
-        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-12 w-full">
-          {QUESTION_ORDER.map((q) => {
-            const color = QUESTION_COLORS[q] || '#888888'
-            const isSelected = formData.question === q
-            return (
-              <button
-                key={q}
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, question: q }))}
-                className="px-6 py-2 rounded-md border-[3px] border-black cursor-pointer uppercase text-white font-bold tracking-wide text-sm md:text-base shadow-sm transition-transform hover:scale-105"
-                style={{ 
-                  backgroundColor: color,
-                  fontFamily: "'Jersey 15', sans-serif",
-                  opacity: isSelected ? 1 : 0.6,
-                }}
-              >
-                {q}
-              </button>
-            )
-          })}
-        </div>
+        {/* Top section — header + categories + title */}
+        <div className="flex flex-col items-center px-[10%] pt-10" style={{ boxSizing: 'border-box' }}>
 
-        {/* Title Row - Flexbox trick to keep input perfectly centered while TITRE stays left */}
-        <div className="flex flex-row items-center w-full mb-10">
-          <div className="w-1/4 flex justify-start">
-            <span className="text-3xl md:text-4xl font-bold text-black uppercase tracking-widest" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
-              TITRE :
-            </span>
-          </div>
-          
-          <div className="w-2/4 flex justify-center">
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="SANS TITRE"
-              className="text-3xl md:text-4xl font-bold bg-transparent border-none outline-none text-center uppercase tracking-widest w-full text-black placeholder:text-black/50"
-              style={{ fontFamily: "'Jersey 15', sans-serif" }}
-            />
+          {/* MEMO Header */}
+          <h2 className="text-6xl md:text-7xl text-white mb-6 text-center uppercase tracking-widest drop-shadow-sm font-bold" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
+            MEMO
+          </h2>
+
+          {/* Categories */}
+          <div className="flex flex-wrap justify-center items-center mb-8 w-full" style={{ gap: '5%' }}>
+            {QUESTION_ORDER.map((q) => {
+              const color = QUESTION_COLORS[q] || '#888888'
+              const isSelected = formData.question === q
+              return (
+                <button
+                  key={q}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, question: q }))}
+                  className="px-6 py-2 border-[3px] border-black cursor-pointer uppercase text-white font-bold tracking-wide text-4xl md:text-5xl shadow-sm transition-transform hover:scale-105"
+                  style={{ 
+                    backgroundColor: color,
+                    fontFamily: "'Jersey 15', sans-serif",
+                    opacity: isSelected ? 1 : 0.6,
+                    borderRadius: '9px',
+                  }}
+                >
+                  {q}
+                </button>
+              )
+            })}
           </div>
 
-          <div className="w-1/4"></div> {/* Invisible spacer to balance the flex layout */}
+          {/* Title Row */}
+          <div className="flex flex-row items-center w-full mb-6">
+            <div className="w-1/4 flex justify-start">
+              <span className="text-3xl md:text-4xl font-bold text-black uppercase tracking-widest" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
+                TITRE :
+              </span>
+            </div>
+            <div className="w-2/4 flex justify-center">
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="SANS TITRE"
+                className="text-3xl md:text-4xl font-bold bg-transparent border-none outline-none text-center uppercase tracking-widest w-full text-black placeholder:text-black/50"
+                style={{ fontFamily: "'Jersey 15', sans-serif" }}
+              />
+            </div>
+            <div className="w-1/4" />
+          </div>
         </div>
 
-        {/* Lined Notepad Area — fixed at 4 lines, scrolls internally */}
-        <div className="mb-8" style={{ height: 'calc(4 * 3rem)', overflow: 'hidden' }}>
+        {/* Centered notepad area */}
+        <div className="absolute left-[10%] right-[10%]" style={{ top: '50%', transform: 'translateY(-50%)' }}>
           <textarea
             value={formData.description}
             onChange={(e) => {
@@ -355,9 +354,9 @@ export function MemoryModal({
           />
         </div>
 
-        {/* Bottom Section: URL & Words */}
-        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-end w-full mb-10 gap-4">
-          <div className="flex items-center gap-3 w-full sm:w-2/3">
+        {/* VIDEO URL + word count — above buttons */}
+        <div className="absolute left-[10%] right-[10%] flex flex-row justify-between items-center" style={{ bottom: 'calc(10% + 60px)' }}>
+          <div className="flex items-center gap-3">
             <span className="text-3xl md:text-4xl text-[#FF3B30] uppercase tracking-wide font-bold whitespace-nowrap" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
               VIDEO URL:
             </span>
@@ -375,8 +374,8 @@ export function MemoryModal({
           </span>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-center gap-6 sm:gap-12 w-full mt-auto">
+        {/* Action Buttons — 10% from bottom */}
+        <div className="absolute flex gap-6 sm:gap-12" style={{ bottom: '10%', left: '50%', transform: 'translateX(-50%)' }}>
           <button
             type="button"
             onClick={() => {
@@ -422,7 +421,7 @@ export function MemoryModal({
             exit="exit"
             className="relative flex flex-col shadow-2xl w-full"
             style={{
-              height: '70vh',
+              height: '85vh',
               backgroundColor: isEditing ? '#D9D9D9' : 'transparent',
               border: isEditing ? '6px solid #FF3B30' : `6px solid ${borderColor}`,
               borderRadius: '24px',
