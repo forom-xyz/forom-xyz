@@ -4,12 +4,13 @@
 
 /** Available WH-questions for memories */
 export const WH_QUESTIONS = [
-  'Comment ?',
-  'Qui ?',
-  'Pourquoi ?',
-  'Quoi ?',
-  'Quand ?',
-  'Ou ?',
+  'QUI?',
+  'QUOI?',
+  'OU?',
+  'QUAND?',
+  'COMMENT?',
+  'COMBIEN?',
+  'POURQUOI?',
 ] as const
 
 export type WhQuestion = (typeof WH_QUESTIONS)[number]
