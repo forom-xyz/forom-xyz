@@ -39,7 +39,6 @@ const QUESTION_COLORS: Record<string, string> = {
   'POURQUOI?': '#8B5CF6',
 }
 
-// Order for display
 const QUESTION_ORDER: WhQuestion[] = [
   'QUI?',
   'QUOI?',
@@ -68,23 +67,22 @@ const customStyles: Modal.Styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '1.5rem', // increased padding to ensure border isn't clipped
   },
   content: {
-    display: 'flex', 
-    flexDirection: 'column', 
     position: 'relative',
     inset: 'auto',
-    width: '100%',
-    maxWidth: '56rem', // max-w-4xl (approx 900px, responsive via 100% width)
-    maxHeight: '90vh',
-    height: 'auto',
+    width: '80vw',
+    maxWidth: 'none',
+    maxHeight: '70vh',
+    height: '70vh',
     padding: 0,
     border: 'none',
     background: 'transparent',
-    overflow: 'visible',
+    overflow: 'hidden',
     borderRadius: 0,
     boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
   },
 }
 
@@ -93,28 +91,18 @@ const customStyles: Modal.Styles = {
 // =============================================================================
 
 const modalVariants = {
-  hidden: { 
-    opacity: 0, 
-    scale: 0.8, 
-    y: 50,
-  },
+  hidden: { opacity: 0, scale: 0.95, y: 20 },
   visible: { 
     opacity: 1, 
     scale: 1, 
     y: 0,
-    transition: {
-      type: 'spring' as const,
-      damping: 25,
-      stiffness: 300,
-    },
+    transition: { type: 'spring' as const, damping: 25, stiffness: 300 },
   },
   exit: { 
     opacity: 0, 
-    scale: 0.9, 
-    y: 30,
-    transition: {
-      duration: 0.2,
-    },
+    scale: 0.95, 
+    y: 20,
+    transition: { duration: 0.2 },
   },
 }
 
@@ -139,7 +127,6 @@ export function MemoryModal({
     description: '',
   })
 
-  // Reset form when memory changes or modal opens
   useEffect(() => {
     if (memory) {
       setFormData({
@@ -148,18 +135,14 @@ export function MemoryModal({
         videoUrl: memory.videoUrl || '',
         description: memory.isFilled ? memory.description : '',
       })
-      // Auto-open edit mode for empty memories
       setIsEditing(!memory.isFilled)
       setIsVideoPlaying(false)
     }
   }, [memory, isOpen])
 
-  // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose()
-      }
+      if (e.key === 'Escape' && isOpen) onClose()
     }
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
@@ -170,11 +153,8 @@ export function MemoryModal({
   const videoId = extractYouTubeId(memory.videoUrl)
   const memoryHasVideo = hasVideo(memory)
 
-  // Handle form submission
   const handleSave = () => {
-    if (!formData.question || !formData.title.trim()) {
-      return // Don't save if required fields are empty
-    }
+    if (!formData.question || !formData.title.trim()) return
 
     const updatedMemory = updateMemory(memory.category as CategoryType, 
       parseInt(memory.id.split('-')[1]), {
@@ -186,77 +166,71 @@ export function MemoryModal({
       }
     )
 
-    if (updatedMemory && onMemoryUpdate) {
-      onMemoryUpdate(updatedMemory)
-    }
-
+    if (updatedMemory && onMemoryUpdate) onMemoryUpdate(updatedMemory)
     setIsEditing(false)
   }
 
-  // Render the filled memory view (display mode)
+  // ===========================================================================
+  // FILLED VIEW
+  // ===========================================================================
   const renderFilledView = () => (
-    <div className="relative w-full aspect-video min-h-[400px] flex flex-col overflow-hidden rounded-xl bg-[#2a2a2e]">
-      
-      {/* Background - Video Thumbnail & 25% Overlay */}
-      <div className="absolute inset-0 z-0">
-        {memoryHasVideo && videoId ? (
-          isVideoPlaying ? (
-            <iframe 
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`} 
-              allow="autoplay; encrypted-media; fullscreen" 
-              allowFullScreen 
-              className="absolute inset-0 w-full h-full border-none z-30" 
-            />
-          ) : (
-            <>
-              <img
-                src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-                alt={memory.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/25 z-0" />
-            </>
-          )
-        ) : (
-          <div 
-            className="w-full h-full"
-            style={{ backgroundColor: '#2a2a2e' }}
-          />
-        )}
-      </div>
+    <div className="relative w-full flex flex-col" style={{ height: '70vh', overflow: 'hidden' }}>
 
-      {/* Main Content Wrapper - with generous padding */}
+      {/* Background layer: thumbnail stretched to full container */}
+      {memoryHasVideo && videoId ? (
+        isVideoPlaying ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+            allow="autoplay; encrypted-media; fullscreen"
+            allowFullScreen
+            className="absolute inset-0 w-full h-full border-none z-0"
+          />
+        ) : (
+          <img
+            src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+            alt={memory.title}
+            className="absolute inset-0 w-full h-full object-cover z-0"
+          />
+        )
+      ) : (
+        <div className="absolute inset-0 w-full h-full bg-[#2a2a2e] z-0" />
+      )}
+
+      {/* 25% black overlay – always on top of background, below content */}
       {!isVideoPlaying && (
-        <div className="relative z-10 flex-1 flex flex-col p-8 sm:p-12 justify-between h-full">
-          
-          {/* Top: YouTube Link */}
-          <div className="text-center flex flex-col items-center">
-            <span 
-              className="text-xl text-white font-bold tracking-wide drop-shadow-md"
-              style={{ fontFamily: "'Montserrat', sans-serif" }}
-            >
-              Youtube link:
-            </span>
-            {memory.videoUrl && (
-              <a 
+        <div className="absolute inset-0 z-10" style={{ backgroundColor: 'rgba(0,0,0,0.25)' }} />
+      )}
+
+      {/* Overlay content – hidden while video plays */}
+      {!isVideoPlaying && (
+        <div className="relative z-20 flex flex-col justify-between h-full px-12 py-10">
+
+          {/* Top: URL */}
+          <div className="flex justify-center">
+            {memory.videoUrl ? (
+              <a
                 href={memory.videoUrl.startsWith('http') ? memory.videoUrl : `https://www.youtube.com/watch?v=${memory.videoUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-xs text-white/90 hover:text-white underline mt-1 truncate max-w-md drop-shadow-md"
+                className="text-xs text-white/80 hover:text-white underline drop-shadow-md truncate max-w-lg"
+                style={{ fontFamily: "'Montserrat', sans-serif" }}
               >
-                {memory.videoUrl.startsWith('http') ? memory.videoUrl : `https://www.youtube.com/watch?v=${memory.videoUrl}`}
+                {memory.videoUrl}
               </a>
+            ) : (
+              <span className="text-xs text-white/40 italic" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                Aucune vidéo
+              </span>
             )}
           </div>
 
-          {/* Center: Absolute Centered Play Button */}
+          {/* Center: play button */}
           {memoryHasVideo && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+            <div className="flex justify-center">
               <button
                 onClick={() => setIsVideoPlaying(true)}
                 className="w-24 h-16 bg-white/90 hover:bg-white rounded-2xl flex items-center justify-center transition-all shadow-xl cursor-pointer border-none"
               >
-                {/* Simple Play Icon */}
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-black ml-2">
                   <path d="M8 5v14l11-7z"/>
                 </svg>
@@ -264,78 +238,54 @@ export function MemoryModal({
             </div>
           )}
 
-          {/* Bottom: Question, Response & Description */}
-          <div className="mt-auto flex flex-col w-full z-20">
-            
-            {/* Question and Response Row */}
-            <div className="flex justify-between items-end w-full mb-4">
-              
-              {/* Left: Question */}
-              <div className="flex flex-col items-start">
-                <span 
-                  className="text-sm uppercase tracking-widest text-white drop-shadow-md font-black"
-                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
-                >
+          {/* Bottom: question / answer + description */}
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-end w-full">
+              <div className="flex flex-col items-start w-1/2">
+                <span className="text-xs uppercase tracking-widest text-white/80 font-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                   QUESTION
                 </span>
-                <h2 
-                  className="text-[48px] text-white leading-none mt-1 drop-shadow-lg"
-                  style={{ fontFamily: "'Jersey 15', sans-serif" }}
-                >
-                  {memory.question || 'Comment ?'}
+                <h2 className="text-4xl sm:text-5xl text-white leading-none mt-1 drop-shadow-lg" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
+                  {memory.question || '?'}
                 </h2>
               </div>
-
-              {/* Right: Response */}
-              <div className="flex flex-col items-end text-right">
-                <span 
-                  className="text-sm uppercase tracking-widest text-white drop-shadow-md font-black"
-                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
-                >
+              <div className="flex flex-col items-end text-right w-1/2">
+                <span className="text-xs uppercase tracking-widest text-white/80 font-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                   RÉPONSE
                 </span>
-                <h2 
-                  className="text-[48px] text-white leading-none mt-1 drop-shadow-lg"
-                  style={{ fontFamily: "'Jersey 15', sans-serif" }}
-                >
+                <h2 className="text-4xl sm:text-5xl text-white leading-none mt-1 drop-shadow-lg truncate w-full" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
                   {memory.title}
                 </h2>
               </div>
             </div>
-
-            {/* Description (400 words max limit style) */}
-            <div className="text-left mt-2">
-              <p 
-                className="text-sm text-white/90 leading-relaxed line-clamp-4 drop-shadow-md"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              >
+            {memory.description && (
+              <p className="text-sm text-white/90 leading-relaxed line-clamp-3 drop-shadow-md" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                 {memory.description}
               </p>
-            </div>
-            
+            )}
           </div>
+
         </div>
       )}
     </div>
   )
 
-  // Render the edit/create form (MEMO style)
-  const renderEditView = () => (
-    <div className="w-full h-full flex flex-col" style={{ padding: '0' }}>
-      {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto w-full flex flex-col items-center px-4 sm:px-12 pt-8 pb-2">
-        {/* MEMO Title */}
-        <h2 
-          className="text-5xl text-white mb-6 text-center uppercase tracking-wider font-bold"
-          style={{ 
-            fontFamily: "'Jersey 15', sans-serif"
-          }}
-        >
+  // ===========================================================================
+  // EDIT VIEW
+  // ===========================================================================
+  const renderEditView = () => {
+    const wordCount = formData.description.split(/\s+/).filter(Boolean).length;
+    
+    return (
+      <div className="w-full h-full flex flex-col pt-12 pb-10 px-[10%] overflow-y-auto bg-[#D9D9D9]" style={{ overflowX: 'hidden', boxSizing: 'border-box' }}>
+        
+        {/* MEMO Header */}
+        <h2 className="text-6xl md:text-7xl text-white mb-8 text-center uppercase tracking-widest drop-shadow-sm font-bold" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
           MEMO
         </h2>
 
-        {/* Question Buttons - wrapped and centered */}
-        <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4 mb-8 w-full max-w-full">
+        {/* Categories - Added gap-4 md:gap-6 for spacing */}
+        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-12 w-full">
           {QUESTION_ORDER.map((q) => {
             const color = QUESTION_COLORS[q] || '#888888'
             const isSelected = formData.question === q
@@ -344,14 +294,11 @@ export function MemoryModal({
                 key={q}
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, question: q }))}
-                className="px-4 sm:px-5 py-2 rounded-full cursor-pointer uppercase text-white font-bold tracking-wide text-xs sm:text-sm whitespace-nowrap"
+                className="px-6 py-2 rounded-md border-[3px] border-black cursor-pointer uppercase text-white font-bold tracking-wide text-sm md:text-base shadow-sm transition-transform hover:scale-105"
                 style={{ 
                   backgroundColor: color,
                   fontFamily: "'Jersey 15', sans-serif",
-                  border: isSelected ? '4px solid #000' : '4px solid #000',
-                  opacity: isSelected ? 1 : 0.7,
-                  flexShrink: 1,
-                  minWidth: '0', 
+                  opacity: isSelected ? 1 : 0.6,
                 }}
               >
                 {q}
@@ -360,32 +307,30 @@ export function MemoryModal({
           })}
         </div>
 
-        {/* Title Row */}
-        <div className="flex items-center justify-start gap-4 mb-6 w-full max-w-3xl overflow-hidden box-border">
-          <span 
-            className="text-2xl sm:text-3xl font-bold text-black uppercase tracking-wide whitespace-nowrap"
-            style={{ fontFamily: "'Jersey 15', sans-serif" }}
-          >
-            TITRE :
-          </span>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-            placeholder="SANS TITRE"
-            className="text-2xl sm:text-3xl font-bold bg-transparent border-none outline-none uppercase tracking-wide flex-1 w-full min-w-0"
-            style={{ 
-              fontFamily: "'Jersey 15', sans-serif",
-              color: '#000',
-            }}
-          />
+        {/* Title Row - Flexbox trick to keep input perfectly centered while TITRE stays left */}
+        <div className="flex flex-row items-center w-full mb-10">
+          <div className="w-1/4 flex justify-start">
+            <span className="text-3xl md:text-4xl font-bold text-black uppercase tracking-widest" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
+              TITRE :
+            </span>
+          </div>
+          
+          <div className="w-2/4 flex justify-center">
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="SANS TITRE"
+              className="text-3xl md:text-4xl font-bold bg-transparent border-none outline-none text-center uppercase tracking-widest w-full text-black placeholder:text-black/50"
+              style={{ fontFamily: "'Jersey 15', sans-serif" }}
+            />
+          </div>
+
+          <div className="w-1/4"></div> {/* Invisible spacer to balance the flex layout */}
         </div>
 
-        {/* Lined Notepad Area for Description */}
-        <div 
-          className="relative w-full max-w-3xl flex-grow mb-6 mt-4 box-border"
-          style={{ minHeight: '180px' }}
-        >
+        {/* Lined Notepad Area — fixed at 4 lines, scrolls internally */}
+        <div className="mb-8" style={{ height: 'calc(4 * 3rem)', overflow: 'hidden' }}>
           <textarea
             value={formData.description}
             onChange={(e) => {
@@ -394,65 +339,52 @@ export function MemoryModal({
                 setFormData(prev => ({ ...prev, description: e.target.value }))
               }
             }}
-            placeholder=""
-            className="w-full h-full bg-transparent border-0 outline-none focus:outline-none focus:ring-0 resize-none z-10 text-base box-border"
+            className="w-full bg-transparent border-0 outline-none resize-none text-lg md:text-xl font-medium"
             style={{ 
               fontFamily: "'Montserrat', sans-serif",
-              color: '#333',
-              lineHeight: '2rem',
-              backgroundImage: 'linear-gradient(transparent, transparent 31px, #000 31px, #000 32px)',
-              backgroundSize: '100% 32px',
-              paddingTop: '0px',
-              boxSizing: 'border-box'
+              color: '#1a1a1a',
+              lineHeight: '3rem',
+              height: 'calc(4 * 3rem)',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              display: 'block',
+              backgroundImage: 'linear-gradient(transparent, transparent calc(3rem - 1px), #888 calc(3rem - 1px), #888 3rem)',
+              backgroundSize: '100% 3rem',
+              boxSizing: 'border-box',
             }}
           />
         </div>
-      </div>
 
-      {/* FIXED BOTTOM SECTION */}
-      <div className="w-full flex flex-col flex-shrink-0 bg-transparent px-4 sm:px-12 pt-2 pb-8">
-        {/* URL and Counter Row */}
-        <div className="flex justify-between items-end w-full max-w-3xl mx-auto mb-6">
-          <div className="flex items-center gap-3">
-            <span 
-              className="text-2xl text-[#FF3B30] uppercase tracking-wide whitespace-nowrap font-bold"
-              style={{ fontFamily: "'Jersey 15', sans-serif" }}
-            >
+        {/* Bottom Section: URL & Words */}
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-end w-full mb-10 gap-4">
+          <div className="flex items-center gap-3 w-full sm:w-2/3">
+            <span className="text-3xl md:text-4xl text-[#FF3B30] uppercase tracking-wide font-bold whitespace-nowrap" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
               VIDEO URL:
             </span>
             <input
               type="text"
               value={formData.videoUrl}
               onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
-              placeholder=""
-              className="bg-transparent border-none outline-none text-base w-full max-w-[300px] flex-1 min-w-[150px]"
-              style={{ 
-                fontFamily: "'Montserrat', sans-serif",
-                color: '#333',
-              }}
+              placeholder="https://..."
+              className="bg-transparent border-none outline-none text-lg md:text-xl w-full text-black placeholder:text-black/30"
+              style={{ fontFamily: "'Montserrat', sans-serif" }}
             />
           </div>
-          <span 
-            className="text-2xl text-black font-bold"
-            style={{ fontFamily: "'Jersey 15', sans-serif" }}
-          >
-            {formData.description.split(/\s+/).filter(Boolean).length}/400
+          <span className="text-3xl md:text-4xl text-black font-bold whitespace-nowrap" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
+            {wordCount}/400
           </span>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-10 justify-center w-full mt-2">
+        <div className="flex justify-center gap-6 sm:gap-12 w-full mt-auto">
           <button
             type="button"
             onClick={() => {
-              if (memory.isFilled) {
-                setIsEditing(false)
-              } else {
-                onClose()
-              }
+              if (memory.isFilled) setIsEditing(false)
+              else onClose()
             }}
-            className="px-8 py-2 bg-white border-4 border-black text-black rounded-full font-bold uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors text-lg"
-            style={{ fontFamily: "'Jersey 15', sans-serif", minWidth: '150px' }}
+            className="px-8 md:px-12 py-2 md:py-3 bg-white text-black rounded-full font-bold uppercase tracking-widest cursor-pointer hover:bg-gray-100 transition-colors text-xl md:text-2xl shadow-sm border-2 border-black/10"
+            style={{ fontFamily: "'Jersey 15', sans-serif" }}
           >
             ANNULER
           </button>
@@ -460,15 +392,15 @@ export function MemoryModal({
             type="button"
             onClick={handleSave}
             disabled={!formData.question || !formData.title.trim()}
-            className="px-8 py-2 bg-black text-white rounded-full font-bold uppercase tracking-wide cursor-pointer hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg border-4 border-transparent"
-            style={{ fontFamily: "'Jersey 15', sans-serif", minWidth: '150px' }}
+            className="px-8 md:px-12 py-2 md:py-3 bg-black text-white rounded-full font-bold uppercase tracking-widest cursor-pointer hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xl md:text-2xl shadow-sm border-2 border-transparent"
+            style={{ fontFamily: "'Jersey 15', sans-serif" }}
           >
             CONFIRMER
           </button>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <AnimatePresence>
@@ -478,65 +410,56 @@ export function MemoryModal({
           onRequestClose={onClose}
           style={customStyles}
           closeTimeoutMS={200}
-          contentLabel={memory.title}
+          contentLabel={memory.title || "Memory Modal"}
           shouldCloseOnOverlayClick={true}
           shouldCloseOnEsc={true}
-          ariaHideApp={true}
+          ariaHideApp={false}
         >
           <motion.div
             variants={modalVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="relative h-full flex flex-col" 
+            className="relative flex flex-col shadow-2xl w-full"
             style={{
+              height: '70vh',
               backgroundColor: isEditing ? '#D9D9D9' : 'transparent',
               border: isEditing ? '6px solid #FF3B30' : `6px solid ${borderColor}`,
-              borderRadius: '16px',
-              boxShadow: '0 0 40px rgba(0,0,0,0.3)',
+              borderRadius: '24px',
               overflow: 'hidden',
-              width: '100%',
-              flex: 1,
-              boxSizing: 'border-box'
+              overflowX: 'hidden',
+              boxSizing: 'border-box',
             }}
           >
-            {/* Button Modifier */}
+            {/* Modifier Button */}
             {memory.isFilled && !isEditing && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsEditing(true)}
-                className="absolute z-50 cursor-pointer bg-white/95 hover:bg-white text-black shadow-xl rounded-full border border-black/10"
-                style={{ 
-                  top: '18px',     
-                  left: '18px', 
-                  padding: '8px 20px',   
-                  fontSize: '0.95rem',   
-                  fontWeight: '600',     
-                  fontFamily: "'Montserrat', sans-serif",
-                }}
+                className="absolute z-50 cursor-pointer bg-white/95 hover:bg-white text-black shadow-xl rounded-full border border-black/10 transition-colors"
+                style={{ top: '20px', left: '20px', padding: '8px 24px', fontSize: '1rem', fontWeight: '600', fontFamily: "'Montserrat', sans-serif" }}
                 type="button"
               >
                 Modifier
               </motion.button>
             )}
 
-            {/* Button Close Modal*/}
+            {/* Close Button */}
             <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={onClose}
-              className="absolute z-50 cursor-pointer bg-[#FF3B30] w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
-              style={{ 
-                  top: '16px', 
-                  right: '16px' 
-              }}
+              className="absolute z-50 cursor-pointer bg-[#FF3B30] w-12 h-12 rounded-full flex items-center justify-center shadow-md transition-transform"
+              style={{ top: '16px', right: '16px' }}
               aria-label="Close modal"
               type="button"
             >
-              <X size={20} strokeWidth={4} className="text-white" />
+              <X size={28} strokeWidth={4} className="text-white" />
             </motion.button>
             
-            {/* Contenu */}
-            <div className="w-full flex-1 flex flex-col min-h-0">
+            {/* Main Content Area */}
+            <div className="w-full flex-1 flex flex-col overflow-y-auto" style={{ overflowX: 'hidden' }}>
               {isEditing ? renderEditView() : (memory.isFilled ? renderFilledView() : renderEditView())}
             </div>
           </motion.div>

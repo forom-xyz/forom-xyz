@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search, X, Mail } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Mail } from 'lucide-react'
 import cedilleIcon from '../assets/icons/cedille.png'
 import etsIcon from '../assets/icons/ets.jpg'
 import userIcon from '../assets/icons/user.png'
@@ -74,69 +74,35 @@ export function Header({ onTokenClick, onSupportClick, isDark = false }: HeaderP
           <img src={etsIcon} alt="ÉTS Montréal" className="w-full h-full object-contain rounded" />
         </motion.a>
 
-        {/* Search Icon / Expanded Search Bar */}
-        <div className="shrink-0">
-          <AnimatePresence mode="wait">
-            {!isSearchActive ? (
-              <motion.button
-                key="search-trigger"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                onClick={() => setIsSearchActive(true)}
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                className="cursor-pointer bg-transparent border-none outline-none"
-                style={{ color: isDark ? '#a1a1aa' : '#18181b' }}
-                aria-label="Open search"
-              >
-                <Search size={22} strokeWidth={2.5} />
-              </motion.button>
-            ) : (
-              <motion.div
-                key="search-bar"
-                initial={{ opacity: 0, width: 44 }}
-                animate={{ opacity: 1, width: 280 }}
-                exit={{ opacity: 0, width: 44 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                className="flex items-center gap-2 rounded-full px-3 py-1.5 border-2 transition-colors duration-300"
-                style={{
-                  backgroundColor: isDark ? '#18181b' : '#ffffff',
-                  borderColor: isDark ? '#3f3f46' : '#d4d4d8',
-                }}
-              >
-                <Search size={18} className="shrink-0" style={{ color: isDark ? '#71717a' : '#a1a1aa' }} />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Escape' && handleCloseSearch()}
-                  placeholder="Search FOROM..."
-                  className="flex-1 bg-transparent outline-none text-sm transition-colors duration-300"
-                  style={{
-                    color: isDark ? '#fafafa' : '#18181b',
-                    fontFamily: 'Inter, system-ui, sans-serif',
-                  }}
-                />
-                <motion.button
-                  onClick={handleCloseSearch}
-                  whileHover={{ scale: 1.15 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="shrink-0 p-0.5 rounded-full cursor-pointer transition-colors duration-300"
-                  style={{
-                    backgroundColor: isDark ? '#27272a' : '#f4f4f5',
-                    color: isDark ? '#a1a1aa' : '#71717a',
-                  }}
-                  aria-label="Close search"
-                >
-                  <X size={16} />
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        {/* Search – circle expand animation */}
+        <form
+          className="forom-search-form"
+          onSubmit={(e) => e.preventDefault()}
+        >
+          <input
+            ref={searchInputRef}
+            type="text"
+            className={`forom-search-input${isSearchActive ? ' forom-search-square' : ''}`}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Escape' && handleCloseSearch()}
+            placeholder={isSearchActive ? 'Search FOROM...' : ''}
+            readOnly={!isSearchActive}
+            aria-label="Search"
+          />
+          <button
+            type="button"
+            className={`forom-search-btn${isSearchActive ? ' forom-search-close' : ''}`}
+            onClick={() => {
+              if (isSearchActive) {
+                handleCloseSearch()
+              } else {
+                setIsSearchActive(true)
+              }
+            }}
+            aria-label={isSearchActive ? 'Close search' : 'Open search'}
+          />
+        </form>
       </div>
 
       {/* ---- Center: FOROM Logo ---- */}
