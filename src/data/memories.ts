@@ -15,6 +15,26 @@ export const WH_QUESTIONS = [
 
 export type WhQuestion = (typeof WH_QUESTIONS)[number]
 
+export const QUESTION_COLORS: Record<string, string> = {
+  'QUI?': '#F59E0B',
+  'QUOI?': '#FACC15',
+  'OU?': '#84CC16',
+  'QUAND?': '#10B981',
+  'COMMENT?': '#0EA5E9',
+  'COMBIEN?': '#4F46E5',
+  'POURQUOI?': '#8B5CF6',
+}
+
+export const QUESTION_ORDER: WhQuestion[] = [
+  'QUI?',
+  'QUOI?',
+  'OU?',
+  'QUAND?',
+  'COMMENT?',
+  'COMBIEN?',
+  'POURQUOI?',
+]
+
 export interface Memory {
   /** Unique identifier for the memory */
   id: string

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence, easeOut, easeIn } from 'framer-motion'
 import { MemoryBox } from './MemoryBox'
 import { MemoryModal } from './MemoryModal'
-import { getMemory, ITEMS_PER_ROW } from '../data/memories'
+import { getMemory, ITEMS_PER_ROW, QUESTION_ORDER, QUESTION_COLORS } from '../data/memories'
 import type { Memory, CategoryType } from '../data/memories'
 
 // =============================================================================
@@ -38,7 +38,7 @@ const MAX_HORIZONTAL_INDEX = ITEMS_PER_ROW - 1
 /** Shared styles for navigation buttons */
 const getNavButtonStyle = (isDark: boolean): React.CSSProperties => ({
   fontFamily: "'Jersey 15', sans-serif",
-  fontSize: '42px',
+  fontSize: '28px',
   color: isDark ? '#ffffff' : '#000000',
   background: 'none',
   border: 'none',
@@ -295,6 +295,52 @@ export function CarouselGrid({
   }
 
   // ---------------------------------------------------------------------------
+  // Filters handlers 
+  // ---------------------------------------------------------------------------
+
+  const handleQuestionClick = useCallback((questionStr: string) => {
+    let closestRow = -1
+    let closestCol = -1
+    let minDistance = Infinity
+
+    // Search through all categories and items to find the closest match
+    for (let c = 0; c < categories.length; c++) {
+      const cat = categories[c] as CategoryType
+      for (let i = 0; i < ITEMS_PER_ROW; i++) {
+        const mem = getMemory(cat, i)
+        
+        // Match if it has the right question
+        if (mem && mem.question === questionStr) {
+          // Calculate a simple distance metric (row distance heavily weighted to prefer current row, plus horizontal distance)
+          const rowDist = Math.abs(c - activeIndex)
+          const colDist = Math.abs(i - horizontalIndex)
+          // Weight row distance more so we prefer staying in the same category if possible
+          const dist = (rowDist * 100) + colDist
+
+          if (dist < minDistance) {
+            minDistance = dist
+            closestRow = c
+            closestCol = i
+          }
+        }
+      }
+    }
+
+    if (closestRow !== -1 && closestCol !== -1) {
+      // 1. Change category if needed
+      if (closestRow !== activeIndex) {
+        onCategoryChange(categories[closestRow])
+      }
+      
+      // 2. Slide horizontally
+      if (closestCol !== horizontalIndex) {
+        setSlideDirection(closestCol > horizontalIndex ? 'right' : 'left')
+        setHorizontalIndex(closestCol)
+      }
+    }
+  }, [activeIndex, categories, horizontalIndex, onCategoryChange])
+
+  // ---------------------------------------------------------------------------
   // Grid Render Logic
   // ---------------------------------------------------------------------------
 
@@ -378,8 +424,38 @@ export function CarouselGrid({
   return (
     <div
       className="absolute flex flex-col items-center justify-center z-10 pointer-events-none"
-      style={{ top: 0, bottom: 0, left: '80px', right: 0, paddingBottom: '30px' }}
+      style={{ top: 0, bottom: 0, left: 0, right: 0, paddingBottom: '30px' }}
     >
+      
+      {/* ------------------------------------------------------------------------
+          Top Question Filters
+      -------------------------------------------------------------------------- */}
+      <div 
+        className="absolute w-full flex flex-wrap justify-center items-center pointer-events-auto z-40 px-4" 
+        style={{ top: 'max(9%, 80px)', gap: '1.5%' }}
+      >
+        {QUESTION_ORDER.map((q) => {
+          const color = QUESTION_COLORS[q] || '#888888'
+          return (
+            <button
+              key={q}
+              onClick={() => handleQuestionClick(q)}
+              className="cursor-pointer uppercase text-white font-bold tracking-wide shadow-sm transition-transform hover:scale-105 mb-2"
+              style={{
+                backgroundColor: color,
+                fontFamily: "'Jersey 15', sans-serif",
+                fontSize: 'clamp(14px, 1.5vw, 20px)',
+                borderRadius: '8px',
+                padding: '6px clamp(10px, 1.5vw, 20px)',
+                border: '3px solid black',
+              }}
+            >
+              {q}
+            </button>
+          )
+        })}
+      </div>
+
       {/* Main Content - Grid centered, Vertical Navigation positioned separately */}
       <div ref={gridRef} className="relative flex items-center justify-center pointer-events-auto">
         {/* 3x5 Grid - centered */}
@@ -397,7 +473,7 @@ export function CarouselGrid({
         {/* Vertical Navigation - positioned to the right of grid */}
         <nav
           className="fixed flex flex-col items-center justify-center pointer-events-auto z-50"
-          style={{ gap: '15px', right: '3%', top: '50%', transform: 'translateY(-50%)', marginRight: '14px' }}
+          style={{ gap: '8px', right: '1%', top: '50%', transform: 'translateY(-50%)' }}
           aria-label="Category navigation"
         >
           <motion.button
@@ -405,17 +481,17 @@ export function CarouselGrid({
             whileTap={{ scale: 0.9 }}
             onClick={handlePrevCategory}
             className="nav-button"
-            style={{ ...getNavButtonStyle(isDark), transform: 'rotate(90deg)' }}
+            style={getNavButtonStyle(isDark)}
             aria-label="Previous category"
           >
-            {'<'}
+            <span style={{ display: 'inline-block', transform: 'rotate(90deg)' }}>{'<'}</span>
           </motion.button>
 
           {/* Vertical Slider Track */}
           <div
             ref={verticalTrackRef}
             className="flex flex-col items-center justify-center relative"
-            style={{ height: '200px', width: '24px', cursor: 'pointer' }}
+            style={{ height: '130px', width: '16px', cursor: 'pointer' }}
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect()
               const y = e.clientY - rect.top
@@ -433,11 +509,11 @@ export function CarouselGrid({
               <div
                 className="absolute rounded-full left-1/2 -translate-x-1/2"
                 style={{
-                    width: '32px',
-                    height: '32px',
+                    width: '18px',
+                    height: '18px',
                     backgroundColor: isDark ? '#ffffff' : '#000000',
-                    boxShadow: isDark ? '0 6px 18px rgba(0,0,0,0.6)' : '0 6px 18px rgba(0,0,0,0.35)',
-                    border: isDark ? '3px solid rgba(0,0,0,0.6)' : '3px solid rgba(255,255,255,0.85)',
+                    boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.6)' : '0 4px 12px rgba(0,0,0,0.35)',
+                    border: isDark ? '2px solid rgba(0,0,0,0.6)' : '2px solid rgba(255,255,255,0.85)',
                     zIndex: 40,
                     top: `${(activeIndex / Math.max(1, categories.length - 1)) * 100}%`,
                     cursor: 'grab',
@@ -451,10 +527,10 @@ export function CarouselGrid({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleNextCategory}
-            style={{ ...getNavButtonStyle(isDark), transform: 'rotate(90deg)' }}
+            style={getNavButtonStyle(isDark)}
             aria-label="Next category"
           >
-            {'>'}
+            <span style={{ display: 'inline-block', transform: 'rotate(-90deg)' }}>{'<'}</span>
           </motion.button>
         </nav>
       </div>
@@ -462,7 +538,7 @@ export function CarouselGrid({
       {/* Horizontal Navigation - Below Grid */}
       <nav
         className="fixed flex items-center justify-center pointer-events-auto z-50"
-        style={{ bottom: '48px', left: 'calc(50% + 40px)', transform: 'translateX(-50%)', gap: '30px' }}
+        style={{ bottom: '16px', left: '50%', transform: 'translateX(-50%)', gap: '16px' }}
         aria-label="Video navigation"
       >
         <motion.button
@@ -479,7 +555,7 @@ export function CarouselGrid({
         <div
           ref={horizontalTrackRef}
           className="flex items-center justify-center relative"
-          style={{ width: '300px', height: '24px', cursor: 'pointer' }}
+          style={{ width: '200px', height: '16px', cursor: 'pointer' }}
           onClick={(e) => {
             const rect = e.currentTarget.getBoundingClientRect()
             const x = e.clientX - rect.left
@@ -497,13 +573,13 @@ export function CarouselGrid({
             <div
               className="absolute rounded-full top-1/2 -translate-x-1/2 -translate-y-1/2"
               style={{
-                width: '32px',
-                height: '32px',
+                width: '18px',
+                height: '18px',
                 backgroundColor: isDark ? '#ffffff' : '#000000',
-                boxShadow: isDark ? '0 6px 18px rgba(0,0,0,0.6)' : '0 6px 18px rgba(0,0,0,0.35)',
-                border: isDark ? '3px solid rgba(0,0,0,0.6)' : '3px solid rgba(255,255,255,0.85)',
+                boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.6)' : '0 4px 12px rgba(0,0,0,0.35)',
+                border: isDark ? '2px solid rgba(0,0,0,0.6)' : '2px solid rgba(255,255,255,0.85)',
                 zIndex: 40,
-                left: `${(horizontalIndex / MAX_HORIZONTAL_INDEX) * 100}%`,
+                left: `${(horizontalIndex / ITEMS_PER_ROW) * 100}%`,
                 cursor: 'grab',
                 transition: isDraggingHorizontal ? 'none' : 'left 0.3s ease-out'
               }}

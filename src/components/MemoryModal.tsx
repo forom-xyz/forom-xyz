@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
-import { extractYouTubeId, hasVideo, updateMemory } from '../data/memories'
+import { X, Play } from 'lucide-react'
+import { extractYouTubeId, hasVideo, updateMemory, QUESTION_COLORS, QUESTION_ORDER } from '../data/memories'
 import type { Memory, WhQuestion, CategoryType } from '../data/memories'
 
 // =============================================================================
@@ -24,30 +24,6 @@ interface FormData {
   videoUrl: string
   description: string
 }
-
-// =============================================================================
-// QUESTION COLORS
-// =============================================================================
-
-const QUESTION_COLORS: Record<string, string> = {
-  'QUI?': '#F59E0B',
-  'QUOI?': '#FACC15',
-  'OU?': '#84CC16',
-  'QUAND?': '#10B981',
-  'COMMENT?': '#0EA5E9',
-  'COMBIEN?': '#4F46E5',
-  'POURQUOI?': '#8B5CF6',
-}
-
-const QUESTION_ORDER: WhQuestion[] = [
-  'QUI?',
-  'QUOI?',
-  'OU?',
-  'QUAND?',
-  'COMMENT?',
-  'COMBIEN?',
-  'POURQUOI?',
-]
 
 // =============================================================================
 // MODAL STYLES
@@ -116,6 +92,7 @@ export function MemoryModal({
 }: MemoryModalProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
+  const [inlineUrl, setInlineUrl] = useState('')
   const [formData, setFormData] = useState<FormData>({
     question: null,
     title: '',
@@ -131,6 +108,7 @@ export function MemoryModal({
         videoUrl: memory.videoUrl || '',
         description: memory.isFilled ? memory.description : '',
       })
+      setInlineUrl(memory.videoUrl || '')
       setIsEditing(!memory.isFilled)
       setIsVideoPlaying(false)
     }
@@ -148,6 +126,17 @@ export function MemoryModal({
 
   const videoId = extractYouTubeId(memory.videoUrl)
   const memoryHasVideo = hasVideo(memory)
+
+  /** Split text into N roughly equal chunks by character count */
+  const chunkText = (text: string, chunks: number): string[] => {
+    if (!text) return Array(chunks).fill('')
+    const chunkSize = Math.ceil(text.length / chunks)
+    const result: string[] = []
+    for (let i = 0; i < chunks; i++) {
+      result.push(text.slice(i * chunkSize, (i + 1) * chunkSize))
+    }
+    return result
+  }
 
   const handleSave = () => {
     if (!formData.question || !formData.title.trim()) return
@@ -169,102 +158,173 @@ export function MemoryModal({
   // ===========================================================================
   // FILLED VIEW
   // ===========================================================================
-  const renderFilledView = () => (
-    <div className="relative w-full flex flex-col" style={{ height: '85vh', overflow: 'hidden' }}>
+  const renderFilledView = () => {
+    const descChunks = chunkText(memory.description || '', 4)
+    const rowOpacities = [1, 0.75, 0.5, 0.25]
 
-      {/* Background layer: thumbnail stretched to full container */}
-      {memoryHasVideo && videoId ? (
-        isVideoPlaying ? (
-          <iframe
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-            allow="autoplay; encrypted-media; fullscreen"
-            allowFullScreen
-            className="absolute inset-0 w-full h-full border-none z-0"
-          />
+    return (
+      <div className="w-full h-full" style={{ position: 'relative', overflow: 'hidden', backgroundColor: '#D9D9D9', flex: 1, height: '100%', minHeight: '100%' }}>
+
+        {/* Background layer: thumbnail at 25% opacity or iframe at 100% */}
+        {memoryHasVideo && videoId ? (
+          isVideoPlaying ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+              allow="autoplay; encrypted-media; fullscreen"
+              allowFullScreen
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', zIndex: 0 }}
+            />
+          ) : (
+            <img
+              src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+              alt={memory.title}
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, opacity: 0.25 }}
+            />
+          )
         ) : (
-          <img
-            src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-            alt={memory.title}
-            className="absolute inset-0 w-full h-full object-cover z-0"
-          />
-        )
-      ) : (
-        <div className="absolute inset-0 w-full h-full bg-[#2a2a2e] z-0" />
-      )}
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#D9D9D9', zIndex: 0 }} />
+        )}
 
-      {/* 25% black overlay – always on top of background, below content */}
-      {!isVideoPlaying && (
-        <div className="absolute inset-0 z-10" style={{ backgroundColor: 'rgba(0,0,0,0.25)' }} />
-      )}
+        {/* Overlay content – hidden while video plays */}
+        {!isVideoPlaying && (
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%', zIndex: 20 }}>
 
-      {/* Overlay content – hidden while video plays */}
-      {!isVideoPlaying && (
-        <div className="relative z-20 flex flex-col justify-between h-full px-12 py-10">
-
-          {/* Top: URL */}
-          <div className="flex justify-center">
-            {memory.videoUrl ? (
-              <a
-                href={memory.videoUrl.startsWith('http') ? memory.videoUrl : `https://www.youtube.com/watch?v=${memory.videoUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-white/80 hover:text-white underline drop-shadow-md truncate max-w-lg"
-                style={{ fontFamily: "'Montserrat', sans-serif" }}
+            {/* Top Left: Modifier button */}
+            {memory.isFilled && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsEditing(true)}
+                className="bg-white text-black font-bold border-none cursor-pointer shadow-lg"
+                style={{
+                  position: 'absolute',
+                  top: '6%', 
+                  left: '6%',
+                  padding: '12px 30px',
+                  borderRadius: '30px',
+                  fontFamily: "'Montserrat', sans-serif", 
+                  fontSize: '22px',
+                  zIndex: 30
+                }}
+                type="button"
               >
-                {memory.videoUrl}
-              </a>
-            ) : (
-              <span className="text-xs text-white/40 italic" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                Aucune vidéo
-              </span>
+                Modifier
+              </motion.button>
             )}
-          </div>
 
-          {/* Center: play button */}
-          {memoryHasVideo && (
-            <div className="flex justify-center">
-              <button
+            {/* Top Center: Question badge + Title */}
+            <div style={{ position: 'absolute', top: '9%', left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', pointerEvents: 'none', zIndex: 30 }}>
+              {memory.question && (
+                <span
+                  className="text-white font-bold uppercase"
+                  style={{
+                    fontFamily: "'Jersey 15', sans-serif",
+                    fontSize: '32px',
+                    padding: '8px 40px',
+                    backgroundColor: QUESTION_COLORS[memory.question] || '#888',
+                    border: '4px solid black',
+                    borderRadius: '12px',
+                    pointerEvents: 'auto'
+                  }}
+                >
+                  {memory.question}
+                </span>
+              )}
+              <h2
+                className="text-black uppercase drop-shadow-sm"
+                style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '48px', lineHeight: 1.1, marginTop: '8px', textAlign: 'center', pointerEvents: 'auto' }}
+              >
+                {memory.title}
+              </h2>
+            </div>
+
+            {/* Center: Play button */}
+            {memoryHasVideo && (
+              <div
+                 className="cursor-pointer"
+                 style={{
+                   position: 'absolute',
+                   top: '50%',
+                   left: '50%',
+                   transform: 'translate(-50%, -50%)',
+                   zIndex: 40
+                 }}
                 onClick={() => setIsVideoPlaying(true)}
-                className="w-24 h-16 bg-white/90 hover:bg-white rounded-2xl flex items-center justify-center transition-all shadow-xl cursor-pointer border-none"
               >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-black ml-2">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              </button>
-            </div>
-          )}
-
-          {/* Bottom: question / answer + description */}
-          <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-end w-full">
-              <div className="flex flex-col items-start w-1/2">
-                <span className="text-xs uppercase tracking-widest text-white/80 font-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                  QUESTION
-                </span>
-                <h2 className="text-4xl sm:text-5xl text-white leading-none mt-1 drop-shadow-lg" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
-                  {memory.question || '?'}
-                </h2>
+                <Play
+                  size={100}
+                  fill="white"
+                  color="white"
+                  className="drop-shadow-2xl hover:scale-110 transition-transform"
+                />
               </div>
-              <div className="flex flex-col items-end text-right w-1/2">
-                <span className="text-xs uppercase tracking-widest text-white/80 font-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                  RÉPONSE
-                </span>
-                <h2 className="text-4xl sm:text-5xl text-white leading-none mt-1 drop-shadow-lg truncate w-full" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
-                  {memory.title}
-                </h2>
-              </div>
-            </div>
-            {memory.description && (
-              <p className="text-sm text-white/90 leading-relaxed line-clamp-3 drop-shadow-md" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                {memory.description}
-              </p>
             )}
-          </div>
 
-        </div>
-      )}
-    </div>
-  )
+            {/* Bottom Area: Fading text lines + URL row */}
+            <div style={{ position: 'absolute', bottom: '6%', left: '6%', right: '6%', display: 'flex', flexDirection: 'column', zIndex: 30 }}>
+              
+              {/* Description notepad area */}
+              <div 
+                className="w-full text-black overflow-hidden"
+                style={{ 
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 600,
+                  fontSize: '22px',
+                  lineHeight: '2.5rem',
+                  height: 'calc(4 * 2.5rem)',
+                  backgroundImage: 'linear-gradient(transparent, transparent calc(2.5rem - 1.5px), rgba(0,0,0,0.8) calc(2.5rem - 1.5px), rgba(0,0,0,0.8) 2.5rem)',
+                  backgroundSize: '100% 2.5rem',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 4,
+                  WebkitBoxOrient: 'vertical',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  // Fading out at the bottom
+                  WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)',
+                  maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)'
+                }}
+              >
+                {memory.description}
+              </div>
+
+              {/* URL Row */}
+              <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginTop: '24px' }}>
+                <span
+                  className="font-black uppercase text-black whitespace-nowrap"
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '24px' }}
+                >
+                  VIDEO URL:
+                </span>
+                <input
+                  type="text"
+                  value={inlineUrl}
+                  onChange={(e) => setInlineUrl(e.target.value)}
+                  onBlur={() => {
+                    const trimmed = inlineUrl.trim()
+                    const updatedMemory = updateMemory(
+                      memory.category as CategoryType,
+                      parseInt(memory.id.split('-')[1]),
+                      { videoUrl: trimmed || null }
+                    )
+                    if (updatedMemory && onMemoryUpdate) onMemoryUpdate(updatedMemory)
+                  }}
+                  className="flex-1 mx-4 bg-transparent border-none text-center text-black outline-none w-full"
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '20px', fontWeight: 600 }}
+                />
+                <span
+                  className="font-black uppercase text-white bg-black/30 rounded px-3 py-1 whitespace-nowrap"
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '20px' }}
+                >
+                  1:18:36
+                </span>
+              </div>
+            </div>
+
+          </div>
+        )}
+      </div>
+    )
+  }
 
   // ===========================================================================
   // EDIT VIEW
@@ -352,17 +412,17 @@ export function MemoryModal({
 
         {/* VIDEO URL + word count — above buttons */}
         <div className="absolute left-[10%] right-[10%] flex flex-row justify-between items-center" style={{ bottom: 'calc(10% + 60px)' }}>
-          <div className="flex items-center gap-3">
-            <span className="text-3xl md:text-4xl text-[#FF3B30] uppercase tracking-wide font-bold whitespace-nowrap" style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '35px' }}>
+          <div className="flex items-center w-full flex-1 mr-4">
+            <span className="font-black uppercase text-[#FF3B30] whitespace-nowrap" style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '24px' }}>
               VIDEO URL:
             </span>
             <input
               type="text"
               value={formData.videoUrl}
               onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
-              placeholder="https://..."
-              className="bg-transparent border-none outline-none text-lg md:text-xl w-full text-black placeholder:text-black/30"
-              style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '25px' }}
+              placeholder="HTTPS://..."
+              className="flex-1 mx-4 bg-transparent border-none text-center text-black outline-none w-full placeholder:text-black/30"
+              style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '20px', fontWeight: 600 }}
             />
           </div>
           <span className="text-3xl md:text-4xl text-black font-bold whitespace-nowrap" style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '35px' }}>
@@ -418,28 +478,14 @@ export function MemoryModal({
             className="relative flex flex-col shadow-2xl w-full"
             style={{
               height: '85vh',
-              backgroundColor: isEditing ? '#D9D9D9' : 'transparent',
+              backgroundColor: '#D9D9D9',
               border: isEditing ? '6px solid #FF3B30' : `6px solid ${borderColor}`,
-              borderRadius: '24px',
+              borderRadius: '26px',
               overflow: 'hidden',
               overflowX: 'hidden',
               boxSizing: 'border-box',
             }}
           >
-            {/* Modifier Button */}
-            {memory.isFilled && !isEditing && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsEditing(true)}
-                className="absolute z-50 cursor-pointer bg-white/95 hover:bg-white text-black shadow-xl rounded-full border border-black/10 transition-colors"
-                style={{ top: '20px', left: '20px', padding: '8px 24px', fontSize: '1rem', fontWeight: '600', fontFamily: "'Montserrat', sans-serif" }}
-                type="button"
-              >
-                Modifier
-              </motion.button>
-            )}
-
             {/* Close Button */}
             <motion.button
               whileHover={{ scale: 1.1 }}

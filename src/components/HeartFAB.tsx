@@ -2,6 +2,63 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // =============================================================================
+// VOXEL HEART SVG
+// =============================================================================
+
+/**
+ * 2-D pixel-art heart made of coloured SVG rects.
+ * Grid layout (9 × 8):
+ *   0 = transparent  1 = main red  2 = highlight  3 = shadow
+ */
+const PIXEL_GRID = [
+  [0, 2, 1, 0, 0, 0, 1, 2, 0],
+  [2, 2, 1, 1, 0, 1, 1, 1, 1],
+  [2, 1, 1, 1, 1, 1, 1, 1, 3],
+  [2, 1, 1, 1, 1, 1, 1, 3, 3],
+  [0, 2, 1, 1, 1, 1, 3, 3, 0],
+  [0, 0, 2, 1, 1, 3, 3, 0, 0],
+  [0, 0, 0, 2, 3, 3, 0, 0, 0],
+  [0, 0, 0, 0, 3, 0, 0, 0, 0],
+] as const
+
+const PIXEL_COLORS: Record<number, string> = {
+  1: '#E83030',
+  2: '#FF6060',
+  3: '#AA0000',
+}
+
+function VoxelHeart({ px = 10 }: { px?: number }) {
+  const cols = 9
+  const rows = 8
+  const w = cols * px
+  const h = rows * px
+  return (
+    <svg
+      width={w}
+      height={h}
+      viewBox={`0 0 ${w} ${h}`}
+      style={{ imageRendering: 'pixelated', display: 'block' }}
+      aria-hidden
+    >
+      {PIXEL_GRID.map((row, r) =>
+        row.map((cell, c) =>
+          cell !== 0 ? (
+            <rect
+              key={`${r}-${c}`}
+              x={c * px}
+              y={r * px}
+              width={px}
+              height={px}
+              fill={PIXEL_COLORS[cell]}
+            />
+          ) : null
+        )
+      )}
+    </svg>
+  )
+}
+
+// =============================================================================
 // CONSTANTS
 // =============================================================================
 
@@ -126,55 +183,57 @@ export function HeartFAB() {
   return (
     <div
       className="fixed z-50"
-      style={{ bottom: '100px', left: 'calc(50% + 40px)', transform: 'translateX(-50%)' }}
+      style={{ bottom: '56px', left: '50%', transform: 'translateX(-50%)' }}
       aria-label={`Heart counter: ${heartCount}`}
     >
-      {/* Floating heart particles */}
-      <div className="relative">
+      {/* Floating voxel heart particles */}
+      <div className="relative flex flex-col items-center">
         <AnimatePresence>
           {floatingHearts.map(({ id, dx }) => (
-            <motion.span
+            <motion.div
               key={id}
-              className="absolute pointer-events-none select-none text-base leading-none"
+              className="absolute pointer-events-none select-none"
               style={{ bottom: '100%', left: '50%' }}
-              initial={{ opacity: 1, x: dx - 8, y: 0, scale: 0.9 }}
-              animate={{ opacity: 0, x: dx + (Math.random() * 10 - 5), y: -72, scale: 1.6 }}
+              initial={{ opacity: 1, x: dx - 11, y: 0, scale: 0.8 }}
+              animate={{ opacity: 0, x: dx + (Math.random() * 10 - 5), y: -60, scale: 1.3 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.3, ease: [0.22, 1, 0.36, 1] }}
             >
-              ❤️
-            </motion.span>
+              <VoxelHeart px={3} />
+            </motion.div>
           ))}
         </AnimatePresence>
 
-        {/* Badge */}
+        {/* Count above the heart */}
+        <motion.span
+          key={heartCount}
+          aria-live="polite"
+          className="tabular-nums leading-none mb-1"
+          style={{
+            fontFamily: '"Jersey 15", sans-serif',
+            fontSize: '16px',
+            color: 'var(--color-text)',
+          }}
+          initial={{ y: -4, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+        >
+          {heartCount}
+        </motion.span>
+
+        {/* Voxel heart badge */}
         <motion.div
-          className="flex flex-col items-center gap-0 select-none"
-          style={{ color: 'var(--color-text)' }}
-          whileHover={{ scale: 1.06 }}
-          whileTap={{ scale: 0.96 }}
+          className="relative select-none cursor-default"
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.94 }}
           transition={{ type: 'spring', stiffness: 480, damping: 28 }}
         >
-          {/* Count – sits above the heart */}
-          <motion.span
-            key={heartCount}
-            className="font-jersey-10 text-2xl tabular-nums leading-none"
-            aria-live="polite"
-            initial={{ y: -6, opacity: 0 }}
-            animate={{ y: 0,  opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-          >
-            {heartCount}
-          </motion.span>
-
-          {/* Heart icon – pulses on each new heart, twice original size */}
-          <motion.span
-            className="leading-none text-[2rem]"
-            animate={floatingHearts.length > 0 ? { scale: [1, 1.45, 1] } : {}}
+          <motion.div
+            animate={floatingHearts.length > 0 ? { scale: [1, 1.3, 1] } : {}}
             transition={{ duration: 0.35, ease: 'easeOut' }}
           >
-            ❤️
-          </motion.span>
+            <VoxelHeart px={5} />
+          </motion.div>
         </motion.div>
       </div>
     </div>
