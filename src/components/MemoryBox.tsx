@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Play, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { getMemoryThumbnail, hasVideo, QUESTION_COLORS } from '../data/memories'
 import type { Memory } from '../data/memories'
 
@@ -17,6 +17,7 @@ export interface MemoryBoxProps {
   isDark?: boolean
   onClick?: () => void
   onInfoClick?: () => void
+  questionLabels?: Record<string, string>
 }
 
 // =============================================================================
@@ -44,6 +45,7 @@ export const MemoryBox = memo(function MemoryBox({
   isDark = false,
   onClick,
   onInfoClick,
+  questionLabels = {},
 }: MemoryBoxProps) {
   // Get dimensions from presets
   const dimensions = isCentered 
@@ -81,15 +83,6 @@ export const MemoryBox = memo(function MemoryBox({
       onInfoClick()
     }
   }
-
-  // Font size for question text based on size
-  const questionFontSize = isCentered 
-    ? 'clamp(14px, 1.2vw, 20px)' 
-    : isExtraSmall 
-      ? 'clamp(6px, 0.5vw, 8px)'
-      : isSmall 
-        ? 'clamp(8px, 0.8vw, 12px)'
-        : 'clamp(10px, 1vw, 14px)'
 
   return (
     <div className="flex flex-col items-center">
@@ -138,7 +131,7 @@ export const MemoryBox = memo(function MemoryBox({
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {question}
+                    {questionLabels[question] || question}
                   </span>
                 </div>
               )}

@@ -98,12 +98,36 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
           >
             <button
               onClick={onClose}
-              style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}
-              className="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer bg-[#FF4B4B] hover:bg-[#ff3333] transition-colors z-10"
+              style={{ 
+                position: 'absolute', 
+                top: '24px', 
+                right: '24px', 
+                zIndex: 100,
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#FF4B4B',
+                border: '3px solid black',
+                cursor: 'pointer',
+                boxShadow: '0 4px 0px rgba(0,0,0,1)'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#ff3333'
+                e.currentTarget.style.transform = 'translateY(2px)'
+                e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = '#FF4B4B'
+                e.currentTarget.style.transform = 'none'
+                e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
+              }}
               type="button"
               aria-label="Close modal"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>

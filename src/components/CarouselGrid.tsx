@@ -14,6 +14,7 @@ interface CarouselGridProps {
   activeCategory: string
   onCategoryChange: (category: string) => void
   isDark?: boolean
+  questionLabels?: Record<string, string>
 }
 
 // =============================================================================
@@ -57,6 +58,7 @@ export function CarouselGrid({
   activeCategory,
   onCategoryChange,
   isDark = false,
+  questionLabels = {},
 }: CarouselGridProps) {
   // Start at position 10 so center rectangle shows 10 (middle of 0-19)
   const [horizontalIndex, setHorizontalIndex] = useState(10)
@@ -412,6 +414,7 @@ export function CarouselGrid({
                   isDark={isDark}
                   onClick={() => handleBoxClick(rowOffset, col)}
                   onInfoClick={isCentered ? () => setIsModalOpen(true) : undefined}
+                  questionLabels={questionLabels}
                 />
               </motion.div>
             )
@@ -450,7 +453,7 @@ export function CarouselGrid({
                 border: '3px solid black',
               }}
             >
-              {q}
+              {questionLabels[q] || q}
             </button>
           )
         })}
@@ -606,6 +609,7 @@ export function CarouselGrid({
         borderColor={currentColor}
         index={activeIndex * ITEMS_PER_ROW + horizontalIndex}
         onMemoryUpdate={handleMemoryUpdate}
+        questionLabels={questionLabels}
       />
     </div>
   )

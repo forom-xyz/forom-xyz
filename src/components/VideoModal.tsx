@@ -135,11 +135,32 @@ export function VideoModal({
           {/* Right – Close button */}
           <button
             onClick={onClose}
+            style={{ 
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#FF4B4B',
+              border: '3px solid black',
+              cursor: 'pointer',
+              boxShadow: '0 4px 0px rgba(0,0,0,1)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = '#ff3333'
+              e.currentTarget.style.transform = 'translateY(2px)'
+              e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = '#FF4B4B'
+              e.currentTarget.style.transform = 'none'
+              e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
+            }}
             type="button"
             aria-label="Close modal"
-            className="w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-white shadow-lg transition-colors cursor-pointer"
           >
-            <X size={20} strokeWidth={3} />
+            <X size={24} color="white" strokeWidth={3} />
           </button>
         </div>
 

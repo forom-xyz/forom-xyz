@@ -16,6 +16,7 @@ export interface MemoryModalProps {
   borderColor?: string
   index?: number
   onMemoryUpdate?: (memory: Memory) => void
+  questionLabels?: Record<string, string>
 }
 
 interface FormData {
@@ -89,6 +90,7 @@ export function MemoryModal({
   borderColor = '#E5E7EB',
   index: _index,
   onMemoryUpdate,
+  questionLabels = {},
 }: MemoryModalProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
@@ -127,17 +129,6 @@ export function MemoryModal({
   const videoId = extractYouTubeId(memory.videoUrl)
   const memoryHasVideo = hasVideo(memory)
 
-  /** Split text into N roughly equal chunks by character count */
-  const chunkText = (text: string, chunks: number): string[] => {
-    if (!text) return Array(chunks).fill('')
-    const chunkSize = Math.ceil(text.length / chunks)
-    const result: string[] = []
-    for (let i = 0; i < chunks; i++) {
-      result.push(text.slice(i * chunkSize, (i + 1) * chunkSize))
-    }
-    return result
-  }
-
   const handleSave = () => {
     if (!formData.question || !formData.title.trim()) return
 
@@ -159,9 +150,6 @@ export function MemoryModal({
   // FILLED VIEW
   // ===========================================================================
   const renderFilledView = () => {
-    const descChunks = chunkText(memory.description || '', 4)
-    const rowOpacities = [1, 0.75, 0.5, 0.25]
-
     return (
       <div className="w-full h-full" style={{ position: 'relative', overflow: 'hidden', backgroundColor: '#D9D9D9', flex: 1, height: '100%', minHeight: '100%' }}>
 
@@ -191,25 +179,36 @@ export function MemoryModal({
 
             {/* Top Left: Modifier button */}
             {memory.isFilled && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 onClick={() => setIsEditing(true)}
-                className="bg-white text-black font-bold border-none cursor-pointer shadow-lg"
                 style={{
                   position: 'absolute',
                   top: '6%', 
                   left: '6%',
                   padding: '12px 30px',
-                  borderRadius: '30px',
-                  fontFamily: "'Montserrat', sans-serif", 
-                  fontSize: '22px',
-                  zIndex: 30
+                  borderRadius: '16px',
+                  backgroundColor: 'white',
+                  color: 'black',
+                  fontSize: '28px',
+                  fontFamily: "'Jersey 15', sans-serif",
+                  border: '4px solid black',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 0px rgba(0,0,0,1)',
+                  zIndex: 30,
+                  transition: 'transform 0.1s, box-shadow 0.1s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(2px)'
+                  e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'none'
+                  e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
                 }}
                 type="button"
               >
-                Modifier
-              </motion.button>
+                MODIFIER
+              </button>
             )}
 
             {/* Top Center: Question badge + Title */}
@@ -227,7 +226,7 @@ export function MemoryModal({
                     pointerEvents: 'auto'
                   }}
                 >
-                  {memory.question}
+                  {questionLabels[memory.question] || memory.question}
                 </span>
               )}
               <h2
@@ -363,7 +362,7 @@ export function MemoryModal({
                     border: '4px solid black',
                 }}
               >
-                {q}
+                {questionLabels[q] || q}
               </button>
             )
           })}
@@ -431,15 +430,33 @@ export function MemoryModal({
         </div>
 
         {/* Action Buttons — 10% from bottom */}
-        <div className="absolute flex" style={{ bottom: '7.5%', left: '50%', transform: 'translateX(-50%)', gap: '20%' }}>
+        <div className="absolute flex" style={{ bottom: '7.5%', left: '50%', transform: 'translateX(-50%)', gap: '30px' }}>
           <button
             type="button"
             onClick={() => {
               if (memory.isFilled) setIsEditing(false)
               else onClose()
             }}
-            className="bg-white text-black rounded-full font-bold uppercase tracking-widest cursor-pointer hover:bg-gray-100 transition-colors shadow-sm border-2 border-black/10"
-            style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '40px', padding: '10px 56px' }}
+            style={{ 
+              padding: '12px 40px', 
+              borderRadius: '16px', 
+              backgroundColor: '#444', 
+              color: 'white', 
+              fontSize: '32px', 
+              fontFamily: "'Jersey 15', sans-serif", 
+              border: '4px solid black', 
+              cursor: 'pointer',
+              boxShadow: '0 4px 0px rgba(0,0,0,1)',
+              transition: 'transform 0.1s, box-shadow 0.1s'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(2px)'
+              e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'none'
+              e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
+            }}
           >
             ANNULER
           </button>
@@ -447,8 +464,30 @@ export function MemoryModal({
             type="button"
             onClick={handleSave}
             disabled={!formData.question || !formData.title.trim()}
-            className="bg-black text-white rounded-full font-bold uppercase tracking-widest cursor-pointer hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border-2 border-transparent"
-            style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '40px', padding: '10px 50px' }}
+            style={{ 
+              padding: '12px 40px', 
+              borderRadius: '16px', 
+              backgroundColor: (!formData.question || !formData.title.trim()) ? 'rgba(255,255,255,0.4)' : 'white', 
+              color: (!formData.question || !formData.title.trim()) ? 'rgba(0,0,0,0.4)' : 'black', 
+              fontSize: '32px', 
+              fontFamily: "'Jersey 15', sans-serif", 
+              border: (!formData.question || !formData.title.trim()) ? '4px solid rgba(0,0,0,0.2)' : '4px solid black', 
+              cursor: (!formData.question || !formData.title.trim()) ? 'not-allowed' : 'pointer',
+              boxShadow: (!formData.question || !formData.title.trim()) ? 'none' : '0 4px 0px rgba(0,0,0,1)',
+              transition: 'transform 0.1s, box-shadow 0.1s'
+            }}
+            onMouseOver={(e) => {
+              if (formData.question && formData.title.trim()) {
+                e.currentTarget.style.transform = 'translateY(2px)'
+                e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+              }
+            }}
+            onMouseOut={(e) => {
+              if (formData.question && formData.title.trim()) {
+                e.currentTarget.style.transform = 'none'
+                e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
+              }
+            }}
           >
             CONFIRMER
           </button>
@@ -487,17 +526,40 @@ export function MemoryModal({
             }}
           >
             {/* Close Button */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <button
               onClick={onClose}
-              className="absolute z-50 cursor-pointer bg-[#FF3B30] w-12 h-12 rounded-full flex items-center justify-center shadow-md transition-transform"
-              style={{ top: '16px', right: '16px' }}
+              style={{ 
+                position: 'absolute', 
+                top: '24px', 
+                right: '24px', 
+                zIndex: 100,
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#FF4B4B',
+                border: '3px solid black',
+                cursor: 'pointer',
+                boxShadow: '0 4px 0px rgba(0,0,0,1)',
+                transition: 'transform 0.1s, box-shadow 0.1s'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#ff3333'
+                e.currentTarget.style.transform = 'translateY(2px)'
+                e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = '#FF4B4B'
+                e.currentTarget.style.transform = 'none'
+                e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
+              }}
               aria-label="Close modal"
               type="button"
             >
-              <X size={28} strokeWidth={4} className="text-white" />
-            </motion.button>
+              <X size={24} color="white" strokeWidth={3} />
+            </button>
             
             {/* Main Content Area */}
             <div className="w-full flex-1 flex flex-col overflow-y-auto" style={{ overflowX: 'hidden' }}>
