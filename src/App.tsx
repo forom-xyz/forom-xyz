@@ -15,9 +15,9 @@ import { Settings } from 'lucide-react'
 import { SettingsModal } from './components/SettingsModal'
 import { QUESTION_ORDER, QUESTION_COLORS } from './data/memories'
 
-// Leveling helper
+// Leveling helper — 10 XP per quest, 10 quests = lvl 1 (100 XP per level)
 export function getLevelAndTitle(xp: number) {
-  const level = Math.floor(xp / 100) + 1
+  const level = Math.floor(xp / 100)
   let title = 'Citoyen'
   if (level >= 100) title = 'Légende'
   else if (level >= 75) title = 'Soul'
@@ -235,15 +235,20 @@ function App() {
         personalQuests={personalQuests}
         acceptedQuestId={acceptedQuestId}
         questionLabels={questionLabels}
-        onCreateQuest={(title, reward, question) => {
-          setPersonalQuests(prev => [...prev, { id: Date.now().toString(), title, reward, question }])
+        categories={CATEGORIES as unknown as string[]}
+        onCreateQuest={(title, reward, question, category) => {
+          setPersonalQuests(prev => {
+            if (prev.length >= 100) return prev
+            return [...prev, { id: Date.now().toString(), title, reward, question, category }]
+          })
         }}
         onAcceptQuest={(id) => setAcceptedQuestId(id)}
         onCompleteQuest={(id) => {
           const quest = personalQuests.find(q => q.id === id)
           if (quest) {
-            setPixels(p => p + quest.reward)
-            setXp(x => x + quest.reward)
+            // Fixed reward: 2.07 pixels + 10 XP per completed quest
+            setPixels(p => Math.round((p + 2.07) * 100) / 100)
+            setXp(x => x + 10)
             setPersonalQuests(prev => prev.filter(q => q.id !== id))
             if (acceptedQuestId === id) setAcceptedQuestId(null)
           }

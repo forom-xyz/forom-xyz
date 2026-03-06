@@ -1,8 +1,21 @@
 import ReactModal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { X } from 'lucide-react'
 import { QUESTION_ORDER, QUESTION_COLORS } from '../data/memories'
+
+// Category band colors — 5 bands of 20 quests each (matches Partenaires→Atelier order)
+const BAND_COLORS = [
+  '#86B89E', // #1–20   Partenaires (green)
+  '#C084FC', // #21–40  Culture (purple)
+  '#E85C5C', // #41–60  Clubs (red)
+  '#F4C98E', // #61–80  Trésorie (warm sand)
+  '#60A5FA', // #81–100 Atelier (blue)
+]
+function questBandColor(questNum: number): string {
+  const band = Math.min(Math.floor((questNum - 1) / 20), 4)
+  return BAND_COLORS[band]
+}
 
 // =============================================================================
 // TYPES
@@ -13,6 +26,7 @@ export interface Quest {
   title: string
   reward: number
   question: string | null
+  category: string
 }
 
 export interface QuestModalProps {
@@ -21,7 +35,8 @@ export interface QuestModalProps {
   personalQuests: Quest[]
   acceptedQuestId: string | null
   questionLabels: Record<string, string>
-  onCreateQuest: (title: string, reward: number, question: string | null) => void
+  categories?: string[]
+  onCreateQuest: (title: string, reward: number, question: string | null, category: string) => void
   onAcceptQuest: (id: string) => void
   onCompleteQuest: (id: string) => void
   onCancelQuest: (id: string) => void
@@ -89,23 +104,69 @@ export function QuestModal({
   onCreateQuest,
   onAcceptQuest,
   onCompleteQuest,
-  onCancelQuest
+  onCancelQuest,
+  categories = ['Partenaires', 'Culture', 'Clubs', 'Trésorie', 'Atelier']
 }: QuestModalProps) {
   const [activeTab, setActiveTab] = useState<'community' | 'personal'>('community')
   const [newTitle, setNewTitle] = useState('')
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string>(categories[0])
   const [wheelIndex, setWheelIndex] = useState(0)
+  const [boardSelectedId, setBoardSelectedId] = useState<string | null>(null)
+  const wheelRef = useRef<HTMLDivElement>(null)
+
+  const wheelQuests = useMemo(() => {
+    const arr = Array(100).fill(null)
+    const counts: Record<string, number> = {}
+    personalQuests.forEach(q => {
+      const cat = q.category || categories[0]
+      const catIdx = categories.indexOf(cat)
+      if (catIdx === -1) return
+      
+      const count = counts[cat] || 0
+      if (count < 20) {
+        arr[catIdx * 20 + count] = q
+        counts[cat] = count + 1
+      }
+    })
+    return arr
+  }, [personalQuests, categories])
+
+  const handleNativeWheel = useCallback((e: WheelEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setWheelIndex(prev => {
+      const delta = e.deltaY > 0 ? 1 : -1
+      return (((prev + delta) % 100) + 100) % 100
+    })
+  }, [])
+
+  useEffect(() => {
+    const el = wheelRef.current
+    if (!el) return
+    el.addEventListener('wheel', handleNativeWheel, { passive: false })
+    return () => el.removeEventListener('wheel', handleNativeWheel)
+  }, [handleNativeWheel, activeTab])
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault()
     if (!newTitle.trim()) return
-    onCreateQuest(newTitle, 100, selectedQuestion)
+    if (personalQuests.length >= 100) return
+
+    // Calculate where this new quest will land so we can scroll to it immediately
+    const catIdx = categories.indexOf(selectedCategory)
+    const countInCat = personalQuests.filter(q => (q.category || categories[0]) === selectedCategory).length
+    const targetIdx = Math.min(catIdx * 20 + countInCat, catIdx * 20 + 19)
+
+    onCreateQuest(newTitle, 2.07, selectedQuestion, selectedCategory)
     setNewTitle('')
     setSelectedQuestion(null)
+    
+    // Auto-scroll the wheel to the newly created quest's position
+    setWheelIndex(targetIdx)
   }
 
-  const n = personalQuests.length
-  const centeredQuestId = n > 0 ? personalQuests[((wheelIndex % n) + n) % n]?.id ?? null : null
+  const centeredQuestId = wheelQuests[wheelIndex]?.id ?? null
   return (
     <AnimatePresence>
       {isOpen && (
@@ -272,34 +333,298 @@ export function QuestModal({
 
               {/* Content Switching */}
               {activeTab === 'community' ? (
-                <div className="grid grid-cols-2 gap-16 text-white font-jetbrains text-sm leading-relaxed flex-1 mt-6">
-                  {/* Left Column - French */}
-                  <div className="space-y-6">
-                    <h3 className="font-jersey text-white text-[36px] border-b-2 border-dashed border-white/30 pb-2">Comment ça marche</h3>
-                    <p className="text-lg">
-                      Les quêtes sont des défis collectifs lancés par la communauté FOROM. Chaque défi accompli contribue à l'évolution de la plateforme et récompense les participants.
-                    </p>
-                    <ul className="space-y-4 text-base">
-                      <li><span className="font-bold text-[#FFD700] text-xl">Défis actifs :</span> Chaque semaine, de nouvelles quêtes sont publiées dans les différentes catégories de la grille. Consultez régulièrement pour ne rien manquer.</li>
-                      <li><span className="font-bold text-[#FFD700] text-xl">Gagner des pixels :</span> Compléter une quête vous rapporte des pixels, la monnaie de la plateforme. Plus le défi est complexe, plus la récompense est élevée.</li>
-                      <li><span className="font-bold text-[#FFD700] text-xl">Quêtes collaboratives :</span> Certaines quêtes nécessitent la coopération de plusieurs membres. Formez des équipes et cumulez vos efforts pour décrocher les récompenses les plus rares.</li>
-                      <li><span className="font-bold text-[#FFD700] text-xl">Classement :</span> Les contributeurs les plus actifs apparaissent dans le classement mensuel et reçoivent des bonus exclusifs en pixels.</li>
-                    </ul>
+                <div className="flex-1 flex w-full max-w-6xl mx-auto h-full overflow-hidden mt-6 pb-2" style={{ gap: '3%' }}>
+
+                  {/* LEFT: Active quest spotlight */}
+                  <div className="flex flex-col relative w-1/2 h-full">
+                    <div className="bg-[#D9D9D9] border-[5px] border-black rounded-[24px] p-8 flex flex-col items-center justify-start gap-6 relative flex-1 overflow-hidden">
+                      <h3 className="text-center text-[50px] text-white uppercase tracking-widest drop-shadow-sm font-bold flex-shrink-0 m-0 leading-none" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
+                        ACTIF
+                      </h3>
+
+                      {/* Active quest card */}
+                      <div className="flex-1 flex flex-col items-center justify-center w-full">
+                        {(() => {
+                          const active = personalQuests.find(q => q.id === acceptedQuestId)
+                          if (!active) {
+                            return (
+                              <div className="flex flex-col items-center justify-center gap-4 opacity-50">
+                                <div style={{
+                                  width: '80%',
+                                  borderRadius: '20px',
+                                  backgroundColor: '#E5B58E',
+                                  border: '5px dashed rgba(0,0,0,0.3)',
+                                  padding: '32px 24px',
+                                  textAlign: 'center',
+                                }}>
+                                  <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '28px', color: 'rgba(0,0,0,0.5)' }}>
+                                    AUCUNE QUÊTE ACTIVE
+                                  </span>
+                                </div>
+                                <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '18px', color: 'rgba(0,0,0,0.4)', textAlign: 'center' }}>
+                                  Sélectionne une quête depuis ton tableau
+                                </span>
+                              </div>
+                            )
+                          }
+                          const tagColor = active.question ? (QUESTION_COLORS[active.question] || '#888') : null
+                          const tagLabel = active.question ? (questionLabels[active.question] || active.question) : null
+                          return (
+                            <div style={{
+                              width: '85%',
+                              borderRadius: '20px',
+                              backgroundColor: '#FFA639',
+                              border: '5px solid black',
+                              boxShadow: '0 6px 0px rgba(0,0,0,0.9)',
+                              padding: '28px 24px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '14px',
+                            }}>
+                              {tagLabel && (
+                                <div style={{
+                                  backgroundColor: tagColor!,
+                                  borderRadius: '10px',
+                                  border: '3px solid black',
+                                  padding: '4px 20px',
+                                  fontFamily: "'Jersey 15', sans-serif",
+                                  fontSize: '22px',
+                                  color: 'white',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.08em',
+                                }}>
+                                  {tagLabel}
+                                </div>
+                              )}
+                              <span style={{
+                                fontFamily: "'Jersey 15', sans-serif",
+                                fontSize: '32px',
+                                color: 'black',
+                                textAlign: 'center',
+                                lineHeight: 1.2,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                              }}>
+                                {active.title}
+                              </span>
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                backgroundColor: 'rgba(0,0,0,0.12)',
+                                borderRadius: '10px',
+                                padding: '4px 16px',
+                              }}>
+                                <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '22px', color: 'black' }}>
+                                  +{active.reward} PX
+                                </span>
+                              </div>
+                            </div>
+                          )
+                        })()}
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex flex-shrink-0 justify-center items-center" style={{ gap: '20px', paddingBottom: 'max(3%, 24px)' }}>
+                        {acceptedQuestId ? (
+                          <>
+                            <button
+                              onClick={() => onCancelQuest(acceptedQuestId)}
+                              style={{
+                                padding: '12px 40px',
+                                borderRadius: '16px',
+                                backgroundColor: '#444',
+                                color: 'white',
+                                fontSize: '32px',
+                                fontFamily: "'Jersey 15', sans-serif",
+                                border: '4px solid black',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 0px rgba(0,0,0,1)',
+                                transition: 'transform 0.1s, box-shadow 0.1s',
+                                whiteSpace: 'nowrap',
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.transform = 'translateY(2px)'
+                                e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.transform = 'none'
+                                e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
+                              }}
+                            >
+                              ANNULER
+                            </button>
+                            <button
+                              onClick={() => onCompleteQuest(acceptedQuestId)}
+                              style={{
+                                padding: '12px 40px',
+                                borderRadius: '16px',
+                                backgroundColor: 'white',
+                                color: 'black',
+                                fontSize: '32px',
+                                fontFamily: "'Jersey 15', sans-serif",
+                                border: '4px solid black',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 0px rgba(0,0,0,1)',
+                                transition: 'transform 0.1s, box-shadow 0.1s',
+                                whiteSpace: 'nowrap',
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.transform = 'translateY(2px)'
+                                e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.transform = 'none'
+                                e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
+                              }}
+                            >
+                              COMPLÉTER
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => { if (boardSelectedId) onAcceptQuest(boardSelectedId) }}
+                            style={{
+                              padding: '12px 40px',
+                              borderRadius: '16px',
+                              backgroundColor: boardSelectedId ? 'white' : 'rgba(255,255,255,0.4)',
+                              color: boardSelectedId ? 'black' : 'rgba(0,0,0,0.4)',
+                              fontSize: '32px',
+                              fontFamily: "'Jersey 15', sans-serif",
+                              border: boardSelectedId ? '4px solid black' : '4px solid rgba(0,0,0,0.2)',
+                              cursor: boardSelectedId ? 'pointer' : 'not-allowed',
+                              boxShadow: boardSelectedId ? '0 4px 0px rgba(0,0,0,1)' : 'none',
+                              transition: 'transform 0.1s, box-shadow 0.1s',
+                              whiteSpace: 'nowrap',
+                            }}
+                            onMouseOver={(e) => {
+                              if (boardSelectedId) {
+                                e.currentTarget.style.transform = 'translateY(2px)'
+                                e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+                              }
+                            }}
+                            onMouseOut={(e) => {
+                              if (boardSelectedId) {
+                                e.currentTarget.style.transform = 'none'
+                                e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
+                              }
+                            }}
+                          >
+                            SÉLECTIONNER
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Right Column - English */}
-                  <div className="space-y-6 text-right">
-                    <h3 className="font-jersey text-white text-[36px] border-b-2 border-dashed border-white/30 pb-2">How It Works</h3>
-                    <p className="text-lg">
-                      Quests are collective challenges launched by the FOROM community. Every completed challenge contributes to the platform's growth and rewards participants.
-                    </p>
-                    <ul className="space-y-4 text-base">
-                      <li><span className="font-bold text-[#FFD700] text-xl">Active Challenges:</span> New quests are published weekly across the grid's categories. Check back regularly so you never miss an opportunity.</li>
-                      <li><span className="font-bold text-[#FFD700] text-xl">Earn Pixels:</span> Completing a quest earns you pixels, the platform's currency. The more complex the challenge, the higher the reward.</li>
-                      <li><span className="font-bold text-[#FFD700] text-xl">Collaborative Quests:</span> Some quests require cooperation from multiple members. Form teams, combine your efforts, and unlock the rarest rewards together.</li>
-                      <li><span className="font-bold text-[#FFD700] text-xl">Leaderboard:</span> The most active contributors appear on the monthly leaderboard and receive exclusive pixel bonuses.</li>
-                    </ul>
+                  {/* RIGHT: All quests board */}
+                  <div className="flex flex-col relative w-1/2 h-full">
+                    <div className="bg-[#D9D9D9] border-[5px] border-black rounded-[24px] flex flex-col relative flex-1 overflow-hidden">
+                      <h3 className="text-center text-[50px] text-white uppercase tracking-widest drop-shadow-sm font-bold flex-shrink-0 m-0 pt-3 pb-0 leading-none" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
+                        TABLEAU
+                      </h3>
+
+                      {/* Quest list */}
+                      <div className="flex-1 overflow-y-auto px-5 pb-5 pt-3" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,0,0,0.2) transparent' }}>
+                        {personalQuests.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center h-full gap-4 opacity-50">
+                            <div style={{
+                              borderRadius: '20px',
+                              backgroundColor: '#E5B58E',
+                              border: '5px dashed rgba(0,0,0,0.3)',
+                              padding: '32px 24px',
+                              textAlign: 'center',
+                              width: '80%',
+                            }}>
+                              <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '26px', color: 'rgba(0,0,0,0.5)' }}>
+                                AUCUNE QUÊTE
+                              </span>
+                            </div>
+                            <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '16px', color: 'rgba(0,0,0,0.4)', textAlign: 'center' }}>
+                              Crée des quêtes depuis l'onglet Q
+                            </span>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                            {personalQuests.map((q) => {
+                              const isActive = q.id === acceptedQuestId
+                              const isSelected = q.id === boardSelectedId
+                              const tagColor = q.question ? (QUESTION_COLORS[q.question] || '#888') : null
+                              const tagLabel = q.question ? (questionLabels[q.question] || q.question) : null
+                              return (
+                                <div
+                                  key={q.id}
+                                  onClick={() => setBoardSelectedId(isSelected ? null : q.id)}
+                                  style={{
+                                    borderRadius: '16px',
+                                    backgroundColor: isActive ? '#FFA639' : isSelected ? '#fff' : '#fff',
+                                    border: isSelected || isActive ? '4px solid black' : '4px solid rgba(0,0,0,0.25)',
+                                    boxShadow: isSelected || isActive ? '0 4px 0px rgba(0,0,0,0.8)' : '0 2px 0px rgba(0,0,0,0.2)',
+                                    padding: '10px 14px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '6px',
+                                    transition: 'all 0.15s cubic-bezier(0.34,1.2,0.64,1)',
+                                    transform: isSelected ? 'translateY(-2px)' : 'none',
+                                    opacity: isActive || isSelected ? 1 : 0.85,
+                                  }}
+                                >
+                                  {tagLabel && tagColor && (
+                                    <div style={{
+                                      display: 'inline-flex',
+                                      alignSelf: 'flex-start',
+                                      backgroundColor: tagColor,
+                                      borderRadius: '8px',
+                                      border: '2px solid black',
+                                      padding: '1px 10px',
+                                      fontFamily: "'Jersey 15', sans-serif",
+                                      fontSize: '16px',
+                                      color: 'white',
+                                      textTransform: 'uppercase',
+                                      letterSpacing: '0.06em',
+                                    }}>
+                                      {tagLabel}
+                                    </div>
+                                  )}
+                                  <span style={{
+                                    fontFamily: "'Jersey 15', sans-serif",
+                                    fontSize: '22px',
+                                    color: 'black',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.04em',
+                                    lineHeight: 1.15,
+                                  }}>
+                                    {q.title}
+                                  </span>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '17px', color: 'rgba(0,0,0,0.5)' }}>
+                                      +{q.reward} PX
+                                    </span>
+                                    {isActive && (
+                                      <span style={{
+                                        fontFamily: "'Jersey 15', sans-serif",
+                                        fontSize: '15px',
+                                        backgroundColor: 'black',
+                                        color: '#FFA639',
+                                        borderRadius: '6px',
+                                        padding: '1px 8px',
+                                        letterSpacing: '0.06em',
+                                      }}>
+                                        ACTIF
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
+
                 </div>
               ) : (
                 <div className="flex-1 flex w-full max-w-6xl mx-auto h-full overflow-hidden mt-6 pb-2" style={{ gap: '3%' }}>
@@ -311,6 +636,34 @@ export function QuestModal({
                         IDÉES
                       </h3>
                       
+                      {/* Category selector */}
+                      <div className="flex flex-wrap justify-center items-center mb-2" style={{ gap: '8px', width: '90%' }}>
+                        {categories.map((cat) => {
+                          const isSelected = selectedCategory === cat
+                          return (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => setSelectedCategory(cat)}
+                              className="cursor-pointer uppercase font-bold tracking-wide transition-all"
+                              style={{
+                                backgroundColor: isSelected ? 'white' : 'rgba(255,255,255,0.4)',
+                                color: 'black',
+                                fontFamily: "'Jersey 15', sans-serif",
+                                fontSize: '20px',
+                                borderRadius: '8px',
+                                padding: '4px 16px',
+                                border: isSelected ? '3px solid black' : '3px solid rgba(0,0,0,0.2)',
+                                boxShadow: isSelected ? '0 2px 0px rgba(0,0,0,1)' : 'none',
+                                transform: isSelected ? 'translateY(-2px)' : 'none',
+                              }}
+                            >
+                              {cat}
+                            </button>
+                          )
+                        })}
+                      </div>
+
                       {/* Question tags — same design as MemoryModal */}
                       <div className="flex flex-wrap justify-center items-center" style={{ gap: '5%', width: '80%' }}>
                         {QUESTION_ORDER.map((tag) => {
@@ -367,37 +720,47 @@ export function QuestModal({
                         <div style={{ flex: '2' }} />
                       </form>
                       {/* Envoyer button — flex child, same pb/pt as SÉLECTIONNER for vertical alignment */}
-                      <div className="flex flex-shrink-0 justify-center items-center pt-4" style={{ paddingBottom: 'max(3%, 24px)' }}>
+                      <div className="flex flex-shrink-0 flex-col justify-center items-center pt-4" style={{ paddingBottom: 'max(3%, 24px)', gap: '8px' }}>
+                        {/* Quest count */}
+                        <span style={{
+                          fontFamily: "'Jersey 15', sans-serif",
+                          fontSize: '18px',
+                          color: personalQuests.length >= 100 ? '#c0392b' : 'rgba(0,0,0,0.45)',
+                          letterSpacing: '0.05em',
+                        }}>
+                          {personalQuests.length} / 100
+                        </span>
                         <button
                           form="quest-form"
                           type="submit"
+                          disabled={!newTitle.trim() || personalQuests.length >= 100}
                           style={{
                             padding: '12px 40px',
                             borderRadius: '16px',
-                            backgroundColor: !newTitle.trim() ? 'rgba(255,255,255,0.4)' : 'white',
-                            color: !newTitle.trim() ? 'rgba(0,0,0,0.4)' : 'black',
+                            backgroundColor: (!newTitle.trim() || personalQuests.length >= 100) ? 'rgba(255,255,255,0.4)' : 'white',
+                            color: (!newTitle.trim() || personalQuests.length >= 100) ? 'rgba(0,0,0,0.4)' : 'black',
                             fontSize: '32px',
                             fontFamily: "'Jersey 15', sans-serif",
-                            border: !newTitle.trim() ? '4px solid rgba(0,0,0,0.2)' : '4px solid black',
-                            cursor: !newTitle.trim() ? 'not-allowed' : 'pointer',
-                            boxShadow: !newTitle.trim() ? 'none' : '0 4px 0px rgba(0,0,0,1)',
+                            border: (!newTitle.trim() || personalQuests.length >= 100) ? '4px solid rgba(0,0,0,0.2)' : '4px solid black',
+                            cursor: (!newTitle.trim() || personalQuests.length >= 100) ? 'not-allowed' : 'pointer',
+                            boxShadow: (!newTitle.trim() || personalQuests.length >= 100) ? 'none' : '0 4px 0px rgba(0,0,0,1)',
                             transition: 'transform 0.1s, box-shadow 0.1s',
                             whiteSpace: 'nowrap',
                           }}
                           onMouseOver={(e) => {
-                            if (newTitle.trim()) {
+                            if (newTitle.trim() && personalQuests.length < 100) {
                               e.currentTarget.style.transform = 'translateY(2px)'
                               e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
                             }
                           }}
                           onMouseOut={(e) => {
-                            if (newTitle.trim()) {
+                            if (newTitle.trim() && personalQuests.length < 100) {
                               e.currentTarget.style.transform = 'none'
                               e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
                             }
                           }}
                         >
-                          ENVOYER
+                          {personalQuests.length >= 100 ? 'GRILLE PLEINE' : 'ENVOYER'}
                         </button>
                       </div>
                     </div>
@@ -412,13 +775,9 @@ export function QuestModal({
 
                       {/* Wheel area */}
                       <div
+                        ref={wheelRef}
                         className="flex-1 relative select-none"
-                        onWheel={(e) => {
-                          e.preventDefault()
-                          if (n <= 1) return
-                          setWheelIndex(prev => prev + (e.deltaY > 0 ? 1 : -1))
-                        }}
-                        style={{ cursor: n > 1 ? 'ns-resize' : 'default' }}
+                        style={{ cursor: 'ns-resize' }}
                       >
                         {/* Center highlight line removed per user request */}
 
@@ -437,82 +796,129 @@ export function QuestModal({
                         {(() => {
                           const ITEM_H = 80
                           const GAP = 14
-                          const slots = n === 0
-                            ? [-1, 0, 1]
-                            : n === 1 ? [0] : n === 2 ? [-1, 0, 1] : [-2, -1, 0, 1, 2]
+                          const slots = [-2, -1, 0, 1, 2]
 
                           return slots.map((offset) => {
                             const isCenter = offset === 0
                             const dist = Math.abs(offset)
-                            const opacity = dist === 0 ? 1 : dist === 1 ? 0.55 : 0.25
-                            // center is at 50%; others are stacked above/below with fixed px offset
+                            const opacity = dist === 0 ? 1 : dist === 1 ? 0.6 : 0.4
                             const topPct = 44
                             const topPx = offset * (ITEM_H + GAP)
-                            // center item fills exactly the highlight strip (left/right 8%)
-                            // outer items are slightly narrower for visual depth
                             const inset = isCenter ? '8%' : dist === 1 ? '12%' : '18%'
 
-                            if (n === 0) {
-                              return (
-                                <div
-                                  key={offset}
-                                  style={{
-                                    position: 'absolute',
-                                    left: inset,
-                                    right: inset,
-                                    height: `${ITEM_H}px`,
-                                    top: `calc(${topPct}% + ${topPx}px - ${ITEM_H / 2}px)`,
-                                    borderRadius: '20px',
-                                    backgroundColor: '#E5B58E',
-                                    border: '5px solid rgba(120,120,120,0.4)',
-                                    opacity: isCenter ? 0.7 : 0.35,
-                                    transition: 'all 0.2s',
-                                    zIndex: isCenter ? 5 : 3,
-                                  }}
-                                />
-                              )
+                            const realIdx = (((wheelIndex + offset) % 100) + 100) % 100
+                            const q = wheelQuests[realIdx]
+                            const isAccepted = q ? q.id === acceptedQuestId : false
+                            const questNum = realIdx + 1
+                            
+                            // Visuals
+                            const boxBorder = isCenter ? '4px solid black' : '3px solid rgba(0,0,0,0.3)'
+                            const boxShadow = isCenter ? '0 4px 0px rgba(0,0,0,0.8)' : 'none'
+                            const cursor = offset !== 0 ? 'pointer' : 'default'
+
+                            // Default empty styling
+                            let bgColor = '#9ca3af'
+                            if (q) {
+                              bgColor = questBandColor(questNum)
                             }
-
-                            const idx = ((((wheelIndex + offset) % n) + n) % n)
-                            const q = personalQuests[idx]
-                            const isAccepted = q?.id === acceptedQuestId
-
+                            
                             return (
                               <div
                                 key={offset}
-                                onClick={() => offset !== 0 && setWheelIndex(prev => prev + offset)}
+                                onClick={() => {
+                                  if (offset !== 0)
+                                    setWheelIndex((((wheelIndex + offset) % 100) + 100) % 100)
+                                }}
                                 style={{
                                   position: 'absolute',
                                   left: inset,
                                   right: inset,
                                   height: `${ITEM_H}px`,
                                   top: `calc(${topPct}% + ${topPx}px - ${ITEM_H / 2}px)`,
-                                  borderRadius: '20px',
+                                  borderRadius: '12px',
                                   display: 'flex',
                                   alignItems: 'center',
-                                  justifyContent: 'center',
-                                  cursor: offset !== 0 ? 'pointer' : 'default',
+                                  justifyContent: q ? 'center' : 'flex-start',
+                                  paddingLeft: q ? '0' : '24px',
+                                  cursor,
                                   transition: 'all 0.2s cubic-bezier(0.34,1.2,0.64,1)',
-                                  opacity,
-                                  backgroundColor: isCenter && isAccepted ? '#FFA639' : isCenter ? '#fff' : '#E5B58E',
-                                  border: isCenter ? '5px solid black' : '5px solid rgba(120,120,120,0.4)',
-                                  boxShadow: isCenter ? '0 4px 0px rgba(0,0,0,0.8)' : 'none',
+                                  opacity: isCenter ? 1 : opacity,
+                                  backgroundColor: bgColor,
+                                  border: boxBorder,
+                                  boxShadow,
                                   zIndex: isCenter ? 5 : 3,
+                                  overflow: 'hidden',
                                 }}
                               >
-                                <span
-                                  className="truncate px-4"
-                                  style={{
+                                {/* Accepted glow overlay */}
+                                {isCenter && isAccepted && (
+                                  <div style={{
+                                    position: 'absolute', inset: 0,
+                                    backgroundColor: 'rgba(255,255,255,0.25)',
+                                    borderRadius: '8px',
+                                    pointerEvents: 'none',
+                                  }} />
+                                )}
+                                
+                                {!q ? (
+                                  <span style={{
                                     fontFamily: "'Jersey 15', sans-serif",
-                                    fontSize: '26px',
-                                    color: isCenter ? 'black' : 'rgba(0,0,0,0.7)',
+                                    fontSize: isCenter ? '42px' : '34px',
+                                    color: 'white',
+                                    textShadow: '0px 2px 4px rgba(0,0,0,0.4)',
+                                    letterSpacing: '0.05em',
+                                    fontWeight: 'bold',
+                                    lineHeight: 1,
+                                    userSelect: 'none',
+                                    position: 'relative',
+                                    zIndex: 2,
+                                  }}>
+                                    {questNum}.
+                                  </span>
+                                ) : (
+                                  <div style={{ 
+                                    display: 'flex', 
+                                    flexDirection: 'column', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center',
                                     width: '100%',
-                                    textAlign: 'center',
-                                    display: 'block',
-                                  }}
-                                >
-                                  {q.question ? `${questionLabels[q.question] || q.question}: ` : ''}{q.title}
-                                </span>
+                                    position: 'relative',
+                                    zIndex: 2,
+                                    padding: '0 16px'
+                                  }}>
+                                    <span
+                                      style={{
+                                        fontFamily: "'Jersey 15', sans-serif",
+                                        fontSize: isCenter ? '32px' : '26px',
+                                        color: 'white',
+                                        textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                                        letterSpacing: '0.05em',
+                                        fontWeight: 'bold',
+                                        lineHeight: 1.1,
+                                        userSelect: 'none',
+                                        textAlign: 'center',
+                                        width: '100%',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                      }}
+                                    >
+                                      {q.title}
+                                    </span>
+                                    {isCenter && (
+                                      <span style={{
+                                        fontFamily: "'Jersey 15', sans-serif",
+                                        fontSize: '18px',
+                                        color: 'rgba(255,255,255,0.9)',
+                                        textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                                        letterSpacing: '0.05em',
+                                        marginTop: '2px'
+                                      }}>
+                                        #{questNum} • {q.category}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             )
                           })
