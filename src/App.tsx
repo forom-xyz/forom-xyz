@@ -5,6 +5,7 @@ import { Sidebar } from './components/Sidebar'
 import { CarouselGrid } from './components/CarouselGrid'
 import { WalletModal } from './components/WalletModal'
 import { QuestModal } from './components/QuestModal'
+import type { Quest } from './components/QuestModal'
 import { HeartFAB } from './components/HeartFAB'
 
 // Import Icons
@@ -13,6 +14,18 @@ import { Settings } from 'lucide-react'
 
 import { SettingsModal } from './components/SettingsModal'
 import { QUESTION_ORDER, QUESTION_COLORS } from './data/memories'
+
+// Leveling helper
+export function getLevelAndTitle(xp: number) {
+  const level = Math.floor(xp / 100) + 1
+  let title = 'Citoyen'
+  if (level >= 100) title = 'Légende'
+  else if (level >= 75) title = 'Soul'
+  else if (level >= 50) title = 'Lumière'
+  else if (level >= 25) title = 'Mage'
+  
+  return { level, title }
+}
 
 // =============================================================================
 // CONSTANTS
@@ -72,6 +85,14 @@ function App() {
   const [activeModal, setActiveModal] = useState<'token' | 'support' | null>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
+
+  // Economy & Leveling State
+  const [pixels, setPixels] = useState(0)
+  const [xp, setXp] = useState(0)
+  const [personalQuests, setPersonalQuests] = useState<Quest[]>([])
+  const [acceptedQuestId, setAcceptedQuestId] = useState<string | null>(null)
+
+  const { level, title } = getLevelAndTitle(xp)
 
   // Initialize customizable labels
   const [categoryLabels, setCategoryLabels] = useState<Record<string, string>>(() => {
@@ -202,11 +223,34 @@ function App() {
       <WalletModal
         isOpen={activeModal === 'token'}
         onClose={() => setActiveModal(null)}
+        pixels={pixels}
+        level={level}
+        title={title}
+        xp={xp}
       />
 
       <QuestModal
         isOpen={activeModal === 'support'}
         onClose={() => setActiveModal(null)}
+        personalQuests={personalQuests}
+        acceptedQuestId={acceptedQuestId}
+        questionLabels={questionLabels}
+        onCreateQuest={(title, reward, question) => {
+          setPersonalQuests(prev => [...prev, { id: Date.now().toString(), title, reward, question }])
+        }}
+        onAcceptQuest={(id) => setAcceptedQuestId(id)}
+        onCompleteQuest={(id) => {
+          const quest = personalQuests.find(q => q.id === id)
+          if (quest) {
+            setPixels(p => p + quest.reward)
+            setXp(x => x + quest.reward)
+            setPersonalQuests(prev => prev.filter(q => q.id !== id))
+            if (acceptedQuestId === id) setAcceptedQuestId(null)
+          }
+        }}
+        onCancelQuest={(id) => {
+          if (acceptedQuestId === id) setAcceptedQuestId(null)
+        }}
       />
 
     </div>

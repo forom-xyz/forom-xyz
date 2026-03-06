@@ -8,6 +8,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 interface WalletModalProps {
   isOpen: boolean
   onClose: () => void
+  pixels: number
+  level: number
+  title: string
+  xp: number
 }
 
 // =============================================================================
@@ -63,7 +67,7 @@ const modalVariants = {
 // COMPONENT
 // =============================================================================
 
-export function WalletModal({ isOpen, onClose }: WalletModalProps) {
+export function WalletModal({ isOpen, onClose, pixels, level, title, xp }: WalletModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -136,15 +140,20 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
             <div className="flex-1 overflow-auto" style={{ padding: '2rem 5%' }}>
               <div className="flex flex-col h-full">
                 {/* Header */}
-                <div className="flex justify-between items-end mb-8">
-                  <div className="flex-1 pb-4">
-                    <h2 className="font-montserrat font-black text-[#FFD700] text-2xl tracking-wide">L'économie des pixels</h2>
+                <div className="flex justify-between items-end mb-8 border-b-4 border-black/20 pb-6 relative">
+                  <div className="flex-1">
+                    <h2 className="font-jersey text-[#FFD700] text-[52px] tracking-widest drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] m-0 leading-none">{pixels} PX</h2>
+                    <div className="inline-block mt-3 text-2xl">
+                      <span className="font-jersey text-black bg-[#FFD700] px-4 py-1.5 rounded-lg border-2 border-black shadow-[0_4px_0px_#000] uppercase tracking-wider">
+                        Lvl {level} : {title}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex-shrink-0 px-4">
-                    <h1 className="text-white text-[100px] tracking-widest drop-shadow-md m-0 leading-none" style={{ fontFamily: "'Jersey 15', sans-serif" }}>PIXELS</h1>
+                  <div className="flex-shrink-0 px-4 absolute left-1/2 transform -translate-x-1/2">
+                    <h1 className="text-white text-[100px] tracking-widest drop-shadow-md m-0 leading-none" style={{ fontFamily: "'Jersey 15', sans-serif", textShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}>PIXELS</h1>
                   </div>
-                  <div className="flex-1 text-right pb-4">
-                    <h2 className="font-montserrat font-black text-[#FFD700] text-2xl tracking-wide">The Pixel Economy</h2>
+                  <div className="flex-1 text-right">
+                    <h2 className="font-jersey text-[#FFD700] text-[52px] tracking-widest drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] m-0 leading-none">{xp} XP</h2>
                   </div>
                 </div>
 
