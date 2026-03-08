@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence, easeOut, easeIn } from 'framer-motion'
 import { MemoryBox } from './MemoryBox'
 import { MemoryModal } from './MemoryModal'
-import { getMemory, ITEMS_PER_ROW, QUESTION_ORDER, QUESTION_COLORS } from '../data/memories'
+import { getMemory, ITEMS_PER_ROW, QUESTION_ORDER, QUESTION_COLORS, CATEGORY_COLORS } from '../data/memories'
 import type { Memory, CategoryType } from '../data/memories'
 
 // =============================================================================
@@ -15,6 +15,7 @@ interface CarouselGridProps {
   onCategoryChange: (category: string) => void
   isDark?: boolean
   questionLabels?: Record<string, string>
+  personalQuests?: Array<{ id: string; category: string; question: string | null; title: string }>
 }
 
 // =============================================================================
@@ -22,13 +23,6 @@ interface CarouselGridProps {
 // =============================================================================
 
 /** Color mapping for each category - defines border colors for video boxes */
-const CATEGORY_COLORS: Record<string, string> = {
-  A: '#86B89E',
-  B: '#C084FC',
-  C: '#E85C5C',
-  D: '#F4C98E',
-  E: '#60A5FA',
-}
 
 /** Fallback color for categories without defined colors */
 const DEFAULT_COLOR = '#E5E7EB'
@@ -50,6 +44,29 @@ const getNavButtonStyle = (isDark: boolean): React.CSSProperties => ({
 })
 
 // =============================================================================
+// HELPER
+// =============================================================================
+
+export const mixColors = (color1: string, color2: string): string => {
+  if (!color1 || !color2) return color1 || color2 || '#ffffff';
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+  };
+  const c1 = hexToRgb(color1);
+  const c2 = hexToRgb(color2);
+  if (!c1 || !c2) return color1 || color2;
+  const r = Math.round((c1.r + c2.r) / 2);
+  const g = Math.round((c1.g + c2.g) / 2);
+  const b = Math.round((c1.b + c2.b) / 2);
+  const componentToHex = (c: number) => {
+    const hex = c.toString(16);
+    return hex.length === 1 ? "0" + hex : hex;
+  };
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+};
+
+// =============================================================================
 // COMPONENT
 // =============================================================================
 
@@ -58,10 +75,9 @@ export function CarouselGrid({
   activeCategory,
   onCategoryChange,
   isDark = false,
-  questionLabels = {},
-}: CarouselGridProps) {
+  questionLabels = {},  personalQuests = [],}: CarouselGridProps) {
   // Start at position 10 so center rectangle shows 10 (middle of 0-19)
-  const [horizontalIndex, setHorizontalIndex] = useState(10)
+  const [horizontalIndex, setHorizontalIndex] = useState(4)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [memoryUpdateKey, setMemoryUpdateKey] = useState(0) // For triggering re-renders
@@ -73,25 +89,24 @@ export function CarouselGrid({
   const [isDraggingVertical, setIsDraggingVertical] = useState(false)
 
   // Get current memory data for modal
-  const currentMemory = getMemory(categories[activeIndex] as CategoryType, horizontalIndex)
-  const currentColor = CATEGORY_COLORS[categories[activeIndex]] ?? DEFAULT_COLOR
+  let currentMemory = getMemory(categories[activeIndex] as CategoryType, horizontalIndex)
+  let currentColor = DEFAULT_COLOR
+
+  if (currentMemory) {
+    const matchedQuest = personalQuests.find(q => q.category === currentMemory?.category && q.question === currentMemory?.question);
+    if (matchedQuest) {
+      const catColor = CATEGORY_COLORS[currentMemory.category] || '#ffffff';
+      const tagColor = currentMemory.question ? (QUESTION_COLORS[currentMemory.question] || '#888888') : '#888888';
+      currentColor = mixColors(catColor, tagColor);
+      currentMemory = { ...currentMemory, title: matchedQuest.title };
+    }
+  }
 
   // Handle memory update from modal
   const handleMemoryUpdate = useCallback((_updatedMemory: Memory) => {
     // Force re-render of the grid to reflect changes
     setMemoryUpdateKey(prev => prev + 1)
   }, [])
-
-  // ---------------------------------------------------------------------------
-  // Helper Functions
-  // ---------------------------------------------------------------------------
-
-  /** Returns the color for a row based on its offset from the active category */
-  const getRowColor = (rowOffset: number): string => {
-    const rowIndex = activeIndex + rowOffset
-    if (rowIndex < 0 || rowIndex >= categories.length) return DEFAULT_COLOR
-    return CATEGORY_COLORS[categories[rowIndex]] ?? DEFAULT_COLOR
-  }
 
   // ---------------------------------------------------------------------------
   // Navigation Handlers (memoized to prevent unnecessary re-renders)
@@ -371,8 +386,6 @@ export function CarouselGrid({
   }
 
   const renderRow = (rowOffset: number, opacity: number, gap: string = '32px') => {
-    const rowColor = getRowColor(rowOffset)
-
     return (
       <div
         key={rowOffset}
@@ -384,7 +397,21 @@ export function CarouselGrid({
             // Center box of the middle row gets special treatment
             const isCentered = rowOffset === 0 && col === 0
             const globalIndex = getGlobalIndex(rowOffset, col)
-            const memory = getMemoryForPosition(rowOffset, col)
+            let memory = getMemoryForPosition(rowOffset, col)
+
+            // Determine if there is a quest assigned to this slot
+            let itemBorderColor = '#555555'; // default unassigned stroke color
+            if (memory) {
+              const matchedQuest = personalQuests.find(q => q.category === memory?.category && q.question === memory?.question);
+              if (matchedQuest) {
+                const catColor = CATEGORY_COLORS[memory.category] || '#ffffff';
+                const tagColor = memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888';
+                itemBorderColor = mixColors(catColor, tagColor);
+                
+                // Override the memory title with the quest title
+                memory = { ...memory, title: matchedQuest.title };
+              }
+            }
 
             // Calculate sizing based on positions to create sphere perspective
             const absRow = Math.abs(rowOffset)
@@ -406,7 +433,7 @@ export function CarouselGrid({
               >
                 <MemoryBox
                   memory={memory}
-                  borderColor={rowColor}
+                  borderColor={itemBorderColor}
                   displayNumber={globalIndex}
                   isCentered={isCentered}
                   isSmall={isSmall}

@@ -4,6 +4,7 @@
 
 /** Available WH-questions for memories */
 export const WH_QUESTIONS = [
+  '0',
   '1',
   '2',
   '3',
@@ -11,21 +12,27 @@ export const WH_QUESTIONS = [
   '5',
   '6',
   '7',
+  '8',
+  '9',
 ] as const
 
 export type WhQuestion = (typeof WH_QUESTIONS)[number]
 
 export const QUESTION_COLORS: Record<string, string> = {
-  '1': '#F59E0B',
-  '2': '#FACC15',
-  '3': '#84CC16',
-  '4': '#10B981',
-  '5': '#0EA5E9',
-  '6': '#4F46E5',
-  '7': '#8B5CF6',
+  '0': '#FF8080', // Light Red
+  '1': '#FFB880', // Light Orange-Red
+  '2': '#FFF180', // Light Yellow
+  '3': '#D5FF80', // Light Yellow-Green
+  '4': '#9CFF80', // Light Green
+  '5': '#80FF9C', // Light Green-Cyan
+  '6': '#80FFD5', // Light Cyan
+  '7': '#80F1FF', // Light Deep Sky Blue
+  '8': '#80B8FF', // Light Dodger Blue
+  '9': '#8080FF', // Light Blue
 }
 
 export const QUESTION_ORDER: WhQuestion[] = [
+  '0',
   '1',
   '2',
   '3',
@@ -33,13 +40,15 @@ export const QUESTION_ORDER: WhQuestion[] = [
   '5',
   '6',
   '7',
+  '8',
+  '9',
 ]
 
 export interface Memory {
   /** Unique identifier for the memory */
   id: string
   /** Category this memory belongs to */
-  category: 'A' | 'B' | 'C' | 'D' | 'E'
+  category: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J'
   /** WH-question for this memory (Comment?, Pourquoi?, etc.) */
   question: WhQuestion | null
   /** Title of the memory - acts as the response to the question */
@@ -58,11 +67,24 @@ export interface Memory {
 // CATEGORY CONFIGURATION
 // =============================================================================
 
-export const CATEGORIES = ['A', 'B', 'C', 'D', 'E'] as const
+export const CATEGORY_COLORS: Record<string, string> = {
+  A: '#008080', // Dark Cyan
+  B: '#0E7180',
+  C: '#1C6380',
+  D: '#2A5580',
+  E: '#384780',
+  F: '#473880',
+  G: '#552A80',
+  H: '#631C80',
+  I: '#710E80',
+  J: '#800080', // Dark Magenta
+}
+
+export const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] as const
 export type CategoryType = (typeof CATEGORIES)[number]
 
-export const ITEMS_PER_ROW = 20
-export const TOTAL_ROWS = 5
+export const ITEMS_PER_ROW = 10
+export const TOTAL_ROWS = 10
 
 // =============================================================================
 // HELPER FUNCTIONS
@@ -146,7 +168,7 @@ export function hasVideo(memory: Memory): boolean {
 
 /**
  * Generates placeholder memories for development/testing
- * Creates 100 items (5 categories × 20 items each)
+ * Creates 100 items (10 categories × 10 items each)
  * All slots are empty by default - ready to be filled with real content
  */
 function generatePlaceholderMemories(): Memory[] {
@@ -157,7 +179,7 @@ function generatePlaceholderMemories(): Memory[] {
       memories.push({
         id: `${category.toLowerCase()}-${i}`,
         category,
-        question: null,
+        question: WH_QUESTIONS[i] || null,
         title: `Emplacement ${i + 1}`,
         description: 'Cet emplacement est disponible. Ajoutez une vidéo ou un contenu pour le remplir.',
         videoUrl: null,

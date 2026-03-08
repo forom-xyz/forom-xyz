@@ -2,32 +2,44 @@ import ReactModal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { X } from 'lucide-react'
-import { QUESTION_ORDER, QUESTION_COLORS } from '../data/memories'
+import { QUESTION_ORDER, QUESTION_COLORS, CATEGORY_COLORS } from '../data/memories'
 
-// Category band colors — 5 bands of 20 quests each (matches A→E order)
-const BAND_COLORS = [
-  '#86B89E', // #1–20   A (green)
-  '#C084FC', // #21–40  B (purple)
-  '#E85C5C', // #41–60  C (red)
-  '#F4C98E', // #61–80  D (warm sand)
-  '#60A5FA', // #81–100 E (blue)
-]
-function questBandColor(questNum: number): string {
-  const band = Math.min(Math.floor((questNum - 1) / 20), 4)
-  return BAND_COLORS[band]
-}
-
-const CATEGORY_COLORS: Record<string, string> = {
-  A: '#86B89E',
-  B: '#C084FC',
-  C: '#E85C5C',
-  D: '#F4C98E',
-  E: '#60A5FA',
-}
+// Category band colors removed because we now use mixColors
 
 // =============================================================================
 // TYPES
 // =============================================================================
+
+export function mixColors(color1: string, color2: string): string {
+  // Simple hex color mixer
+  if (!color1 || !color2) return color1 || color2 || '#ffffff';
+  
+  // Convert hex to rgb
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  };
+  
+  const c1 = hexToRgb(color1);
+  const c2 = hexToRgb(color2);
+  
+  if (!c1 || !c2) return color1 || color2;
+  
+  const r = Math.round((c1.r + c2.r) / 2);
+  const g = Math.round((c1.g + c2.g) / 2);
+  const b = Math.round((c1.b + c2.b) / 2);
+  
+  const componentToHex = (c: number) => {
+    const hex = c.toString(16);
+    return hex.length === 1 ? "0" + hex : hex;
+  };
+  
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
 
 export interface Quest {
   id: string
@@ -115,7 +127,7 @@ export function QuestModal({
   onCancelQuest,
   categories = ['A', 'B', 'C', 'D', 'E']
 }: QuestModalProps) {
-  const [activeTab, setActiveTab] = useState<'community' | 'personal'>('community')
+  const [activeTab, setActiveTab] = useState<'community' | 'personal'>('personal')
   const [newTitle, setNewTitle] = useState('')
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0])
@@ -132,8 +144,8 @@ export function QuestModal({
       if (catIdx === -1) return
       
       const count = counts[cat] || 0
-      if (count < 20) {
-        arr[catIdx * 20 + count] = q
+      if (count < 10) {
+        arr[catIdx * 10 + count] = q
         counts[cat] = count + 1
       }
     })
@@ -158,13 +170,13 @@ export function QuestModal({
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newTitle.trim()) return
+    if (!newTitle.trim() || !selectedQuestion) return // Require tag/question
     if (personalQuests.length >= 100) return
 
     // Calculate where this new quest will land so we can scroll to it immediately
     const catIdx = categories.indexOf(selectedCategory)
     const countInCat = personalQuests.filter(q => (q.category || categories[0]) === selectedCategory).length
-    const targetIdx = Math.min(catIdx * 20 + countInCat, catIdx * 20 + 19)
+    const targetIdx = Math.min(catIdx * 10 + countInCat, catIdx * 10 + 9) // 10 per category now
 
     onCreateQuest(newTitle, 2.07, selectedQuestion, selectedCategory)
     setNewTitle('')
@@ -821,16 +833,28 @@ export function QuestModal({
                             const questNum = realIdx + 1
                             
                             // Visuals
-                            const boxBorder = isCenter ? '4px solid black' : '3px solid rgba(0,0,0,0.3)'
                             const boxShadow = isCenter ? '0 4px 0px rgba(0,0,0,0.8)' : 'none'
                             const cursor = offset !== 0 ? 'pointer' : 'default'
 
                             // Default empty styling
-                            let bgColor = '#9ca3af'
+                            let bgColor = '#D9D9D9'
+                            let borderColor = 'rgba(0,0,0,0.3)'
+                            let borderSize = isCenter ? '4px' : '3px'
+                            
                             if (q) {
-                              bgColor = questBandColor(questNum)
+                              const tagColor = q.question ? QUESTION_COLORS[q.question] : null
+                              const catColor = CATEGORY_COLORS[q.category] || null
+                              
+                              if (tagColor && catColor) {
+                                borderColor = mixColors(tagColor, catColor)
+                              } else {
+                                borderColor = tagColor || catColor || 'black'
+                              }
+                              borderSize = isCenter ? '6px' : '4px'
                             }
                             
+                            const boxBorder = `${borderSize} solid ${borderColor}`
+
                             return (
                               <div
                                 key={offset}

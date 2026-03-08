@@ -104,9 +104,10 @@ export function MemoryModal({
 
   useEffect(() => {
     if (memory) {
+      const defaultEmptyTitle = memory.title.startsWith('Emplacement ') ? '' : memory.title;
       setFormData({
         question: memory.question,
-        title: memory.isFilled ? memory.title : '',
+        title: memory.isFilled ? memory.title : defaultEmptyTitle,
         videoUrl: memory.videoUrl || '',
         description: memory.isFilled ? memory.description : '',
       })

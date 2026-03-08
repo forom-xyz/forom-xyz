@@ -72,8 +72,8 @@ function CircularProgress({ percentage, color, title, size = 180, strokeWidth = 
   const offset = circumference - (percentage / 100) * circumference
 
   return (
-    <div className="flex flex-col items-center" style={{ gap: '5%' }}>
-      {title && <span className="text-white text-[64px] font-jersey uppercase drop-shadow-md leading-none tracking-widest">{title}</span>}
+    <div className="flex flex-col items-center gap-6">
+      {title && <span className="text-white text-[56px] drop-shadow-md leading-none font-bold" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{title}</span>}
       <div className="relative" style={{ width: size, height: size }}>
         {/* Background circle */}
         <svg width={size} height={size} className="transform -rotate-90">
@@ -102,7 +102,7 @@ function CircularProgress({ percentage, color, title, size = 180, strokeWidth = 
         </svg>
         {/* Percentage text inside circle */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-white text-[56px] font-jetbrains drop-shadow-sm font-bold tracking-tight">
+          <span className="text-white text-[48px] drop-shadow-sm font-bold" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
             {Math.round(percentage)}%
           </span>
         </div>
@@ -116,7 +116,7 @@ function CircularProgress({ percentage, color, title, size = 180, strokeWidth = 
 // =============================================================================
 
 export function WalletModal({ isOpen, onClose, pixels }: WalletModalProps) {
-  const [activeTab, setActiveTab] = useState<'personal' | 'community'>('personal')
+  const [activeTab, setActiveTab] = useState<'personal' | 'community'>('community')
 
   // Economy calculations
   const MAX_PIXELS = 607
@@ -310,11 +310,11 @@ export function WalletModal({ isOpen, onClose, pixels }: WalletModalProps) {
                 ) : (
                   <div className="flex flex-col items-center justify-start font-jersey text-center h-full pt-4 pb-8 overflow-y-auto" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
                     {/* Header */}
-                    <div className="text-center mb-12 flex flex-col gap-6 w-full">
-                        <h2 className="text-[72px] font-jersey leading-none drop-shadow-[2px_2px_0px_rgba(0,0,0,0.5)] m-0 tracking-widest">
+                    <div className="text-center mb-12 flex flex-col gap-6 w-full mt-4">
+                        <h2 className="text-[52px] leading-none drop-shadow-[2px_2px_0px_rgba(0,0,0,0.5)] m-0 font-bold" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                           <span className="text-[#FF4B4B]">COMMUNITY</span> <span className="text-white">WALLET</span>
                         </h2>
-                        <h3 className="text-[56px] font-jersey leading-none drop-shadow-[2px_2px_0px_rgba(0,0,0,0.5)] m-0 tracking-wider">
+                        <h3 className="text-[40px] leading-none drop-shadow-[2px_2px_0px_rgba(0,0,0,0.5)] m-0 font-bold" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                           <span className="text-[#FF4B4B]">607</span> <span className="text-white">PIXELS</span> <span className="text-[#FF4B4B]">MAX.</span>
                         </h3>
                     </div>
@@ -349,7 +349,7 @@ export function WalletModal({ isOpen, onClose, pixels }: WalletModalProps) {
                             boxShadow: '0 4px 0px rgba(0,0,0,0.2)'
                           }}
                         >
-                          <span className="text-black font-jetbrains text-[28px] font-bold tracking-tight">
+                          <span className="text-black text-[28px] font-bold" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                             {Math.round(totalPercentage)}%
                           </span>
                         </div>

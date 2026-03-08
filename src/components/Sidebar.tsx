@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useRef, useEffect } from 'react'
+import { CATEGORY_COLORS } from '../data/memories'
 
 // =============================================================================
 // TYPES
@@ -132,7 +133,7 @@ export function Sidebar({ items, activeId, onSelect, isDark = false }: SidebarPr
                 fontWeight: isActive ? 900 : 400,
                 fontStyle: isActive ? 'normal' : 'italic',
                 color: isActive 
-                  ? (isDark ? '#ffffff' : '#000000') 
+                  ? (CATEGORY_COLORS[item.id] || (isDark ? '#ffffff' : '#000000')) 
                   : (isDark ? '#71717a' : '#9CA3AF'),
                 cursor: 'pointer',
                 background: 'none',

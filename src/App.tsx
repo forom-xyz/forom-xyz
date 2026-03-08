@@ -33,7 +33,7 @@ export function getLevelAndTitle(xp: number) {
 // =============================================================================
 
 /** Available categories for the application */
-const CATEGORIES = ['A', 'B', 'C', 'D', 'E']
+const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
 // =============================================================================
 // HELPER COMPONENTS
@@ -82,7 +82,7 @@ function ThemeToggle({
 // =============================================================================
 
 function App() {
-  const [activeCategory, setActiveCategory] = useState('A')
+  const [activeCategory, setActiveCategory] = useState('F')
   const [activeModal, setActiveModal] = useState<'token' | 'support' | 'user' | null>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -201,6 +201,7 @@ function App() {
         onCategoryChange={setActiveCategory}
         isDark={isDarkMode}
         questionLabels={questionLabels}
+        personalQuests={personalQuests}
       />
 
       {/* --------------------------------------------------------------------------
