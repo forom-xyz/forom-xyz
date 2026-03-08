@@ -4,42 +4,42 @@
 
 /** Available WH-questions for memories */
 export const WH_QUESTIONS = [
-  'QUI?',
-  'QUOI?',
-  'OU?',
-  'QUAND?',
-  'COMMENT?',
-  'COMBIEN?',
-  'POURQUOI?',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
 ] as const
 
 export type WhQuestion = (typeof WH_QUESTIONS)[number]
 
 export const QUESTION_COLORS: Record<string, string> = {
-  'QUI?': '#F59E0B',
-  'QUOI?': '#FACC15',
-  'OU?': '#84CC16',
-  'QUAND?': '#10B981',
-  'COMMENT?': '#0EA5E9',
-  'COMBIEN?': '#4F46E5',
-  'POURQUOI?': '#8B5CF6',
+  '1': '#F59E0B',
+  '2': '#FACC15',
+  '3': '#84CC16',
+  '4': '#10B981',
+  '5': '#0EA5E9',
+  '6': '#4F46E5',
+  '7': '#8B5CF6',
 }
 
 export const QUESTION_ORDER: WhQuestion[] = [
-  'QUI?',
-  'QUOI?',
-  'OU?',
-  'QUAND?',
-  'COMMENT?',
-  'COMBIEN?',
-  'POURQUOI?',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
 ]
 
 export interface Memory {
   /** Unique identifier for the memory */
   id: string
   /** Category this memory belongs to */
-  category: 'Partenaires' | 'Culture' | 'Clubs' | 'Trésorie' | 'Atelier'
+  category: 'A' | 'B' | 'C' | 'D' | 'E'
   /** WH-question for this memory (Comment?, Pourquoi?, etc.) */
   question: WhQuestion | null
   /** Title of the memory - acts as the response to the question */
@@ -58,7 +58,7 @@ export interface Memory {
 // CATEGORY CONFIGURATION
 // =============================================================================
 
-export const CATEGORIES = ['Partenaires', 'Culture', 'Clubs', 'Trésorie', 'Atelier'] as const
+export const CATEGORIES = ['A', 'B', 'C', 'D', 'E'] as const
 export type CategoryType = (typeof CATEGORIES)[number]
 
 export const ITEMS_PER_ROW = 20

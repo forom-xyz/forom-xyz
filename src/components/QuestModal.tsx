@@ -4,17 +4,25 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { X } from 'lucide-react'
 import { QUESTION_ORDER, QUESTION_COLORS } from '../data/memories'
 
-// Category band colors — 5 bands of 20 quests each (matches Partenaires→Atelier order)
+// Category band colors — 5 bands of 20 quests each (matches A→E order)
 const BAND_COLORS = [
-  '#86B89E', // #1–20   Partenaires (green)
-  '#C084FC', // #21–40  Culture (purple)
-  '#E85C5C', // #41–60  Clubs (red)
-  '#F4C98E', // #61–80  Trésorie (warm sand)
-  '#60A5FA', // #81–100 Atelier (blue)
+  '#86B89E', // #1–20   A (green)
+  '#C084FC', // #21–40  B (purple)
+  '#E85C5C', // #41–60  C (red)
+  '#F4C98E', // #61–80  D (warm sand)
+  '#60A5FA', // #81–100 E (blue)
 ]
 function questBandColor(questNum: number): string {
   const band = Math.min(Math.floor((questNum - 1) / 20), 4)
   return BAND_COLORS[band]
+}
+
+const CATEGORY_COLORS: Record<string, string> = {
+  A: '#86B89E',
+  B: '#C084FC',
+  C: '#E85C5C',
+  D: '#F4C98E',
+  E: '#60A5FA',
 }
 
 // =============================================================================
@@ -105,7 +113,7 @@ export function QuestModal({
   onAcceptQuest,
   onCompleteQuest,
   onCancelQuest,
-  categories = ['Partenaires', 'Culture', 'Clubs', 'Trésorie', 'Atelier']
+  categories = ['A', 'B', 'C', 'D', 'E']
 }: QuestModalProps) {
   const [activeTab, setActiveTab] = useState<'community' | 'personal'>('community')
   const [newTitle, setNewTitle] = useState('')
@@ -637,7 +645,7 @@ export function QuestModal({
                       </h3>
                       
                       {/* Category selector */}
-                      <div className="flex flex-wrap justify-center items-center mb-2" style={{ gap: '8px', width: '90%' }}>
+                      <div className="flex flex-wrap justify-center items-center" style={{ gap: '8px', width: '90%', marginBottom: '5%' }}>
                         {categories.map((cat) => {
                           const isSelected = selectedCategory === cat
                           return (
@@ -647,8 +655,9 @@ export function QuestModal({
                               onClick={() => setSelectedCategory(cat)}
                               className="cursor-pointer uppercase font-bold tracking-wide transition-all"
                               style={{
-                                backgroundColor: isSelected ? 'white' : 'rgba(255,255,255,0.4)',
-                                color: 'black',
+                                backgroundColor: CATEGORY_COLORS[cat] || 'rgba(255,255,255,0.4)',
+                                opacity: isSelected ? 1 : 0.4,
+                                color: isSelected ? 'white' : 'black',
                                 fontFamily: "'Jersey 15', sans-serif",
                                 fontSize: '20px',
                                 borderRadius: '8px',

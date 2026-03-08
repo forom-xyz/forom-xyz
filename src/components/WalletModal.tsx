@@ -1,5 +1,7 @@
 import ReactModal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import coromIcon from '../assets/icons/corom.png'
 
 // =============================================================================
 // TYPES
@@ -9,9 +11,6 @@ interface WalletModalProps {
   isOpen: boolean
   onClose: () => void
   pixels: number
-  level: number
-  title: string
-  xp: number
 }
 
 // =============================================================================
@@ -64,10 +63,68 @@ const modalVariants = {
 }
 
 // =============================================================================
+// HELPER COMPONENTS
+// =============================================================================
+
+function CircularProgress({ percentage, color, title, size = 180, strokeWidth = 8 }: { percentage: number, color: string, title?: string, size?: number, strokeWidth?: number }) {
+  const radius = (size - strokeWidth) / 2
+  const circumference = radius * 2 * Math.PI
+  const offset = circumference - (percentage / 100) * circumference
+
+  return (
+    <div className="flex flex-col items-center" style={{ gap: '5%' }}>
+      {title && <span className="text-white text-[64px] font-jersey uppercase drop-shadow-md leading-none tracking-widest">{title}</span>}
+      <div className="relative" style={{ width: size, height: size }}>
+        {/* Background circle */}
+        <svg width={size} height={size} className="transform -rotate-90">
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={color}
+            strokeWidth={strokeWidth}
+            fill="transparent"
+            opacity="0.2"
+          />
+          {/* Progress circle */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={color}
+            strokeWidth={strokeWidth}
+            fill="transparent"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            className="transition-all duration-1000 ease-out"
+          />
+        </svg>
+        {/* Percentage text inside circle */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-white text-[56px] font-jetbrains drop-shadow-sm font-bold tracking-tight">
+            {Math.round(percentage)}%
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// =============================================================================
 // COMPONENT
 // =============================================================================
 
-export function WalletModal({ isOpen, onClose, pixels, level, title, xp }: WalletModalProps) {
+export function WalletModal({ isOpen, onClose, pixels }: WalletModalProps) {
+  const [activeTab, setActiveTab] = useState<'personal' | 'community'>('personal')
+
+  // Economy calculations
+  const MAX_PIXELS = 607
+  const mxPixels = 0 // Represents other users' pixels (mocked to 0 for now)
+  const miPercentage = Math.min(100, (pixels / MAX_PIXELS) * 100)
+  const mxPercentage = Math.min(100, (mxPixels / MAX_PIXELS) * 100)
+  const totalPercentage = Math.min(100, ((pixels + mxPixels) / MAX_PIXELS) * 100)
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -100,6 +157,93 @@ export function WalletModal({ isOpen, onClose, pixels, level, title, xp }: Walle
               overflow: 'hidden',
             }}
           >
+            {/* Left Side Switch Buttons (Info / Community) */}
+            <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 100, display: 'flex', gap: '16px' }}>
+              <button
+                onClick={() => setActiveTab('personal')}
+                style={{ 
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#FFD700',
+                  border: '3px solid black',
+                  cursor: 'pointer',
+                  boxShadow: activeTab === 'personal' ? '0 0px 0px rgba(0,0,0,1)' : '0 4px 0px rgba(0,0,0,1)',
+                  transform: activeTab === 'personal' ? 'translateY(4px)' : 'none',
+                  transition: 'transform 0.1s, box-shadow 0.1s',
+                  fontFamily: "'Jersey 15', sans-serif",
+                  fontSize: '28px',
+                  color: 'black',
+                  lineHeight: 1,
+                  opacity: activeTab === 'personal' ? 1 : 0.7,
+                }}
+                onMouseOver={(e) => {
+                  if (activeTab !== 'personal') {
+                    e.currentTarget.style.backgroundColor = '#ffe033'
+                    e.currentTarget.style.transform = 'translateY(2px)'
+                    e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+                    e.currentTarget.style.opacity = '1'
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (activeTab !== 'personal') {
+                    e.currentTarget.style.backgroundColor = '#FFD700'
+                    e.currentTarget.style.transform = 'none'
+                    e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
+                    e.currentTarget.style.opacity = '0.7'
+                  }
+                }}
+                aria-label="Info"
+              >
+                I
+              </button>
+
+              <button
+                onClick={() => setActiveTab('community')}
+                style={{ 
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#FF4B4B',
+                  border: '3px solid black',
+                  cursor: 'pointer',
+                  boxShadow: activeTab === 'community' ? '0 0px 0px rgba(0,0,0,1)' : '0 4px 0px rgba(0,0,0,1)',
+                  transform: activeTab === 'community' ? 'translateY(4px)' : 'none',
+                  transition: 'transform 0.1s, box-shadow 0.1s',
+                  fontFamily: "'Jersey 15', sans-serif",
+                  fontSize: '28px',
+                  color: 'white',
+                  lineHeight: 1,
+                  opacity: activeTab === 'community' ? 1 : 0.7,
+                }}
+                onMouseOver={(e) => {
+                  if (activeTab !== 'community') {
+                    e.currentTarget.style.backgroundColor = '#ff3333'
+                    e.currentTarget.style.transform = 'translateY(2px)'
+                    e.currentTarget.style.boxShadow = '0 2px 0px rgba(0,0,0,1)'
+                    e.currentTarget.style.opacity = '1'
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (activeTab !== 'community') {
+                    e.currentTarget.style.backgroundColor = '#FF4B4B'
+                    e.currentTarget.style.transform = 'none'
+                    e.currentTarget.style.boxShadow = '0 4px 0px rgba(0,0,0,1)'
+                    e.currentTarget.style.opacity = '0.7'
+                  }
+                }}
+                aria-label="Community"
+              >
+                C
+              </button>
+            </div>
+
             <button
               onClick={onClose}
               style={{ 
@@ -139,54 +283,92 @@ export function WalletModal({ isOpen, onClose, pixels, level, title, xp }: Walle
 
             <div className="flex-1 overflow-auto" style={{ padding: '2rem 5%' }}>
               <div className="flex flex-col h-full">
-                {/* Header */}
-                <div className="flex justify-between items-end mb-8 border-b-4 border-black/20 pb-6 relative">
-                  <div className="flex-1">
-                    <h2 className="font-jersey text-[#FFD700] text-[52px] tracking-widest drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] m-0 leading-none">{pixels} PX</h2>
-                    <div className="inline-block mt-3 text-2xl">
-                      <span className="font-jersey text-black bg-[#FFD700] px-4 py-1.5 rounded-lg border-2 border-black shadow-[0_4px_0px_#000] uppercase tracking-wider">
-                        Lvl {level} : {title}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex-shrink-0 px-4 absolute left-1/2 transform -translate-x-1/2">
-                    <h1 className="text-white text-[100px] tracking-widest drop-shadow-md m-0 leading-none" style={{ fontFamily: "'Jersey 15', sans-serif", textShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}>PIXELS</h1>
-                  </div>
-                  <div className="flex-1 text-right">
-                    <h2 className="font-jersey text-[#FFD700] text-[52px] tracking-widest drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] m-0 leading-none">{xp} XP</h2>
-                  </div>
-                </div>
 
                 {/* Content */}
-                <div className="grid grid-cols-2 gap-16 text-white font-jetbrains text-sm leading-relaxed">
-                  {/* Left Column - French */}
-                  <div className="space-y-6">
-                    <h3 className="font-montserrat font-bold text-white text-lg">Connaissances et récompenses</h3>
-                    <p>
-                      Dans la grille interactive FOROM, l'économie est conçue pour encourager les contributions éducatives et le partage de connaissances.
-                    </p>
-                    <ul className="space-y-4">
-                      <li><span className="font-bold">• Les couleurs comme catégories :</span> La grille est organisée par couleurs distinctes, chaque couleur représentant une catégorie, un sujet ou un thème spécifique. Cela fait du tableau une carte visuellement organisée de différents sujets.</li>
-                      <li><span className="font-bold">• Gagner des pixels :</span> Les pixels servent de monnaie officielle à la plateforme. Les utilisateurs gagnent cette monnaie en contribuant activement à la communauté - plus précisément, en créant et en publiant des tutoriels utiles au sein des catégories de la grille.</li>
-                      <li><span className="font-bold">• Les 9 super modérateurs :</span> Les neuf super modérateurs agissent comme les gestionnaires économiques de la plateforme. Plutôt que de rivaliser pour l'espace, ils supervisent le système de récompenses. Chaque modérateur est responsable de définir un catalogue unique de « cadeaux » ou d'avantages.</li>
-                      <li><span className="font-bold">• Le système d'échange :</span> Une fois qu'un utilisateur a gagné des pixels grâce à ses tutoriels, il peut s'adresser aux super modérateurs pour échanger sa monnaie. Comme les modérateurs gèrent leurs propres récompenses, les utilisateurs peuvent magasiner et échanger leurs pixels contre les cadeaux spécifiques qui les intéressent le plus.</li>
-                    </ul>
+                {activeTab === 'personal' ? (
+                  <div className="flex flex-col items-center justify-center font-jersey text-center h-full space-y-16 mt-4 pb-12 w-full">
+                    <h1 className="text-white text-[80px] tracking-widest drop-shadow-[4px_4px_0px_rgba(0,0,0,0.5)] uppercase m-0 leading-none font-jersey" style={{ fontFamily: "'Jersey 15', sans-serif" }}>PIXEL WALLET</h1>
+                    
+                    <div className="flex items-center justify-center w-full max-w-4xl mx-auto h-[350px]">
+                      {/* Left: Numbers display */}
+                      <div className="flex-1 flex flex-col items-end border-r-[8px] border-white h-full justify-center" style={{ gap: '5%', paddingRight: '5%' }}>
+                        <span className="text-[#a3e635] text-[80px] leading-none opacity-60 font-jersey" style={{ fontFamily: "'Jersey 15', sans-serif" }}>607</span>
+                        <span className="text-[#FFD700] text-[180px] leading-none drop-shadow-[4px_4px_0px_rgba(0,0,0,0.3)] font-jersey min-w-[200px]" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
+                          {pixels.toString().padStart(2, '0')}
+                        </span>
+                        <span className="text-[#a3e635] text-[80px] leading-none opacity-60 font-jersey" style={{ fontFamily: "'Jersey 15', sans-serif" }}>01</span>
+                      </div>
+                      
+                      {/* Right: PX logo */}
+                      <div className="flex-1 flex items-center justify-start h-full" style={{ paddingLeft: '5%' }}>
+                        <span className="text-white text-[240px] leading-none drop-shadow-[8px_8px_0px_rgba(0,0,0,0.2)] tracking-tight font-jersey" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
+                          PX
+                        </span>
+                      </div>
+                    </div>
                   </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-start font-jersey text-center h-full pt-4 pb-8 overflow-y-auto" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
+                    {/* Header */}
+                    <div className="text-center mb-12 flex flex-col gap-6 w-full">
+                        <h2 className="text-[72px] font-jersey leading-none drop-shadow-[2px_2px_0px_rgba(0,0,0,0.5)] m-0 tracking-widest">
+                          <span className="text-[#FF4B4B]">COMMUNITY</span> <span className="text-white">WALLET</span>
+                        </h2>
+                        <h3 className="text-[56px] font-jersey leading-none drop-shadow-[2px_2px_0px_rgba(0,0,0,0.5)] m-0 tracking-wider">
+                          <span className="text-[#FF4B4B]">607</span> <span className="text-white">PIXELS</span> <span className="text-[#FF4B4B]">MAX.</span>
+                        </h3>
+                    </div>
 
-                  {/* Right Column - English */}
-                  <div className="space-y-6">
-                    <h3 className="font-montserrat font-bold text-white text-lg text-right">Knowledge Creation and Rewards</h3>
-                    <p>
-                      In the FOROM interactive grid, the economy is built around incentivizing educational contributions and knowledge sharing.
-                    </p>
-                    <ul className="space-y-4">
-                      <li><span className="font-bold">• Colors as Categories:</span> The grid is organized by distinct colors, with each color representing a specific category, subject, or theme. This makes the board a visually organized map of different topics.</li>
-                      <li><span className="font-bold">• Earning Pixels:</span> Pixels serve as the platform's official currency. Users earn this currency by actively contributing to the community-specifically, by creating and publishing helpful tutorials within the grid's categories.</li>
-                      <li><span className="font-bold">• The 9 Super Moderators:</span> The nine super moderators act as the economic managers of the platform. Rather than competing for space, they oversee the reward system. Each moderator is responsible for defining a unique catalog of "gifts" or perks.</li>
-                      <li><span className="font-bold">• The Exchange System:</span> Once a user earns pixels from their tutorials, they can approach the super moderators to trade their currency. Because the moderators curate their own rewards, users can shop around and exchange their pixels for the specific gifts that appeal to them the most.</li>
-                    </ul>
+                    {/* Circular Graphs Row */}
+                    <div className="flex justify-center flex-1 items-center w-full" style={{ gap: '2%' }}>
+                      
+                      {/* MI (My Impact) Graph */}
+                      <div style={{ transform: 'translateY(-80px)' }}>
+                        <CircularProgress 
+                          title="MI" 
+                          percentage={miPercentage} 
+                          color="#FFD700" 
+                          size={220} 
+                          strokeWidth={12} 
+                        />
+                      </div>
+
+                      {/* Main Corom Image with Total Percentage */}
+                      <div className="relative flex flex-col items-center justify-end" style={{ width: '380px', height: '380px', margin: '0 20px' }}>
+                        <img 
+                          src={coromIcon} 
+                          alt="Corom Wallet" 
+                          className="w-full h-full object-contain drop-shadow-2xl z-10" 
+                        />
+                        <div 
+                          className="absolute z-20 bg-white rounded-full flex items-center justify-center"
+                          style={{ 
+                            bottom: '12%', 
+                            width: '90px', 
+                            height: '90px',
+                            boxShadow: '0 4px 0px rgba(0,0,0,0.2)'
+                          }}
+                        >
+                          <span className="text-black font-jetbrains text-[28px] font-bold tracking-tight">
+                            {Math.round(totalPercentage)}%
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* MX (Others Impact) Graph */}
+                      <div style={{ transform: 'translateY(-80px)' }}>
+                        <CircularProgress 
+                          title="MX" 
+                          percentage={mxPercentage} 
+                          color="#0066FF" 
+                          size={220} 
+                          strokeWidth={12} 
+                        />
+                      </div>
+
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </motion.div>

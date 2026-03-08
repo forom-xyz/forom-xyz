@@ -31,10 +31,11 @@ const letterAnimation = {
 interface HeaderProps {
   onTokenClick: () => void
   onSupportClick: () => void
+  onUserClick: () => void
   isDark?: boolean
 }
 
-export function Header({ onTokenClick, onSupportClick, isDark = false }: HeaderProps) {
+export function Header({ onTokenClick, onSupportClick, onUserClick, isDark = false }: HeaderProps) {
   const [isSearchActive, setIsSearchActive] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -232,9 +233,10 @@ export function Header({ onTokenClick, onSupportClick, isDark = false }: HeaderP
 
         {/* User Profile */}
         <motion.div
+          onClick={onUserClick}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center justify-center cursor-pointer"
+          className="flex items-center justify-center cursor-pointer rounded-full overflow-hidden border-2 border-transparent hover:border-blue-500 transition-colors"
           style={{ width: '36px', height: '36px' }}
         >
           <img

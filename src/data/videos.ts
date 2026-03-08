@@ -27,7 +27,7 @@ export interface VideoData {
  * 3. Add it to the appropriate category array
  */
 export const VIDEO_DATA: Record<string, VideoData[]> = {
-  Partenaires: [
+  A: [
     { id: 'p0', youtubeId: 'dQw4w9WgXcQ', title: 'Partner Spotlight 1', description: 'An introduction to our partner program and benefits.' },
     { id: 'p1', youtubeId: 'jNQXAC9IVRw', title: 'Partner Spotlight 2', description: 'Stories from our long-time partners and collaborators.' },
     { id: 'p2', youtubeId: 'kJQP7kiw5Fk', title: 'Partner Spotlight 3', description: 'How partners contribute to the community.' },
@@ -50,7 +50,7 @@ export const VIDEO_DATA: Record<string, VideoData[]> = {
     { id: 'p19', youtubeId: 'hLQl3WQQoQ0', title: 'Partner Spotlight 20', description: 'Closing thoughts from partners.' },
   ],
 
-  Culture: [
+  B: [
     { id: 'c0', youtubeId: 'dQw4w9WgXcQ', title: 'Culture Clip 1', description: 'A short piece on local culture and events.' },
     { id: 'c1', youtubeId: 'jNQXAC9IVRw', title: 'Culture Clip 2', description: 'Exploring cultural highlights in the community.' },
     { id: 'c2', youtubeId: 'kJQP7kiw5Fk', title: 'Culture Clip 3', description: 'Interviews with cultural organizers.' },
@@ -73,7 +73,7 @@ export const VIDEO_DATA: Record<string, VideoData[]> = {
     { id: 'c19', youtubeId: 'hLQl3WQQoQ0', title: 'Culture Clip 20', description: 'Reflections on community culture.' },
   ],
 
-  Clubs: [
+  C: [
     { id: 'cl0', youtubeId: 'dQw4w9WgXcQ', title: 'Clubs Highlight 1', description: 'Intro to the Clubs program and activities.' },
     { id: 'cl1', youtubeId: 'jNQXAC9IVRw', title: 'Clubs Highlight 2', description: 'Clubs members share experiences.' },
     { id: 'cl2', youtubeId: 'kJQP7kiw5Fk', title: 'Clubs Highlight 3', description: 'Workshops and club meetups.' },
@@ -96,7 +96,7 @@ export const VIDEO_DATA: Record<string, VideoData[]> = {
     { id: 'cl19', youtubeId: 'hLQl3WQQoQ0', title: 'Clubs Highlight 20', description: 'End-of-year club roundups.' },
   ],
 
-  Trésorie: [
+  D: [
     { id: 't0', youtubeId: 'dQw4w9WgXcQ', title: 'Trésorie Update 1', description: 'Treasury overview and recent updates.' },
     { id: 't1', youtubeId: 'jNQXAC9IVRw', title: 'Trésorie Update 2', description: 'Budgeting and transparency.' },
     { id: 't2', youtubeId: 'kJQP7kiw5Fk', title: 'Trésorie Update 3', description: 'How the treasury supports projects.' },
@@ -119,7 +119,7 @@ export const VIDEO_DATA: Record<string, VideoData[]> = {
     { id: 't19', youtubeId: 'hLQl3WQQoQ0', title: 'Trésorie Update 20', description: 'Next steps for the treasury.' },
   ],
 
-  Atelier: [
+  E: [
     { id: 'a0', youtubeId: 'dQw4w9WgXcQ', title: 'Atelier Session 1', description: 'Workshop session: getting started.' },
     { id: 'a1', youtubeId: 'jNQXAC9IVRw', title: 'Atelier Session 2', description: 'Hands-on atelier projects and demos.' },
     { id: 'a2', youtubeId: 'kJQP7kiw5Fk', title: 'Atelier Session 3', description: 'Creative process deep dive.' },

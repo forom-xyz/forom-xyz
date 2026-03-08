@@ -72,11 +72,11 @@ const modalVariants = {
 // =============================================================================
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Partenaires: '#86B89E',
-  Culture: '#C084FC',
-  Clubs: '#E85C5C',
-  Trésorie: '#F4C98E',
-  Atelier: '#60A5FA',
+  A: '#86B89E',
+  B: '#C084FC',
+  C: '#E85C5C',
+  D: '#F4C98E',
+  E: '#60A5FA',
 }
 
 export function SettingsModal({

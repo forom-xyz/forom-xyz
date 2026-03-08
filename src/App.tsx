@@ -5,6 +5,7 @@ import { Sidebar } from './components/Sidebar'
 import { CarouselGrid } from './components/CarouselGrid'
 import { WalletModal } from './components/WalletModal'
 import { QuestModal } from './components/QuestModal'
+import { UserModal } from './components/UserModal'
 import type { Quest } from './components/QuestModal'
 import { HeartFAB } from './components/HeartFAB'
 
@@ -32,7 +33,7 @@ export function getLevelAndTitle(xp: number) {
 // =============================================================================
 
 /** Available categories for the application */
-const CATEGORIES = ['Partenaires', 'Culture', 'Clubs', 'Trésorie', 'Atelier']
+const CATEGORIES = ['A', 'B', 'C', 'D', 'E']
 
 // =============================================================================
 // HELPER COMPONENTS
@@ -81,8 +82,8 @@ function ThemeToggle({
 // =============================================================================
 
 function App() {
-  const [activeCategory, setActiveCategory] = useState('Clubs')
-  const [activeModal, setActiveModal] = useState<'token' | 'support' | null>(null)
+  const [activeCategory, setActiveCategory] = useState('A')
+  const [activeModal, setActiveModal] = useState<'token' | 'support' | 'user' | null>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
 
@@ -162,6 +163,7 @@ function App() {
       <Header 
         onTokenClick={() => setActiveModal('token')}
         onSupportClick={() => setActiveModal('support')}
+        onUserClick={() => setActiveModal('user')}
         isDark={isDarkMode}
       />
 
@@ -220,13 +222,20 @@ function App() {
         questionColors={QUESTION_COLORS}
       />
 
-      <WalletModal
-        isOpen={activeModal === 'token'}
+      <UserModal
+        isOpen={activeModal === 'user'}
         onClose={() => setActiveModal(null)}
         pixels={pixels}
         level={level}
         title={title}
         xp={xp}
+        isDarkMode={isDarkMode}
+      />
+
+      <WalletModal
+        isOpen={activeModal === 'token'}
+        onClose={() => setActiveModal(null)}
+        pixels={pixels}
       />
 
       <QuestModal
