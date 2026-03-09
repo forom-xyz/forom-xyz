@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { LoadingScreen } from './components/LoadingScreen'
+import { ForomLobby } from './components/ForomLobby'
 import { Header } from './components/Header'
 import { Sidebar } from './components/Sidebar'
 import { CarouselGrid } from './components/CarouselGrid'
@@ -84,6 +85,7 @@ function ThemeToggle({
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
+  const [isInLobby, setIsInLobby] = useState(true)
   const [activeCategory, setActiveCategory] = useState('E')
   const [activeModal, setActiveModal] = useState<'token' | 'support' | 'user' | null>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -135,6 +137,10 @@ function App() {
 
   if (isLoading) {
     return <LoadingScreen onComplete={() => setIsLoading(false)} />
+  }
+
+  if (isInLobby) {
+    return <ForomLobby onConfirm={() => setIsInLobby(false)} />
   }
 
   return (
