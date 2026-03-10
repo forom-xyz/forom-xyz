@@ -151,7 +151,7 @@ export function WalletModal({ isOpen, onClose, pixels }: WalletModalProps) {
               display: 'flex',
               flexDirection: 'column',
               boxSizing: 'border-box',
-              backgroundColor: '#5FCB76',
+              backgroundColor: '#007F36',
               border: '8px solid black',
               borderRadius: '38px',
               color: 'white',

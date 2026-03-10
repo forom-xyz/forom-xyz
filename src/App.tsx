@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { LoadingScreen } from './components/LoadingScreen'
 import { ForomLobby } from './components/ForomLobby'
+import { ForomCreationFlow } from './components/ForomCreationFlow'
+import { type ForomColor } from './components/ChooseColorScreen'
 import { Header } from './components/Header'
 import { Sidebar } from './components/Sidebar'
 import { CarouselGrid } from './components/CarouselGrid'
@@ -86,6 +88,9 @@ function ThemeToggle({
 function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [isInLobby, setIsInLobby] = useState(true)
+  const [isCreating, setIsCreating] = useState(false)
+  const [mission, setMission] = useState('')
+  const [foromColor, setForomColor] = useState<ForomColor | null>(null)
   const [activeCategory, setActiveCategory] = useState('E')
   const [activeModal, setActiveModal] = useState<'token' | 'support' | 'user' | null>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -139,8 +144,17 @@ function App() {
     return <LoadingScreen onComplete={() => setIsLoading(false)} />
   }
 
-  if (isInLobby) {
-    return <ForomLobby onConfirm={() => setIsInLobby(false)} />
+  if (isInLobby && !isCreating) {
+    return <ForomLobby onConfirm={() => setIsCreating(true)} />
+  }
+
+  if (isInLobby && isCreating) {
+    return (
+      <ForomCreationFlow
+        onComplete={(m, color) => { setMission(m); setForomColor(color); setIsInLobby(false); setIsCreating(false) }}
+        onBack={() => setIsCreating(false)}
+      />
+    )
   }
 
   return (
@@ -179,6 +193,7 @@ function App() {
         onUserClick={() => setActiveModal('user')}
         onRubixClick={() => setIsRubixView(prev => !prev)}
         isDark={isDarkMode}
+        mission={mission}
       />
 
       {/* --------------------------------------------------------------------------
@@ -256,6 +271,8 @@ function App() {
         title={title}
         xp={xp}
         isDarkMode={isDarkMode}
+        foromColor={foromColor}
+        mission={mission}
       />
 
       <WalletModal

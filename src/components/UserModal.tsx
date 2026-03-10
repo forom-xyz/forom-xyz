@@ -1,6 +1,7 @@
 import ReactModal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
 import userIcon from '../assets/icons/user.png'
+import { FOROM_COLOR_MAP, type ForomColor } from './ChooseColorScreen'
 
 interface UserModalProps {
   isOpen: boolean
@@ -10,6 +11,8 @@ interface UserModalProps {
   title: string
   xp: number
   isDarkMode?: boolean
+  foromColor?: ForomColor | null
+  mission?: string
 }
 
 const modalStyles: ReactModal.Styles = {
@@ -57,7 +60,7 @@ const modalVariants = {
   },
 }
 
-export function UserModal({ isOpen, onClose, pixels, level }: UserModalProps) {
+export function UserModal({ isOpen, onClose, pixels, level, foromColor, mission }: UserModalProps) {
   // Empty quest list as requested without mockup data
   const completedQuests: Array<{ tag: string, tagColor: string, title: string, px: string, active: boolean }> = []
 
@@ -169,9 +172,55 @@ export function UserModal({ isOpen, onClose, pixels, level }: UserModalProps) {
 
                {/* CENTER COLUMN: User Profile */}
                <div className="flex-[1.4] flex flex-col items-center justify-start z-20 relative pt-2">
-                  <div className="w-[160px] h-[160px] rounded-full border-[6px] border-black bg-white flex items-center justify-center overflow-hidden mb-10 shadow-[0_4px_0px_rgba(0,0,0,1)]">
+                  <div className="w-[160px] h-[160px] rounded-full border-[6px] border-black bg-white flex items-center justify-center overflow-hidden mb-6 shadow-[0_4px_0px_rgba(0,0,0,1)]">
                      <img src={userIcon} alt="User Profile" className="w-[60%] h-[60%] object-contain opacity-90" />
                   </div>
+
+                  {/* Forom color badge */}
+                  {foromColor && (
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      marginBottom: '10px',
+                    }}>
+                      <div style={{
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        backgroundColor: FOROM_COLOR_MAP[foromColor].bg,
+                        border: '2px solid black',
+                        flexShrink: 0,
+                      }} />
+                      <span style={{
+                        fontFamily: "'Jersey 15', sans-serif",
+                        fontSize: '22px',
+                        color: 'white',
+                        letterSpacing: '0.12em',
+                      }}>
+                        {FOROM_COLOR_MAP[foromColor].label}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Mission */}
+                  {mission && (
+                    <div style={{
+                      fontFamily: "'Jersey 15', sans-serif",
+                      fontSize: '16px',
+                      color: 'rgba(255,255,255,0.6)',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      textAlign: 'center',
+                      maxWidth: '220px',
+                      marginBottom: '10px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {mission}
+                    </div>
+                  )}
 
                   <div className="text-white text-[32px] tracking-[0.5em] mb-4 drop-shadow-sm ml-4 whitespace-nowrap" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
                     N I V E A U

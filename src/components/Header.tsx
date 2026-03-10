@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Mail } from 'lucide-react'
 import cedilleIcon from '../assets/icons/cedille.png'
 import etsIcon from '../assets/icons/ets.jpg'
+import githubIcon from '../assets/icons/github.png'
 import chromaNotesIcon from '../assets/icons/chroma_notes.svg'
 import rubixViewIcon from '../assets/icons/rubix_view.svg'
 import userIcon from '../assets/icons/user.png'
@@ -36,9 +37,10 @@ interface HeaderProps {
   onUserClick: () => void
   onRubixClick?: () => void
   isDark?: boolean
+  mission?: string
 }
 
-export function Header({ onTokenClick, onSupportClick, onUserClick, onRubixClick, isDark = false }: HeaderProps) {
+export function Header({ onTokenClick, onSupportClick, onUserClick, onRubixClick, isDark = false, mission }: HeaderProps) {
   const [isSearchActive, setIsSearchActive] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -99,6 +101,18 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onRubixClick
           >
             <img src={etsIcon} alt="ÉTS Montréal" className="w-full h-full object-cover" />
           </motion.a>
+
+          <motion.a
+            href="https://github.com/Forom-ets/forom"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center justify-center shrink-0 rounded-full overflow-hidden"
+            style={{ width: '36px', height: '36px' }}
+          >
+            <img src={githubIcon} alt="GitHub" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0) invert(1)' }} />
+          </motion.a>
         </div>
 
         {/* Search – circle expand animation */}
@@ -133,7 +147,8 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onRubixClick
       </div>
 
       {/* ---- Center: FOROM Logo ---- */}
-      <div className="relative flex items-center justify-center gap-3 shrink-0 mx-[5%]">
+      <div className="flex flex-col items-center justify-center shrink-0 mx-[5%]">
+        <div className="relative flex items-center justify-center gap-3">
         {LOGO_LETTERS.map((letter, index) => (
           <motion.span
             key={index}
@@ -183,6 +198,25 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onRubixClick
             style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
           />
         </a>
+        </div>
+        {/* Mission tagline */}
+        {mission && (
+          <div style={{
+            marginTop: '4px',
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '0.12em',
+            color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.45)',
+            textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+            maxWidth: '340px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            textAlign: 'center',
+          }}>
+            {mission}
+          </div>
+        )}
       </div>
 
       {/* ---- Right: Mail, Pixel Wallet ($), Help Hub (?), User ---- */}
@@ -194,11 +228,16 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onRubixClick
           rel="noopener noreferrer"
           whileHover={{ scale: 1.12 }}
           whileTap={{ scale: 0.9 }}
-          className="cursor-pointer"
-          style={{ color: isDark ? '#a1a1aa' : '#18181b' }}
+          className="rounded-full flex items-center justify-center cursor-pointer border-2"
+          style={{
+            width: '36px',
+            height: '36px',
+            backgroundColor: '#881FA0',
+            borderColor: isDark ? '#5b1470' : '#6b1a80',
+          }}
           title="Contact Us"
         >
-          <Mail size={24} strokeWidth={2} />
+          <Mail size={18} strokeWidth={2} color="#ffffff" />
         </motion.a>
 
         {/* Pixel Wallet ($) — solid green circle */}
@@ -210,8 +249,8 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onRubixClick
           style={{
             width: '36px',
             height: '36px',
-            backgroundColor: '#22c55e',
-            borderColor: isDark ? '#166534' : '#15803d',
+            backgroundColor: '#007F36',
+            borderColor: isDark ? '#004d20' : '#005c28',
           }}
           title="Pixel Wallet"
           aria-label="Pixel Wallet"
@@ -238,11 +277,11 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onRubixClick
           style={{
             width: '36px',
             height: '36px',
-            backgroundColor: '#f97316',
-            borderColor: isDark ? '#9a3412' : '#c2410c',
+            backgroundColor: '#FE6C17',
+            borderColor: isDark ? '#b84a0f' : '#d45610',
           }}
-          title="Help Hub"
-          aria-label="Help Hub"
+          title="Quest"
+          aria-label="Quest"
         >
           <span
             style={{

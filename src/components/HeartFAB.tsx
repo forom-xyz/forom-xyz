@@ -94,6 +94,12 @@ interface FloatingHeart {
   dx: number
 }
 
+interface HeartFABProps {
+  /** When true the FAB uses its own fixed positioning (default legacy behaviour).
+   *  When false it renders inline so a parent can control placement. */
+  fixed?: boolean
+}
+
 // =============================================================================
 // COMPONENT
 // =============================================================================

@@ -212,7 +212,7 @@ export function QuestModal({
               display: 'flex',
               flexDirection: 'column',
               boxSizing: 'border-box',
-              backgroundColor: '#FFA639',
+              backgroundColor: '#FE6C17',
               border: '6px solid black',
               borderRadius: '32px',
               color: 'white',

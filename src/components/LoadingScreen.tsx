@@ -93,14 +93,14 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         }} />
       </motion.div>
 
-      {/* ── 4. White exit overlay: fades in → full white → app ── */}
+      {/* ── 4. Black exit overlay: fades in → full black → app ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: phase === 'exit' ? 1 : 0 }}
         transition={{ duration: 0.5, ease: 'easeInOut' }}
         style={{
           position: 'absolute', inset: 0,
-          backgroundColor: '#ffffff',
+          backgroundColor: '#0a0a0a',
           zIndex: 20, willChange: 'opacity',
         }}
       />
