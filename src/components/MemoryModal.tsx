@@ -110,6 +110,7 @@ export function MemoryModal({
     videoUrl: '',
     description: '',
   })
+  const [isResumeVisible, setIsResumeVisible] = useState(true)
 
   useEffect(() => {
     if (memory) {
@@ -273,7 +274,7 @@ export function MemoryModal({
               ref={ytIframeRef}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none', zIndex: 0 }}
               src={`https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`}
-              allow="autoplay; encrypted-media"
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
               allowFullScreen
             />
           ) : (
@@ -299,6 +300,14 @@ export function MemoryModal({
             </span>
           </div>
 
+          {/* Toggle Résumé */}
+          <button
+            onClick={() => setIsResumeVisible((v) => !v)}
+            style={{ position: 'absolute', top: '24px', right: '90px', height: '40px', padding: '0 16px', borderRadius: '20px', background: isResumeVisible ? '#EAEAEA' : '#4ade80', border: '3px solid black', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '2px 2px 0 black', zIndex: 20, fontFamily: 'monospace', fontWeight: 900, fontSize: '14px', textTransform: 'uppercase' }}
+          >
+            {isResumeVisible ? 'Fermer Résumé' : 'Ouvrir Résumé'}
+          </button>
+
           {/* Exit cinema mode */}
           <button
             onClick={() => setIsVideoPlaying(false)}
@@ -308,25 +317,27 @@ export function MemoryModal({
           </button>
 
           {/* Résumé right panel */}
-          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '45%', background: 'rgba(234,234,234,0.25)', padding: '32px 28px 28px 28px', display: 'flex', flexDirection: 'column', zIndex: 10, boxSizing: 'border-box' }}>
-            <h3 style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '26px', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'right', marginBottom: '24px', marginTop: '52px', color: 'white', textShadow: '0 1px 8px rgba(0,0,0,0.8)' }}>Résumé</h3>
-            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '6px' }} className="custom-scrollbar-light">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingBottom: '32px', paddingRight: '4px' }}>
-                {displayBlocks.map((block, i) => {
-                  const base: React.CSSProperties = { fontFamily: "'Montserrat', sans-serif", textAlign: 'justify', color: 'white', lineHeight: 1.7, textShadow: '0 1px 6px rgba(0,0,0,0.7)' }
-                  switch (block.type) {
-                    case 'h1':    return <p key={i} style={{ ...base, fontWeight: 800, fontSize: '17px' }}>{block.content}</p>
-                    case 'h2':    return <p key={i} style={{ ...base, fontWeight: 700, fontSize: '14px' }}>{block.content}</p>
-                    case 'h3':    return <p key={i} style={{ ...base, fontWeight: 700, fontSize: '13px', textDecoration: 'underline' }}>{block.content}</p>
-                    case 'ul':    return <p key={i} style={{ ...base, fontSize: '13px' }}>• {block.content}</p>
-                    case 'ol':    return <p key={i} style={{ ...base, fontSize: '13px' }}>{i + 1}. {block.content}</p>
-                    case 'quote': return <p key={i} style={{ ...base, fontSize: '13px', borderLeft: '3px solid rgba(255,255,255,0.5)', paddingLeft: '10px', color: 'rgba(255,255,255,0.75)', fontStyle: 'italic' }}>{block.content}</p>
-                    default:      return <p key={i} style={{ ...base, fontSize: '13px' }}>{block.content}</p>
-                  }
-                })}
+          {isResumeVisible && (
+            <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '45%', background: 'rgba(234,234,234,0.25)', padding: '32px 28px 28px 28px', display: 'flex', flexDirection: 'column', zIndex: 10, boxSizing: 'border-box' }}>
+              <h3 style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '26px', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'right', marginBottom: '24px', marginTop: '52px', color: 'white', textShadow: '0 1px 8px rgba(0,0,0,0.8)' }}>Résumé</h3>
+              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '6px' }} className="custom-scrollbar-light">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingBottom: '32px', paddingRight: '4px' }}>
+                  {displayBlocks.map((block, i) => {
+                    const base: React.CSSProperties = { fontFamily: "'Montserrat', sans-serif", textAlign: 'justify', color: 'white', lineHeight: 1.7, textShadow: '0 1px 6px rgba(0,0,0,0.7)' }
+                    switch (block.type) {
+                      case 'h1':    return <p key={i} style={{ ...base, fontWeight: 800, fontSize: '17px' }}>{block.content}</p>
+                      case 'h2':    return <p key={i} style={{ ...base, fontWeight: 700, fontSize: '14px' }}>{block.content}</p>
+                      case 'h3':    return <p key={i} style={{ ...base, fontWeight: 700, fontSize: '13px', textDecoration: 'underline' }}>{block.content}</p>
+                      case 'ul':    return <p key={i} style={{ ...base, fontSize: '13px' }}>• {block.content}</p>
+                      case 'ol':    return <p key={i} style={{ ...base, fontSize: '13px' }}>{i + 1}. {block.content}</p>
+                      case 'quote': return <p key={i} style={{ ...base, fontSize: '13px', borderLeft: '3px solid rgba(255,255,255,0.5)', paddingLeft: '10px', color: 'rgba(255,255,255,0.75)', fontStyle: 'italic' }}>{block.content}</p>
+                      default:      return <p key={i} style={{ ...base, fontSize: '13px' }}>{block.content}</p>
+                    }
+                  })}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       )
     }
