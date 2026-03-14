@@ -60,27 +60,14 @@ interface HeaderProps {
 
 export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick, onRomapClick, isDark = false, mission, isPhantom = false, seasonPhase = 'V1' }: HeaderProps) {
   const [isSearchActive, setIsSearchActive] = useState(false)
-  const [isCloseIcon, setIsCloseIcon] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const closeIconTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Auto-focus search input when it appears (after letters have exited)
+  // Auto-focus search input when it appears
   useEffect(() => {
-    if (isCloseIcon && searchInputRef.current) {
+    if (isSearchActive && searchInputRef.current) {
       searchInputRef.current.focus()
     }
-  }, [isCloseIcon])
-
-  // Delay switching to X until letters have all flown out (~0.5s)
-  useEffect(() => {
-    if (closeIconTimerRef.current) clearTimeout(closeIconTimerRef.current)
-    if (isSearchActive) {
-      closeIconTimerRef.current = setTimeout(() => setIsCloseIcon(true), 500)
-    } else {
-      setIsCloseIcon(false)
-    }
-    return () => { if (closeIconTimerRef.current) clearTimeout(closeIconTimerRef.current) }
   }, [isSearchActive])
 
   const handleCloseSearch = () => {
@@ -185,21 +172,67 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
         {/* ── FOROM row: auto-width, search left, badge right ── */}
         <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', pointerEvents: 'auto' }}>
 
-          {/* Search icon — absolute, left of the letters */}
-          <button
-            type="button"
-            className={`forom-search-btn${isCloseIcon ? ' forom-search-close' : ''}`}
-            onClick={() => isSearchActive ? handleCloseSearch() : setIsSearchActive(true)}
+          {/* Search area: expanding input to the left + button — anchored off the FOROM container */}
+          <div
             style={{
               position: 'absolute',
               right: 'calc(100% + 14px)',
               top: '50%',
               transform: 'translateY(-50%)',
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: '8px',
               zIndex: 1,
               pointerEvents: 'auto',
             }}
-            aria-label={isSearchActive ? 'Close search' : 'Open search'}
-          />
+          >
+            {/* Expanding input — grows to the LEFT of the button */}
+            <AnimatePresence>
+              {isSearchActive && (
+                <motion.div
+                  key="search-inp-wrap"
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 240, opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  transition={{ duration: 0.32, ease: 'easeInOut' }}
+                  style={{ overflow: 'hidden', flexShrink: 0 }}
+                >
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Escape' && handleCloseSearch()}
+                    placeholder="Search FOROM..."
+                    aria-label="Search"
+                    style={{
+                      width: '240px',
+                      background: 'transparent',
+                      border: 'none',
+                      borderBottom: '2px solid var(--color-text)',
+                      outline: 'none',
+                      fontSize: '20px',
+                      fontWeight: 600,
+                      fontFamily: 'Montserrat, sans-serif',
+                      color: 'var(--color-text)',
+                      caretColor: 'var(--color-text)',
+                      paddingBottom: '2px',
+                    }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Search / Close button */}
+            <button
+              type="button"
+              className={`forom-search-btn${isSearchActive ? ' forom-search-close' : ''}`}
+              onClick={() => isSearchActive ? handleCloseSearch() : setIsSearchActive(true)}
+              style={{ flexShrink: 0 }}
+              aria-label={isSearchActive ? 'Close search' : 'Open search'}
+            />
+          </div>
 
           {/* V1 badge — absolute, right of the letters */}
           <motion.button
@@ -258,77 +291,38 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             />
           </a>
 
-          {/* FOROM letters — single AnimatePresence, exits straight up */}
-          <AnimatePresence>
-            {!isSearchActive && (
-              <motion.div
-                key="forom-letters"
-                initial={{ y: 16, opacity: 0 }}
-                animate={{ y: 0, opacity: 1, transition: { duration: 0.28, ease: 'easeOut' } }}
-                exit={{ y: -72, opacity: 0, transition: { duration: 0.22, ease: 'easeIn' } }}
+          {/* FOROM letters — always visible, never animate out */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+          >
+            {LOGO_LETTERS.map((letter, index) => (
+              <motion.span
+                key={`l-${index}`}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{
+                  y: 0,
+                  opacity: 1,
+                  transition: { delay: index * 0.08, type: 'spring', damping: 14, stiffness: 120 },
+                }}
+                className="transition-colors duration-300"
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
+                  fontSize: '44px',
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontWeight: 900,
+                  color: isDark ? letter.darkColor : letter.color,
+                  lineHeight: 1,
+                  letterSpacing: '0.04em',
+                  display: 'inline-block',
                 }}
               >
-                {LOGO_LETTERS.map((letter, index) => (
-                  <motion.span
-                    key={`l-${index}`}
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{
-                      y: 0,
-                      opacity: 1,
-                      transition: { delay: index * 0.08, type: 'spring', damping: 14, stiffness: 120 },
-                    }}
-                    className="transition-colors duration-300"
-                    style={{
-                      fontSize: '44px',
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontWeight: 900,
-                      color: isDark ? letter.darkColor : letter.color,
-                      lineHeight: 1,
-                      letterSpacing: '0.04em',
-                      display: 'inline-block',
-                    }}
-                  >
-                    {letter.text}
-                  </motion.span>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Search input — fills the space where letters were */}
-          <AnimatePresence>
-            {isCloseIcon && (
-              <motion.input
-                ref={searchInputRef}
-                key="search-inp"
-                type="text"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Escape' && handleCloseSearch()}
-                placeholder="Search FOROM..."
-                aria-label="Search"
-                style={{
-                  width: '240px',
-                  background: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                  fontSize: '22px',
-                  fontWeight: 600,
-                  fontFamily: 'Montserrat, sans-serif',
-                  color: 'var(--color-text)',
-                  caretColor: 'var(--color-text)',
-                }}
-              />
-            )}
-          </AnimatePresence>
+                {letter.text}
+              </motion.span>
+            ))}
+          </div>
 
         </div>
 
