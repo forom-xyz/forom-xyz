@@ -33,7 +33,7 @@
 
 Imagine booting up a private **Minecraft server** with your friends, but instead of building blocky castles, you are building a highly structured, AI-powered knowledge base to achieve a real-world mission. 
 
-Every Forom starts as an untamed, private 10x10 matrix on a local machine. As your community completes quests, archives knowledge, and builds its economy, the server "levels up". The ultimate goal? Surviving 3 rigorous phases to awaken **ROM**—a locally hosted, embedded AI (RAG system) trained exclusively on your community's 10-year memory, and earning the right to connect your local server to the Global Public Lobby.
+Every Forom starts as an untamed, private 10x10 matrix on a local machine. As your community completes quests, archives knowledge, and builds its economy, the server "levels up". The ultimate goal? Surviving 3 rigorous phases to awaken **ROM**—a locally hosted, embedded AI (RAG system) trained exclusively on your community's 1-year memory, and earning the right to connect your local server to the Global Public Lobby.
 
 **We don't want your data.** You hold the hardware. You hold the keys. We just provide the engine.
 
@@ -169,7 +169,6 @@ Forom is built for high performance, utilizing a modern, edge-ready Vite stack.
 
 ### Quick Start (Dev Mode)
 
-```bash
 # Clone the repository
 git clone https://github.com/Forom-ets/forom.git
 cd forom
@@ -182,3 +181,21 @@ npm install
 
 # Start the Vite dev server
 npm run dev
+
+L'application sera accessible sur http://localhost:5173.
+
+## 🤝 Contribuer & Licence
+
+<div align="center">
+
+Forom est un projet Open Source. Forkez le code, modifiez l'économie, créez vos propres grilles et bâtissez votre univers.
+
+<a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="https://licensebuttons.net/l/by-sa/4.0/88x31.png" alt="CC BY-SA 4.0" /></a>
+
+Ce projet est distribué sous la licence Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0). Vous êtes libre de partager et d'adapter le matériel, à condition de créditer Forom et de partager vos modifications sous la même licence.
+
+Développé avec ❤️ pour préserver la mémoire à long terme de l'humanité.
+
+L'avenir de la navigation de contenu est fini.
+
+</div>
