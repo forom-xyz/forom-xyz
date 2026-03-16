@@ -1,6 +1,5 @@
 import { memo } from 'react'
-import { Play, Plus } from 'lucide-react'
-import { getMemoryThumbnail, hasVideo } from '../data/memories'
+import { QUESTION_COLORS } from '../data/memories'
 import type { Memory } from '../data/memories'
 
 // =============================================================================
@@ -15,8 +14,11 @@ export interface MemoryBoxProps {
   isSmall?: boolean
   isExtraSmall?: boolean
   isDark?: boolean
+  isLocked?: boolean
   onClick?: () => void
   onInfoClick?: () => void
+  questionLabels?: Record<string, string>
+  customBgColor?: string
 }
 
 // =============================================================================
@@ -24,10 +26,10 @@ export interface MemoryBoxProps {
 // =============================================================================
 
 const DIMENSIONS = {
-  centered: { width: '560px', height: '315px', minWidth: '560px', minHeight: '315px' },
-  default: { width: '240px', height: '135px', minWidth: '240px', minHeight: '135px' },
-  small: { width: '160px', height: '90px', minWidth: '160px', minHeight: '90px' },
-  extraSmall: { width: '80px', height: '45px', minWidth: '80px', minHeight: '45px' },
+  centered: { width: 'clamp(100px, min(35vw, 35vh), 400px)', height: 'clamp(100px, min(35vw, 35vh), 400px)', minWidth: '100px', minHeight: '100px' },
+  default: { width: 'clamp(60px, min(15vw, 15vh), 180px)', height: 'clamp(60px, min(15vw, 15vh), 180px)', minWidth: '60px', minHeight: '60px' },
+  small: { width: 'clamp(20px, min(5.5vw, 6vh), 120px)', height: 'clamp(20px, min(5.5vw, 6vh), 120px)', minWidth: '20px', minHeight: '20px' },
+  extraSmall: { width: 'clamp(15px, min(4vw, 4vh), 80px)', height: 'clamp(15px, min(4vw, 4vh), 80px)', minWidth: '15px', minHeight: '15px' },
 } as const
 
 // =============================================================================
@@ -42,8 +44,11 @@ export const MemoryBox = memo(function MemoryBox({
   isSmall = false,
   isExtraSmall = false,
   isDark = false,
+  isLocked = false,
   onClick,
   onInfoClick,
+  questionLabels = {},
+  customBgColor,
 }: MemoryBoxProps) {
   // Get dimensions from presets
   const dimensions = isCentered 
@@ -59,16 +64,13 @@ export const MemoryBox = memo(function MemoryBox({
     return <div style={{ ...dimensions, visibility: 'hidden' }} />
   }
 
-  const memoryHasVideo = memory ? hasVideo(memory) : false
-  const thumbnail = memory ? getMemoryThumbnail(memory) : null
   const title = memory?.title ?? 'Sans titre'
   const question = memory?.question ?? null
   const isFilled = memory?.isFilled ?? false
-  const iconSize = isCentered ? 48 : isExtraSmall ? 12 : isSmall ? 20 : 28
-  const showThumbnail = memoryHasVideo && thumbnail
 
   // For centered empty boxes, clicking should open the modal to create a memory
   const handleBoxClick = () => {
+    if (isLocked) return
     if (isCentered && !isFilled && onInfoClick) {
       // Empty centered box - open modal to create memory
       onInfoClick()
@@ -82,69 +84,74 @@ export const MemoryBox = memo(function MemoryBox({
     }
   }
 
-  // Font size for question text based on size
-  const questionFontSize = isCentered 
-    ? 'clamp(14px, 1.2vw, 20px)' 
-    : isExtraSmall 
-      ? 'clamp(6px, 0.5vw, 8px)'
-      : isSmall 
-        ? 'clamp(8px, 0.8vw, 12px)'
-        : 'clamp(10px, 1vw, 14px)'
-
   return (
     <div className="flex flex-col items-center">
       <div
         className="relative overflow-hidden flex items-center justify-center transition-transform duration-150 hover:scale-105"
         onClick={handleBoxClick}
         style={{
-          border: `3px solid ${borderColor}`,
-          backgroundColor: isDark ? '#27272a' : '#fefefe',
+          border: `3px solid ${isLocked ? (isDark ? '#444' : '#d1d5db') : borderColor}`,
+          backgroundColor: customBgColor ? customBgColor : (isDark ? '#27272a' : '#fefefe'),
           ...dimensions,
-          cursor: onClick || (isCentered && !isFilled && onInfoClick) ? 'pointer' : 'default',
+          cursor: isLocked ? 'not-allowed' : (onClick || (isCentered && !isFilled && onInfoClick) ? 'pointer' : 'default'),
           borderRadius: '16px',
+          opacity: isLocked ? 0.55 : 1,
         }}
       >
-        {showThumbnail ? (
-          // Thumbnail with play overlay and question text
-          <div className="relative w-full h-full">
-            <img
-              src={thumbnail}
-              alt={title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30">
-              {/* Question text at top for filled memories */}
-              {isFilled && question && (
-                <span 
-                  className="absolute top-2 left-2 right-2 text-white font-bold text-center truncate"
-                  style={{ 
-                    fontFamily: "'Jersey 15', sans-serif",
-                    fontSize: questionFontSize,
-                    textShadow: '0 1px 3px rgba(0,0,0,0.8)',
-                  }}
-                >
-                  {question}
-                </span>
-              )}
-              <div 
-                className="rounded-full flex items-center justify-center"
+        {isLocked && (
+          <div style={{
+            position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 10, borderRadius: '13px',
+          }}>
+            <span style={{ fontSize: isCentered ? 'clamp(24px, 4vw, 48px)' : isSmall ? 'clamp(12px, 2vw, 22px)' : isExtraSmall ? 'clamp(10px, 1.5vw, 13px)' : 'clamp(16px, 3vw, 30px)', userSelect: 'none' }}>🔒</span>
+          </div>
+        )}
+        {isFilled ? (
+          // Filled memory display (no thumbnail)
+          <div className="absolute inset-0 w-full h-full flex flex-col pt-3" style={{ zIndex: 3 }}>
+            {/* Dark overlay only for non-centered items (if not using custom background) */}
+            {!isCentered && !customBgColor && (
+              <div className="absolute inset-0 bg-black/10" style={{ zIndex: -1 }} />
+            )}
+            
+            {/* Title — centered in the box */}
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 8px', marginTop: '15px' }}>
+              <span
+                className={`text-center font-bold uppercase w-full ${customBgColor ? 'text-white' : (isDark ? 'text-white' : 'text-black')}`}
                 style={{
-                  width: iconSize * 1.5,
-                  height: iconSize * 1.5,
-                  backgroundColor: 'rgba(255,255,255,0.9)',
+                  fontFamily: "'Jersey 15', sans-serif",
+                  fontSize: isCentered ? 'clamp(20px, 3.5vw, 40px)' : isSmall ? 'clamp(10px, 1.5vw, 18px)' : isExtraSmall ? 'clamp(8px, 1vw, 10px)' : 'clamp(14px, 2vw, 24px)',
+                  lineHeight: 1.1,
+                  textShadow: customBgColor ? '2px 2px 4px rgba(0,0,0,0.5)' : 'none',
                 }}
               >
-                <Play 
-                  size={iconSize * 0.6} 
-                  className="text-gray-800 ml-0.5" 
-                  fill="currentColor"
-                />
-              </div>
+                {title}
+              </span>
             </div>
+
+            {/* Badge — pinned to bottom center */}
+            {question && (
+              <div style={{ paddingBottom: '10px', display: 'flex', justifyContent: 'center' }}>
+                <span
+                  className="flex items-center justify-center font-bold text-white uppercase shadow-sm"
+                  style={{
+                    fontFamily: "'Jersey 15', sans-serif",
+                    fontSize: isCentered ? 'clamp(12px, 2vw, 22px)' : isSmall ? 'clamp(8px, 1vw, 12px)' : isExtraSmall ? '8px' : 'clamp(10px, 1.5vw, 16px)',
+                    backgroundColor: question ? (QUESTION_COLORS[question] || borderColor) : borderColor,
+                    padding: isCentered ? '6px 24px' : '2px 10px',
+                    borderRadius: isCentered ? '12px' : '4px',
+                    border: isCentered ? '3px solid #111' : `2px solid ${borderColor}`,
+                    letterSpacing: isCentered ? '1px' : 'normal',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {questionLabels[question] || question}
+                </span>
+              </div>
+            )}
           </div>
         ) : (
-          // Empty slot with plus sign
+          // Empty slot with frame number
           <div 
             className="w-full h-full flex items-center justify-center"
             style={{
@@ -153,39 +160,21 @@ export const MemoryBox = memo(function MemoryBox({
                 : 'linear-gradient(135deg, #fefefe 0%, #f0f0f5 100%)',
             }}
           >
-            <Plus 
-              size={iconSize} 
-              strokeWidth={isCentered ? 2.5 : 2}
-              style={{ color: borderColor, opacity: isCentered ? 0.7 : 0.5 }} 
-            />
+            <span
+              style={{
+                fontFamily: "'Jersey 15', sans-serif",
+                fontSize: isCentered ? 'clamp(60px, 12vw, 120px)' : isSmall ? 'clamp(24px, 4vw, 48px)' : isExtraSmall ? 'clamp(12px, 2vw, 24px)' : 'clamp(36px, 6vw, 72px)',
+                color: borderColor,
+                opacity: isCentered ? 0.6 : 0.4,
+                lineHeight: 1
+              }}
+            >
+              {displayNumber !== null && displayNumber !== undefined ? (displayNumber + 1).toString().padStart(2, '0') : ''}
+            </span>
           </div>
         )}
       </div>
       
-      {/* Info bar - only for centered items */}
-      {isCentered && onInfoClick && (
-        <div
-          className="w-full flex justify-between items-center mt-2 cursor-pointer select-none hover:opacity-80 transition-opacity"
-          onClick={(e) => {
-            e.stopPropagation()
-            onInfoClick()
-          }}
-          style={{
-            fontFamily: "'Jersey 15', sans-serif",
-            color: isDark ? '#ffffff' : '#000000',
-            fontSize: '24px',
-          }}
-        >
-          <span>
-            {displayNumber !== null && displayNumber !== undefined 
-              ? (displayNumber + 1).toString().padStart(2, '0') + '.' 
-              : ''}
-          </span>
-          <span className="truncate ml-2 text-right flex-1">
-            {title}
-          </span>
-        </div>
-      )}
     </div>
   )
 })

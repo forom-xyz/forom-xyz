@@ -4,22 +4,51 @@
 
 /** Available WH-questions for memories */
 export const WH_QUESTIONS = [
-  'QUI?',
-  'QUOI?',
-  'OU?',
-  'QUAND?',
-  'COMMENT?',
-  'COMBIEN?',
-  'POURQUOI?',
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
 ] as const
 
 export type WhQuestion = (typeof WH_QUESTIONS)[number]
+
+export const QUESTION_COLORS: Record<string, string> = {
+  '0': '#DF1F24', // Red
+  '1': '#EE8712', // Orange (blend red→yellow)
+  '2': '#FDF000', // Yellow
+  '3': '#7EB71B', // Lime (blend yellow→green)
+  '4': '#007F36', // Green
+  '5': '#009691', // Teal (blend green→sky blue)
+  '6': '#00ADED', // Sky Blue
+  '7': '#186DB7', // Medium Blue (blend sky→dark blue)
+  '8': '#302E81', // Dark Blue
+  '9': '#EC028A', // Magenta
+}
+
+export const QUESTION_ORDER: WhQuestion[] = [
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+]
 
 export interface Memory {
   /** Unique identifier for the memory */
   id: string
   /** Category this memory belongs to */
-  category: 'Partenaires' | 'Culture' | 'Clubs' | 'Trésorie' | 'Atelier'
+  category: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J'
   /** WH-question for this memory (Comment?, Pourquoi?, etc.) */
   question: WhQuestion | null
   /** Title of the memory - acts as the response to the question */
@@ -30,6 +59,8 @@ export interface Memory {
   videoUrl: string | null
   /** Optional custom thumbnail URL (overrides YouTube thumbnail) */
   thumbnailUrl: string | null
+  /** Optional list of source URLs for this memory */
+  sources?: string[]
   /** Whether this memory has been filled by a user */
   isFilled: boolean
 }
@@ -38,11 +69,24 @@ export interface Memory {
 // CATEGORY CONFIGURATION
 // =============================================================================
 
-export const CATEGORIES = ['Partenaires', 'Culture', 'Clubs', 'Trésorie', 'Atelier'] as const
+export const CATEGORY_COLORS: Record<string, string> = {
+  A: '#881FA0', // Purple
+  B: '#4C2CA2', // Purple-Blue blend
+  C: '#1139A4', // Blue
+  D: '#085C6D', // Blue-Green blend
+  E: '#007F36', // Green
+  F: '#7EB21B', // Green-Yellow blend
+  G: '#FDE500', // Yellow
+  H: '#FEA80B', // Yellow-Orange blend
+  I: '#FE6C17', // Orange
+  J: '#F60B0F', // Red
+}
+
+export const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] as const
 export type CategoryType = (typeof CATEGORIES)[number]
 
-export const ITEMS_PER_ROW = 20
-export const TOTAL_ROWS = 5
+export const ITEMS_PER_ROW = 10
+export const TOTAL_ROWS = 10
 
 // =============================================================================
 // HELPER FUNCTIONS
@@ -126,18 +170,18 @@ export function hasVideo(memory: Memory): boolean {
 
 /**
  * Generates placeholder memories for development/testing
- * Creates 100 items (5 categories × 20 items each)
+ * Creates 100 items (10 categories × 10 items each)
  * All slots are empty by default - ready to be filled with real content
  */
 function generatePlaceholderMemories(): Memory[] {
   const memories: Memory[] = []
 
-  CATEGORIES.forEach((category, _categoryIndex) => {
+  CATEGORIES.forEach((category) => {
     for (let i = 0; i < ITEMS_PER_ROW; i++) {
       memories.push({
         id: `${category.toLowerCase()}-${i}`,
         category,
-        question: null,
+        question: WH_QUESTIONS[i] || null,
         title: `Emplacement ${i + 1}`,
         description: 'Cet emplacement est disponible. Ajoutez une vidéo ou un contenu pour le remplir.',
         videoUrl: null,
