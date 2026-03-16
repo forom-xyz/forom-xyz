@@ -4,6 +4,7 @@ import { MemoryBox } from './MemoryBox'
 import { MemoryModal } from './MemoryModal'
 import { getMemory, ITEMS_PER_ROW, QUESTION_ORDER, QUESTION_COLORS, CATEGORY_COLORS } from '../data/memories'
 import type { Memory, CategoryType } from '../data/memories'
+import { mixColors } from '../utils/colors'
 
 // =============================================================================
 // TYPES
@@ -50,25 +51,6 @@ const getNavButtonStyle = (isDark: boolean): React.CSSProperties => ({
 // =============================================================================
 // HELPER
 // =============================================================================
-
-export const mixColors = (color1: string, color2: string): string => {
-  if (!color1 || !color2) return color1 || color2 || '#ffffff';
-  const hexToRgb = (hex: string) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
-  };
-  const c1 = hexToRgb(color1);
-  const c2 = hexToRgb(color2);
-  if (!c1 || !c2) return color1 || color2;
-  const r = Math.round((c1.r + c2.r) / 2);
-  const g = Math.round((c1.g + c2.g) / 2);
-  const b = Math.round((c1.b + c2.b) / 2);
-  const componentToHex = (c: number) => {
-    const hex = c.toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-  };
-  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-};
 
 // =============================================================================
 // COMPONENT
@@ -118,7 +100,7 @@ export function CarouselGrid({
   }
 
   // Handle memory update from modal
-  const handleMemoryUpdate = useCallback((_updatedMemory: Memory) => {
+  const handleMemoryUpdate = useCallback((_updatedMemory: Memory) => { // eslint-disable-line @typescript-eslint/no-unused-vars
     // Force re-render of the grid to reflect changes
     setMemoryUpdateKey(prev => prev + 1)
   }, [])
@@ -488,7 +470,7 @@ export function CarouselGrid({
             let memory = getMemoryForPosition(rowOffset, col)
 
             // Determine if there is a quest assigned to this slot
-            let itemBorderColor = memory ? mixColors(CATEGORY_COLORS[memory.category] || '#ffffff', memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888') : '#555555';
+            const itemBorderColor = memory ? mixColors(CATEGORY_COLORS[memory.category] || '#ffffff', memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888') : '#555555';
             let customBgColor: string | undefined = undefined;
             if (memory) {
               const catColor = CATEGORY_COLORS[memory.category] || '#ffffff';
@@ -593,7 +575,7 @@ export function CarouselGrid({
               {Array.from({ length: 10 }).map((_, col) => {
                 const globalIndex = row * 10 + col
                 let memory = getMemory(category as CategoryType, col)
-                let itemBorderColor = memory ? mixColors(CATEGORY_COLORS[memory.category] || '#ffffff', memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888') : '#e5e7eb';
+                const itemBorderColor = memory ? mixColors(CATEGORY_COLORS[memory.category] || '#ffffff', memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888') : '#e5e7eb';
                 let customBgColor: string | undefined = undefined;
                 
                 if (memory) {

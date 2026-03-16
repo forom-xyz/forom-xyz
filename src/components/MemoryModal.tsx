@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import Modal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Play, Plus, ChevronRight, Image as ImageIcon } from 'lucide-react'
-import RichTextEditor, { deserializeBlocks } from './RichTextEditor'
+import RichTextEditor from './RichTextEditor'
+import { deserializeBlocks, type Block } from '../utils/richText'
 import { extractYouTubeId, hasVideo, updateMemory, QUESTION_COLORS, QUESTION_ORDER } from '../data/memories'
 import type { Memory, WhQuestion, CategoryType } from '../data/memories'
 
@@ -90,7 +91,7 @@ export function MemoryModal({
   onClose,
   memory,
   borderColor = '#E5E7EB',
-  index: _index,
+  index: _index, // eslint-disable-line @typescript-eslint/no-unused-vars
   onMemoryUpdate,
   questionLabels = {},
 }: MemoryModalProps) {
@@ -101,7 +102,7 @@ export function MemoryModal({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [videoCurrentTime, setVideoCurrentTime] = useState(0)
   const [videoDuration, setVideoDuration] = useState(0)
-  const ytPlayerRef = useRef<any>(null)
+  const ytPlayerRef = useRef<any>(null) // eslint-disable-line @typescript-eslint/no-explicit-any
   const ytTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const ytIframeRef = useRef<HTMLIFrameElement>(null)
   const [formData, setFormData] = useState<FormData>({
@@ -115,7 +116,7 @@ export function MemoryModal({
   useEffect(() => {
     if (memory) {
       const defaultEmptyTitle = memory.title.startsWith('Emplacement ') ? '' : memory.title;
-      setFormData({
+      setFormData({ // eslint-disable-line react-hooks/set-state-in-effect
         question: memory.question,
         title: memory.isFilled ? memory.title : defaultEmptyTitle,
         videoUrl: memory.videoUrl || '',
@@ -143,8 +144,8 @@ export function MemoryModal({
       if (ytTimerRef.current) { clearInterval(ytTimerRef.current); ytTimerRef.current = null }
       if (ytPlayerRef.current?.destroy) ytPlayerRef.current.destroy()
       ytPlayerRef.current = null
-      setVideoCurrentTime(0)
-      setVideoDuration(0)
+      setVideoCurrentTime(0) // eslint-disable-line react-hooks/set-state-in-effect
+      setVideoDuration(0)  
       return
     }
 
@@ -246,7 +247,7 @@ export function MemoryModal({
 
     const DescriptionContent = () => (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingBottom: '32px', paddingRight: '4px' }}>
-        {displayBlocks.map((block, i) => {
+        {displayBlocks.map((block: Block, i: number) => {
           const base: React.CSSProperties = { fontFamily: "'Montserrat', sans-serif", textAlign: 'justify', color: 'rgba(0,0,0,0.88)', lineHeight: 1.7 }
           switch (block.type) {
             case 'h1':    return <p key={i} style={{ ...base, fontWeight: 800, fontSize: '17px' }}>{block.content}</p>
@@ -322,7 +323,7 @@ export function MemoryModal({
               <h3 style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '26px', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'right', marginBottom: '24px', marginTop: '52px', color: 'white', textShadow: '0 1px 8px rgba(0,0,0,0.8)' }}>Résumé</h3>
               <div style={{ flex: 1, overflowY: 'auto', paddingRight: '6px' }} className="custom-scrollbar-light">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingBottom: '32px', paddingRight: '4px' }}>
-                  {displayBlocks.map((block, i) => {
+                  {displayBlocks.map((block: Block, i: number) => {
                     const base: React.CSSProperties = { fontFamily: "'Montserrat', sans-serif", textAlign: 'justify', color: 'white', lineHeight: 1.7, textShadow: '0 1px 6px rgba(0,0,0,0.7)' }
                     switch (block.type) {
                       case 'h1':    return <p key={i} style={{ ...base, fontWeight: 800, fontSize: '17px' }}>{block.content}</p>

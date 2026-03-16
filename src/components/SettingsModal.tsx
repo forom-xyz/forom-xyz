@@ -85,8 +85,8 @@ export function SettingsModal({
 
   useEffect(() => {
     if (isOpen) {
-      setLocalCategoryLabels({ ...currentCategoryLabels })
-      setLocalQuestionLabels({ ...currentQuestionLabels })
+      setLocalCategoryLabels({ ...currentCategoryLabels }) // eslint-disable-line react-hooks/set-state-in-effect
+      setLocalQuestionLabels({ ...currentQuestionLabels })  
     }
   }, [isOpen, currentCategoryLabels, currentQuestionLabels])
 

@@ -176,7 +176,7 @@ export function hasVideo(memory: Memory): boolean {
 function generatePlaceholderMemories(): Memory[] {
   const memories: Memory[] = []
 
-  CATEGORIES.forEach((category, _categoryIndex) => {
+  CATEGORIES.forEach((category) => {
     for (let i = 0; i < ITEMS_PER_ROW; i++) {
       memories.push({
         id: `${category.toLowerCase()}-${i}`,

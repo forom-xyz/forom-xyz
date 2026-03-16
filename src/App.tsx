@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { LoadingScreen } from './components/LoadingScreen'
 import { ForomLobby } from './components/ForomLobby'
 import { ForomCreationFlow } from './components/ForomCreationFlow'
-import { type ForomColor } from './components/ChooseColorScreen'
+import { type ForomColor } from './utils/foromColors'
 import { Header } from './components/Header'
 import { Sidebar } from './components/Sidebar'
 import { CarouselGrid } from './components/CarouselGrid'
@@ -26,18 +26,7 @@ import { DEFAULT_PUBLIC_FOROM_MISSION, getInitialQuestsForMission } from './data
 
 import { useAppStore } from './stores/useAppStore'
 import { useModalStore } from './stores/useModalStore'
-
-// Leveling helper — 10 XP per quest, 10 quests = lvl 1 (100 XP per level)
-export function getLevelAndTitle(xp: number) {
-  const level = Math.floor(xp / 100)
-  let title = 'Citoyen'
-  if (level >= 100) title = 'Légende'
-  else if (level >= 75) title = 'Soul'
-  else if (level >= 50) title = 'Lumière'
-  else if (level >= 25) title = 'Mage'
-  
-  return { level, title }
-}
+import { getLevelAndTitle } from './utils/leveling'
 
 // =============================================================================
 // CONSTANTS

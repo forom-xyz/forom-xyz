@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-// Import local types safely if needed, otherwise use ANY right now. We'll type this properly.
-// e.g., import type { Quest } from '../components/QuestModal';
+import type { Quest } from '../components/QuestModal';
+import type { Memory } from '../data/memories';
+import type { VideoData } from '../data/videos';
 
 /**
  * @interface ModalStore
@@ -18,19 +19,19 @@ interface ModalStore {
   isVideoOpen: boolean;
 
   // Selected Payloads (Data displayed inside the active modal)
-  selectedQuest: any | null;    // Replace 'any' with explicit Quest type later
+  selectedQuest: Quest | null;
   selectedUserId: string | null;
-  selectedMemory: any | null;   // Replace 'any' with Memory object type
-  selectedVideo: any | null;    // Replace 'any' with Video object type
+  selectedMemory: Memory | null;
+  selectedVideo: VideoData | null;
 
   // Open Actions
   openWallet: () => void;
-  openQuest: (quest?: any) => void;
+  openQuest: (quest?: Quest) => void;
   openUser: (userId?: string) => void;
   openRomap: () => void;
   openSettings: () => void;
-  openMemory: (memory?: any) => void;
-  openVideo: (video?: any) => void;
+  openMemory: (memory?: Memory) => void;
+  openVideo: (video?: VideoData) => void;
 
   // Close Actions
   closeWallet: () => void;
@@ -45,7 +46,7 @@ interface ModalStore {
   closeAll: () => void;
 }
 
-export const useModalStore = create<ModalStore>((set) => ({
+export const useModalStore = create<ModalStore>((set, _get) => ({ // eslint-disable-line @typescript-eslint/no-unused-vars
   // Defaults
   isWalletOpen: false,
   isQuestOpen: false,
@@ -64,10 +65,10 @@ export const useModalStore = create<ModalStore>((set) => ({
   openWallet: () => set({ isWalletOpen: true }),
   closeWallet: () => set({ isWalletOpen: false }),
 
-  openQuest: (quest) => set({ isQuestOpen: true, selectedQuest: quest ?? null }),
+  openQuest: (quest?: Quest) => set({ isQuestOpen: true, selectedQuest: quest ?? null }),
   closeQuest: () => set({ isQuestOpen: false, selectedQuest: null }),
 
-  openUser: (userId) => set({ isUserOpen: true, selectedUserId: userId ?? null }),
+  openUser: (userId?: string) => set({ isUserOpen: true, selectedUserId: userId ?? null }),
   closeUser: () => set({ isUserOpen: false, selectedUserId: null }),
 
   openRomap: () => set({ isRomapOpen: true }),
@@ -76,10 +77,10 @@ export const useModalStore = create<ModalStore>((set) => ({
   openSettings: () => set({ isSettingsOpen: true }),
   closeSettings: () => set({ isSettingsOpen: false }),
 
-  openMemory: (memory) => set({ isMemoryOpen: true, selectedMemory: memory ?? null }),
+  openMemory: (memory?: Memory) => set({ isMemoryOpen: true, selectedMemory: memory ?? null }),
   closeMemory: () => set({ isMemoryOpen: false, selectedMemory: null }),
 
-  openVideo: (video) => set({ isVideoOpen: true, selectedVideo: video ?? null }),
+  openVideo: (video?: VideoData) => set({ isVideoOpen: true, selectedVideo: video ?? null }),
   closeVideo: () => set({ isVideoOpen: false, selectedVideo: null }),
 
   closeAll: () => set({

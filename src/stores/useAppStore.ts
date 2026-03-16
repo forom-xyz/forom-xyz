@@ -28,16 +28,16 @@ interface AppStore {
   clearJoinContext: () => void;
 }
 
-export const useAppStore = create<AppStore>((set) => ({
+export const useAppStore = create<AppStore>((set, _get) => ({ // eslint-disable-line @typescript-eslint/no-unused-vars
   phase: 'loading',
   language: 'fr',
   selectedColor: null,
   joinRule: null,
 
-  setPhase: (phase) => set({ phase }),
-  setLanguage: (language) => set({ language }),
-  setSelectedColor: (color) => set({ selectedColor: color }),
-  setJoinRule: (rule) => set({ joinRule: rule }),
+  setPhase: (phase: AppPhase) => set({ phase }),
+  setLanguage: (language: AppLanguage) => set({ language }),
+  setSelectedColor: (color: string | null) => set({ selectedColor: color }),
+  setJoinRule: (rule: string | null) => set({ joinRule: rule }),
   
   clearJoinContext: () => set({ selectedColor: null, joinRule: null }),
 }));

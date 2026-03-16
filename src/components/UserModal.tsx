@@ -2,7 +2,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useCallback } from 'react'
 import userIcon from '../assets/icons/user.png'
-import type { ForomColor } from './ChooseColorScreen'
+import type { ForomColor } from '../utils/foromColors'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props

@@ -3,44 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { X } from 'lucide-react'
 import { QUESTION_ORDER, QUESTION_COLORS, CATEGORY_COLORS, getMemory } from '../data/memories'
-import type { CategoryType } from '../data/memories'
+import type { CategoryType, WhQuestion } from '../data/memories'
+import { mixColors } from '../utils/colors'
 
 // Category band colors removed because we now use mixColors
 
 // =============================================================================
 // TYPES
 // =============================================================================
-
-export function mixColors(color1: string, color2: string): string {
-  // Simple hex color mixer
-  if (!color1 || !color2) return color1 || color2 || '#ffffff';
-  
-  // Convert hex to rgb
-  const hexToRgb = (hex: string) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : null;
-  };
-  
-  const c1 = hexToRgb(color1);
-  const c2 = hexToRgb(color2);
-  
-  if (!c1 || !c2) return color1 || color2;
-  
-  const r = Math.round((c1.r + c2.r) / 2);
-  const g = Math.round((c1.g + c2.g) / 2);
-  const b = Math.round((c1.b + c2.b) / 2);
-  
-  const componentToHex = (c: number) => {
-    const hex = c.toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-  };
-  
-  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
 
 export interface Quest {
   id: string
@@ -181,7 +151,7 @@ export function QuestModal({
   // Auto-switch to quest log and highlight the accepted quest
   useEffect(() => {
     if (acceptedQuestId) {
-      setBoardSelectedId(acceptedQuestId)
+      setBoardSelectedId(acceptedQuestId) // eslint-disable-line react-hooks/set-state-in-effect
       setActiveTab('community')
     }
   }, [acceptedQuestId])
@@ -415,7 +385,7 @@ export function QuestModal({
                           }
                           const tagColor = active.question ? (QUESTION_COLORS[active.question] || '#888') : null
                           const tagLabel = active.question ? (questionLabels[active.question] || active.question) : null
-                          const qIdx = active.question ? QUESTION_ORDER.indexOf(active.question as any) : -1
+                          const qIdx = active.question ? QUESTION_ORDER.indexOf(active.question as WhQuestion) : -1
                           const mem = qIdx >= 0 ? getMemory(active.category as CategoryType, qIdx) : null
                           const descWordCount = (mem?.isFilled && mem?.description) ? mem.description.trim().split(/\s+/).filter(Boolean).length : 0
                           const objectives = [
@@ -551,7 +521,7 @@ export function QuestModal({
                             </button>
                             {(() => {
                               const qObj = personalQuests.find(q => q.id === boardSelectedId);
-                              const qIdx2 = qObj?.question ? QUESTION_ORDER.indexOf(qObj.question as any) : -1;
+                              const qIdx2 = qObj?.question ? QUESTION_ORDER.indexOf(qObj.question as WhQuestion) : -1;
                               const mem2 = qIdx2 >= 0 ? getMemory(qObj!.category as CategoryType, qIdx2) : null;
                               const descWords2 = (mem2?.isFilled && mem2?.description) ? mem2.description.trim().split(/\s+/).filter(Boolean).length : 0;
                               const canComplete = !!boardSelectedId && !!(mem2?.videoUrl) && descWords2 >= 100 && !!(mem2?.sources && mem2.sources.length > 0);

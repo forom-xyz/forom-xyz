@@ -92,6 +92,8 @@ interface FloatingHeart {
   id: number
   /** small horizontal drift (-12 .. +12 px) */
   dx: number
+  /** random x offset for animation */
+  randomX: number
 }
 
 interface HeartFABProps {
@@ -110,13 +112,14 @@ export function HeartFAB({ fixed = true }: HeartFABProps) {
 
   // Mutable refs – avoids stale-closure problems inside the interval
   const accRef      = useRef(0)        // accumulated visible-tab ms
-  const lastTickRef = useRef(Date.now())
+  const lastTickRef = useRef<number>(0)
   const nextIdRef   = useRef(0)
 
   // ── Initialise from localStorage ────────────────────────────────────────────
   useEffect(() => {
+    lastTickRef.current = Date.now()
     const { count, lastTs } = loadStorage()
-    setHeartCount(count)
+    setHeartCount(count) // eslint-disable-line react-hooks/set-state-in-effect
 
     // Resume partial progress from previous session
     if (lastTs > 0) {
@@ -137,7 +140,8 @@ export function HeartFAB({ fixed = true }: HeartFABProps) {
 
     const id = nextIdRef.current++
     const dx = Math.round(Math.random() * 24 - 12)
-    setFloatingHearts(prev => [...prev, { id, dx }])
+    const randomX = Math.random() * 10 - 5
+    setFloatingHearts(prev => [...prev, { id, dx, randomX }])
 
     // Remove particle after its animation finishes
     setTimeout(() => {
@@ -195,13 +199,13 @@ export function HeartFAB({ fixed = true }: HeartFABProps) {
       {/* Floating voxel heart particles */}
       <div className="relative flex flex-col items-center">
         <AnimatePresence>
-          {floatingHearts.map(({ id, dx }) => (
+          {floatingHearts.map(({ id, dx, randomX }) => (
             <motion.div
               key={id}
               className="absolute pointer-events-none select-none"
               style={{ bottom: '100%', left: '50%' }}
               initial={{ opacity: 1, x: dx - 11, y: 0, scale: 0.8 }}
-              animate={{ opacity: 0, x: dx + (Math.random() * 10 - 5), y: -60, scale: 1.3 }}
+              animate={{ opacity: 0, x: dx + randomX, y: -60, scale: 1.3 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.3, ease: [0.22, 1, 0.36, 1] }}
             >

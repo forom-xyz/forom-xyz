@@ -2,7 +2,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import romWht from '../assets/icons/rom_wht.png'
 import foromLogoBlk from '../assets/icons/forom_logo_blk.png'
-import type { ForomColor } from './ChooseColorScreen'
+import type { ForomColor } from '../utils/foromColors'
 
 type Step = 'mission' | 'color' | 'friends' | 'rules' | 'welcome'
 

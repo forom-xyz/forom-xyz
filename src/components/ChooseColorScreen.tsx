@@ -1,26 +1,18 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import romWht from '../assets/icons/rom_wht.png'
+import { type ForomColor } from '../utils/foromColors'
 
 interface ChooseColorScreenProps {
   onConfirm: (color: ForomColor) => void
   onBack: () => void
 }
 
-export type ForomColor = 'social' | 'guardien' | 'creation'
-
 const COLORS: { id: ForomColor; label: string; bg: string; text: string }[] = [
   { id: 'social',   label: 'SOCIAL',   bg: '#3333DD', text: '#ffffff' },
   { id: 'guardien', label: 'GUARDIEN', bg: '#EE2222', text: '#ffffff' },
   { id: 'creation', label: 'CRÉATION', bg: '#DDFF55', text: '#ffffff' },
 ]
-
-// Visual color dot used in UserModal
-export const FOROM_COLOR_MAP: Record<ForomColor, { bg: string; label: string }> = {
-  social:   { bg: '#3333DD', label: 'SOCIAL'   },
-  guardien: { bg: '#EE2222', label: 'GUARDIEN' },
-  creation: { bg: '#DDFF55', label: 'CRÉATION' },
-}
 
 export function ChooseColorScreen({ onConfirm, onBack }: ChooseColorScreenProps) {
   const [selected, setSelected] = useState<ForomColor | null>(null)
