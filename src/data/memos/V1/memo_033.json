@@ -1,0 +1,16 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "A0",
+  "y_axis_district": "Vision",
+  "x_axis_action": "Idée",
+  "title": "Valeur pilier",
+  "image_url": "https://forom.community/images/grid_A0.png",
+  "video_url": "https://www.youtube.com/watch?v=9S_f9S3tEos",
+  "sources": [
+    "[cite: 2] README.md: Philosophy and Grid Overview",
+    " forom-config.ts: Default Category and Question Labels",
+    " quests.ts: Foundational Quest Specifications"
+  ],
+  "resume": "The foundational core of a Forom begins with the establishment of a 'Valeur pilier' (Pillar Value), which resides at the intersection of District A (Vision) and Action 0 (Idée) within the 10x10 FRM Grid[cite: 2]. According to the project's 'Minecraft Server' philosophy, every community starts as a private, untamed matrix where data sovereignty is absolute; users hold the hardware and the keys rather than renting cloud space[cite: 2]. This specific quest, identified as A0, is the first step in Phase 1: The Foundations (V1), where the goal is to populate the grid with 100 high-quality foundational memos[cite: 2]. Technically, this vision is supported by a modern stack including React 19, Vite 7, and Tailwind 4, ensuring that the spatial 5x5 viewport remains performant while rendering the infinite grid[cite: 2]. The 'Valeur pilier' acts as the philosophical anchor for the entire community mission, which in the default Public Forom is defined as 'Saving human communities and long-term memory'[cite: 2]. The economic layer of the Forom reinforces this value-building; completing this quest rewards the contributor with 2 Pixels (PX), the ecosystem's internal currency used to redistribute purchasing power to the community[cite: 2]. As the community progresses, these pillar values will eventually be ingested by ROM, the locally hosted RAG (Retrieval-Augmented Generation) system, which awakens in Phase 3 after the community proves its resilience and organizational strength[cite: 2]. By archiving these values in the database—structured via the 'memos' table which links users, categories, and specific WH-questions—the Forom ensures that the mission remains consistent even as members change. This architectural approach transforms a standard knowledge base into a 'multiplayer command center' designed for decadal memory preservation[cite: 2]. To support this vision, the hardware setup recommends an NVIDIA Jetson for local AI inference, allowing the community to maintain its intelligence edge without relying on external APIs[cite: 2]. Thus, the A0 quest is not merely a text entry; it is the cryptographic and philosophical seed of a federated ecosystem[cite: 2].",
+  "summary": "The 'Valeur pilier' quest (A0) establishes the foundational philosophical anchor for a community's vision within the 10x10 FRM grid, initiating the V1 phase of data preservation."
+}
