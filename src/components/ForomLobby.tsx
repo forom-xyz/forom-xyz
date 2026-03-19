@@ -1,18 +1,15 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import romWht from '../assets/icons/rom_wht.png'
 import foromLogoWht from '../assets/icons/forom_logo_wht.png'
 import githubIcon from '../assets/icons/github.png'
 import chromaNotesIcon from '../assets/icons/chroma_notes.svg'
 import userIcon from '../assets/icons/user.png'
+import { RomOnboarding } from './RomOnboarding'
 
 const LANGUAGES = [
-  { id: 'ar', label: 'مرحبا' },
-  { id: 'hi', label: 'स्वागत' },
-  { id: 'es', label: 'BIENVENIDO' },
-  { id: 'fr', label: 'BIENVENUE' },
   { id: 'en', label: 'WELCOME' },
-  { id: 'zh', label: '歡迎' },
+  { id: 'fr', label: 'BIENVENUE' },
+  { id: 'es', label: 'BIENVENIDO' },
 ]
 
 const N = LANGUAGES.length
@@ -28,8 +25,8 @@ function LanguageCarousel({
 }: {
   onChange: (id: string) => void
 }) {
-  // Start centered on 'fr' (index 3)
-  const [center, setCenter] = useState(3)
+  // Start centered on 'en' (index 0)
+  const [center, setCenter] = useState(0)
 
   const move = useCallback((dir: number) => {
     setCenter(prev => {
@@ -116,7 +113,7 @@ function LanguageCarousel({
   )
 }
 
-export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onConfirm: () => void; onSkip?: () => void; onSignIn?: (username: string) => void; currentUser?: string | null }) {
+export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToLoading }: { onConfirm: () => void; onSkip?: () => void; onSignIn?: (username: string) => void; currentUser?: string | null; onBackToLoading?: () => void }) {
   const [isCreateSelected, setIsCreateSelected] = useState(false)
   const [isSignInOpen, setIsSignInOpen] = useState(false)
   const [username, setUsername] = useState('')
@@ -127,6 +124,16 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
   const [joinStep, setJoinStep] = useState<'idle' | 'color' | 'rule'>('idle')
   const [joinColor, setJoinColor] = useState<string | null>(null)
   const [joinRule, setJoinRule] = useState('')
+  
+  const [romPhase, setRomPhase] = useState<string | number>(0)
+
+  const [activeLang, setActiveLang] = useState('en')
+  const TRANSLATIONS: Record<string, any> = {
+    en: { rejoindre: 'JOIN', creer: 'CREATE', connectKey: 'Connect with a Key', confirmer: 'Confirm', public: 'Public', prive: 'Private' },
+    fr: { rejoindre: 'REJOINDRE', creer: 'CRÉER', connectKey: 'Se connecter avec une clé', confirmer: 'Confirmer', public: 'Public', prive: 'Privé' },
+    es: { rejoindre: 'UNIRSE', creer: 'CREAR', connectKey: 'Conectar con una llave', confirmer: 'Confirmar', public: 'Público', prive: 'Privado' }
+  }
+  const t = TRANSLATIONS[activeLang] || TRANSLATIONS.en
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault()
@@ -157,12 +164,26 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
         position: 'relative',
       }}
     >
-      {/* SKIP TO FOROM */}
-      {onSkip && !isSignInOpen && (
+      {/* SPOTLIGHT OVERLAY for Golden Snitch Tour */}
+      <motion.div 
+        animate={{ opacity: romPhase === 'public_tour' || romPhase === 'login_tour' ? 0.8 : 0 }}
+        style={{ position: 'absolute', inset: 0, backgroundColor: 'black', zIndex: 40, pointerEvents: 'none' }}
+        transition={{ duration: 0.5 }}
+      />
+
+      {/* SKIP TO FOROM / BACK TO LOADING */}
+      {!isSignInOpen && (
         <button
-          onClick={onSkip}
-          className="absolute z-50 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform"
+          onClick={() => {
+            if (!currentUser && onBackToLoading) {
+              onBackToLoading()
+            } else if (onSkip) {
+              onSkip()
+            }
+          }}
+          className="absolute flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform"
           style={{
+            zIndex: 30, // sits below overlay usually
             top: '32px',
             left: '32px',
             width: '48px',
@@ -171,9 +192,9 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
             border: 'none',
             padding: 0
           }}
-          title={currentUser ? "Consulter le FOROM" : "Consulter le FOROM (Fantôme)"}
+          title={!currentUser ? "Retour à l'accueil" : "Consulter le FOROM"}
         >
-          <img src={chromaNotesIcon} alt="Return to Forom" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          <img src={chromaNotesIcon} alt="Return" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </button>
       )}
 
@@ -181,8 +202,9 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
       {!isSignInOpen && !currentUser && (
         <button
           onClick={() => setIsSignInOpen(true)}
-          className="absolute z-50 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform"
+          className="absolute flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform"
           style={{
+            zIndex: romPhase === 'login_tour' ? 45 : 30, // Spotlight above overlay during login_tour
             top: '32px',
             right: '32px',
             width: '48px',
@@ -388,7 +410,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
       }}>
 
         {/* LEFT: REJOINDRE */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: romPhase === 'public_tour' ? 45 : 1 }}>
           <div style={{
             color: '#E85C5C',
             fontWeight: 900,
@@ -397,7 +419,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
             marginBottom: 'clamp(10px, 2vh, 24px)',
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
-          }}>REJOINDRE</div>
+          }}>{t.rejoindre}</div>
           <div style={{
             backgroundColor: '#1A1A1A',
             borderRadius: 'clamp(12px, 1.5vw, 24px)',
@@ -423,7 +445,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
             {/* ── PUBLIC ───────────────────────────────────────── */}
             {/* The main FOROM is the only public forom at launch. */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>Public</span>
+              <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.public}</span>
               <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
             </div>
 
@@ -474,7 +496,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
             {/* ── PRIVÉ ─────────────────────────────────────── */}
             {/* Private foroms — only visible once logged in */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>Privé</span>
+              <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.prive}</span>
               <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
             </div>
 
@@ -496,36 +518,13 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
             </div>
 
           </div>
-        </div>
 
-        {/* MIDDLE: LOGO & LANGUAGE CAROUSEL */}
-        <div style={{
-          flex: 1,
-          minWidth: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <img
-            src={romWht}
-            alt="Forom Logo"
-            style={{
-              width: 'clamp(52px, 7vw, 110px)',
-              height: 'clamp(52px, 7vw, 110px)',
-              objectFit: 'contain',
-              marginBottom: 'clamp(24px, 4vh, 56px)',
-              flexShrink: 0,
-            }}
-          />
-          <LanguageCarousel onChange={() => {}} />
-
-          {/* GitHub icon — same gap as between logo and carousel */}
+          {/* GitHub icon moved underneath REJOINDRE box */}
           <a
             href="https://github.com/Forom-ets/forom"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ marginTop: 'clamp(24px, 4vh, 56px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+            style={{ marginTop: '10%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
           >
             <img
               src={githubIcon}
@@ -542,25 +541,20 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
               onMouseLeave={e => (e.currentTarget.style.opacity = '0.8')}
             />
           </a>
+        </div>
 
-          {/* CONNECT WITH A KEY */}
-          <div style={{ marginTop: 'clamp(16px, 3vh, 32px)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            <span style={{ fontSize: 'clamp(10px, 1.1vw, 15px)', fontFamily: 'Montserrat, sans-serif', fontWeight: 600, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Connect with a Key</span>
-            <input 
-              type="text" 
-              value={joinKey}
-              onChange={e => setJoinKey(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && joinKey.trim().length > 0) {
-                  setJoinStep('color')
-                }
-              }}
-              placeholder="FRM-XXXX-XXXX"
-              style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', padding: '6px 12px', color: '#fff', fontSize: 'clamp(12px, 1.4vw, 18px)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', width: 'clamp(140px, 16vw, 200px)', outline: 'none', transition: 'border-color 0.2s' }}
-              onFocus={(e) => e.target.style.borderColor = '#FFD700'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
-            />
+        <div style={{
+          flex: 1,
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <div style={{ width: '100%', position: 'relative', zIndex: 45, display: 'flex', justifyContent: 'center' }}>
+            <RomOnboarding currentUser={currentUser || null} isCreateSelected={isCreateSelected} onPhaseChange={setRomPhase} />
           </div>
+          <LanguageCarousel onChange={setActiveLang} />
         </div>
 
         {/* RIGHT: CRÉER */}
@@ -573,7 +567,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
             marginBottom: 'clamp(10px, 2vh, 24px)',
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
-          }}>CRÉER</div>
+          }}>{t.creer}</div>
           <div
             onClick={() => {
               if (currentUser) {
@@ -602,6 +596,26 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
               <span style={{ fontSize: 'clamp(32px, 5vw, 72px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
             )}
           </div>
+
+          {/* CONNECT WITH A KEY moved underneath CRÉER box */}
+          <div style={{ marginTop: '10%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            <span style={{ fontSize: 'clamp(10px, 1.1vw, 15px)', fontFamily: 'Montserrat, sans-serif', fontWeight: 600, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.connectKey}</span>
+            <input 
+              type="text" 
+              value={joinKey}
+              onChange={e => setJoinKey(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && joinKey.trim().length > 0) {
+                  setJoinStep('color')
+                }
+              }}
+              placeholder="FRM-XXXX-XXXX"
+              style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', padding: '6px 12px', color: '#fff', fontSize: 'clamp(12px, 1.4vw, 18px)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', width: 'clamp(140px, 16vw, 200px)', outline: 'none', transition: 'border-color 0.2s' }}
+              onFocus={(e) => e.target.style.borderColor = '#FFD700'}
+              onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
+            />
+          </div>
+
         </div>
 
       </div>
@@ -624,7 +638,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
             transition: 'background-color 0.2s, color 0.2s',
           }}
         >
-          Confirmer
+          {t.confirmer}
         </button>
       </div>
     </motion.div>

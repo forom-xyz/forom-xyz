@@ -156,6 +156,7 @@ function App() {
           setIsPhantomMode(!currentUser)
           setPhase('grid')
         }}
+        onBackToLoading={() => setIsLoading(true)}
         onSignIn={(username) => {
           setCurrentUser(username)
           setIsPhantomMode(false)

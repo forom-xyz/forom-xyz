@@ -1,7 +1,19 @@
-﻿import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import foromLogoBlk from '../assets/icons/forom_logo_blk.png'
 import foromLogoWht from '../assets/icons/forom_logo_wht.png'
+import bonjourHiSnd from '../assets/sons/bonjourhi.mp3'
+import exploromSnd from '../assets/sons/explorom.mp3'
+
+const generateStars = (count: number, maxSize: number, maxOpacity: number) => {
+  return Array.from({ length: count })
+    .map(() => `${Math.floor(Math.random() * 110)}vw ${Math.floor(Math.random() * 110)}vh 0 ${Math.random() * maxSize}px rgba(255,255,255,${Math.random() * maxOpacity + 0.1})`)
+    .join(', ')
+}
+
+const starsSml = generateStars(150, 1.5, 0.4)
+const starsMed = generateStars(100, 2.5, 0.6)
+const starsLrg = generateStars(40, 4, 0.9)
 
 interface LoadingScreenProps {
   onComplete: () => void
@@ -16,18 +28,48 @@ interface LoadingScreenProps {
 //  2.70s  onComplete
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Phase = 'blackwipe' | 'split' | 'logo' | 'exit'
+type Phase = 'init' | 'blackwipe' | 'split' | 'logo' | 'exit'
 
 export function LoadingScreen({ onComplete }: LoadingScreenProps) {
-  const [phase, setPhase] = useState<Phase>('blackwipe')
+  const [phase, setPhase] = useState<Phase>('init')
+  const [isHovering, setIsHovering] = useState(false)
+  const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase('split'), 700)
-    const t2 = setTimeout(() => setPhase('logo'),  1100)
-    const t3 = setTimeout(() => setPhase('exit'),  2000)
-    const t4 = setTimeout(onComplete,              2700)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
-  }, [onComplete])
+    if (!hoverAudioRef.current) {
+      hoverAudioRef.current = new Audio(exploromSnd)
+      hoverAudioRef.current.loop = true
+    }
+  }, [])
+
+  useEffect(() => {
+    const audio = hoverAudioRef.current
+    if (!audio) return
+    
+    if (isHovering && phase === 'init') {
+      audio.play().catch(e => console.warn('Hover audio blocked:', e))
+    } else {
+      audio.pause()
+      audio.currentTime = 0
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      audio.pause()
+    }
+  }, [isHovering, phase])
+
+  const handleInit = () => {
+    setPhase('blackwipe')
+    setTimeout(() => {
+      const audio = new Audio(bonjourHiSnd)
+      audio.play().catch(e => console.warn('Audio autoplay prevented by browser', e))
+    }, 600)
+    setTimeout(() => setPhase('split'), 700)
+    setTimeout(() => setPhase('logo'),  1100)
+    setTimeout(() => setPhase('exit'),  2000)
+    setTimeout(onComplete,              2700)
+  }
 
   return (
     <div style={{
@@ -35,6 +77,124 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
       backgroundColor: '#0a0a0a', overflow: 'hidden',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
+
+      {/* ── 0. Init Phase: User Interaction to start ── */}
+      <AnimatePresence>
+        {phase === 'init' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            style={{
+              position: 'absolute', inset: 0,
+              backgroundColor: '#050505', zIndex: 50,
+              overflow: 'hidden'
+            }}
+          >
+            {/* Deep Space Starfield */}
+            <div style={{ position: 'absolute', inset: '-10%', pointerEvents: 'none' }}>
+              <motion.div 
+                animate={{ x: [0, 30, 0], y: [0, 20, 0] }} 
+                transition={{ duration: 45, repeat: Infinity, ease: 'linear' }} 
+                style={{ position: 'absolute', top: 0, left: 0, width: '1px', height: '1px', boxShadow: starsSml }} 
+              />
+              <motion.div 
+                animate={{ x: [0, -20, 0], y: [0, 40, 0] }} 
+                transition={{ duration: 60, repeat: Infinity, ease: 'linear' }} 
+                style={{ position: 'absolute', top: 0, left: 0, width: '1px', height: '1px', boxShadow: starsMed, borderRadius: '50%' }} 
+              />
+              <motion.div 
+                animate={{ x: [0, 15, 0], y: [0, -15, 0] }} 
+                transition={{ duration: 75, repeat: Infinity, ease: 'linear' }} 
+                style={{ position: 'absolute', top: 0, left: 0, width: '1px', height: '1px', boxShadow: starsLrg, borderRadius: '50%' }} 
+              />
+            </div>
+
+            {/* Logo at 25% from top edge */}
+            <motion.img 
+              src={foromLogoWht} 
+              alt="Forom" 
+              style={{ position: 'absolute', top: '25vh', left: '50%', x: '-50%', height: 'clamp(40px, 8vw, 100px)', zIndex: 10, pointerEvents: 'none' }} 
+            />
+
+            {/* EXPLORE Text Button */}
+            <motion.button
+              onClick={handleInit}
+              onHoverStart={() => setIsHovering(true)}
+              onHoverEnd={() => setIsHovering(false)}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                position: 'absolute', top: '50%', left: '50%', x: '-50%', y: '-50%',
+                background: 'transparent', border: 'none', cursor: 'pointer', padding: '0', zIndex: 10,
+                filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.8))'
+              }}
+            >
+              <div style={{ position: 'relative' }}>
+                {/* White Text (Default) */}
+                <motion.span 
+                  animate={{ opacity: isHovering ? 0 : 1, scale: isHovering ? 1.05 : 1 }}
+                  transition={{ duration: 0.2 }}
+                  style={{ 
+                    display: 'block',
+                    fontSize: 'clamp(100px, 18vw, 280px)', 
+                    color: '#ffffff',
+                    fontFamily: "'Jersey 15', sans-serif",
+                    letterSpacing: '0.15em',
+                    lineHeight: 1
+                  }}
+                >
+                  EXPLORE
+                </motion.span>
+
+                {/* Rainbow Text (Hovered) */}
+                <motion.span 
+                  animate={{
+                    opacity: isHovering ? 1 : 0,
+                    scale: isHovering ? 1.05 : 1,
+                    backgroundPosition: isHovering ? ["0% 50%", "200% 50%"] : "0% 50%",
+                  }}
+                  transition={{
+                    opacity: { duration: 0.2 },
+                    scale: { duration: 0.2 },
+                    backgroundPosition: { duration: 1.5, repeat: Infinity, ease: 'linear' }
+                  }}
+                  style={{ 
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                    fontSize: 'clamp(100px, 18vw, 280px)', 
+                    fontFamily: "'Jersey 15', sans-serif",
+                    letterSpacing: '0.15em',
+                    lineHeight: 1,
+                    backgroundImage: 'linear-gradient(90deg, #ff0000, #ff9900, #ffff00, #33ff00, #0099ff, #6633ff, #ff0000)',
+                    backgroundSize: '200% auto',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                    display: 'flex', justifyContent: 'center'
+                  }}
+                >
+                  {"EXPLORE".split('').map((char, i) => (
+                    <motion.span
+                      key={i}
+                      initial={{ y: 0 }}
+                      animate={isHovering ? { y: [0, -16, 0] } : { y: 0 }}
+                      transition={isHovering ? { duration: 0.6, repeat: Infinity, delay: i * 0.08, ease: 'easeInOut' } : { duration: 0 }}
+                      style={{ display: 'inline-block', whiteSpace: 'pre' }}
+                    >
+                      {char}
+                    </motion.span>
+                  ))}
+                </motion.span>
+              </div>
+            </motion.button>
+
+            {/* Lock in text at 25% from bottom edge */}
+            <span style={{ position: 'absolute', bottom: '25vh', left: '50%', transform: 'translateX(-50%)', zIndex: 10, fontSize: 'clamp(14px, 2vw, 20px)', color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace', textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+              LOCK IN, CUT NOISE
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── 1. Black wipe: scans top → bottom over initial white ── */}
       <motion.div
