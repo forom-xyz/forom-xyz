@@ -4,7 +4,7 @@ import { Mail, Ghost, Lock } from 'lucide-react'
 import cedilleIcon from '../assets/icons/cedille.png'
 import etsIcon from '../assets/icons/ets.jpg'
 import githubIcon from '../assets/icons/github.png'
-import chromaNotesIcon from '../assets/icons/chroma_notes.svg'
+import chromaNotesIcon from '../assets/icons/chroma_portal.svg'
 import userIcon from '../assets/icons/user.png'
 
 // =============================================================================
@@ -64,6 +64,9 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
   const [isArchiveDropdownOpen, setIsArchiveDropdownOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
+  const isEtsLight = mission === 'Club étudiants ÉTS' && !isDark;
+  const phaseColor = isEtsLight ? '#ffffff' : (seasonPhase === 'V1' ? '#EF4444' : seasonPhase === 'V2' ? '#22C55E' : '#3B82F6');
+
   // Auto-focus search input when it appears
   useEffect(() => {
     if (isSearchActive && searchInputRef.current) {
@@ -82,7 +85,7 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="px-[3%] relative z-50 flex items-center transition-colors duration-300"
-      style={{ paddingTop: '2.2vh', paddingBottom: '1.6vh', backgroundColor: 'var(--color-bg)' }}
+      style={{ paddingTop: '2.2vh', paddingBottom: '1.6vh', backgroundColor: mission === 'Club étudiants ÉTS' && !isDark ? '#E3022C' : 'var(--color-bg)' }}
     >
       {/* ---- Left group: ETS, Search, FOROM ---- */}
       <div className="flex items-center" style={{ gap: '5%', flex: 1 }}>
@@ -94,9 +97,9 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             whileTap={{ scale: 0.95 }}
             className="flex items-center justify-center shrink-0 cursor-pointer"
             style={{ width: '36px', height: '36px', background: 'none', border: 'none', padding: 0 }}
-            title="Return to Lobby"
+            title="Chroma portal"
           >
-            <img src={chromaNotesIcon} alt="Forom Lobby (Chroma Notes)" style={{ width: '36px', height: '36px', objectFit: 'contain', display: 'block' }} />
+            <img src={chromaNotesIcon} alt="Chroma portal" style={{ width: '36px', height: '36px', objectFit: 'contain', display: 'block' }} />
           </motion.button>
 
           <motion.button
@@ -260,7 +263,7 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             >
               <span style={{
                 fontFamily: "'Jersey 15', sans-serif", fontSize: '28px', fontWeight: 900, lineHeight: 1, 
-                color: seasonPhase === 'V1' ? '#EF4444' : seasonPhase === 'V2' ? '#22C55E' : '#3B82F6',
+                color: phaseColor,
                 width: '32px', textAlign: 'center'
               }}>
                 {seasonPhase}
@@ -272,7 +275,7 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
                   </svg>
                 ) : (
                   <svg width="8" height="10" viewBox="0 0 8 10" fill="none" aria-hidden="true">
-                    <polygon points="1,1 7,5 1,9" fill={seasonPhase === 'V1' ? '#EF4444' : seasonPhase === 'V2' ? '#22C55E' : '#3B82F6'} />
+                    <polygon points="1,1 7,5 1,9" fill={phaseColor} />
                   </svg>
                 )}
               </div>
@@ -367,7 +370,7 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
                   fontSize: '44px',
                   fontFamily: 'Montserrat, sans-serif',
                   fontWeight: 900,
-                  color: isDark ? letter.darkColor : letter.color,
+                  color: (isEtsLight && letter.text === 'F') ? '#ffffff' : (isDark ? letter.darkColor : letter.color),
                   lineHeight: 1,
                   letterSpacing: '0.04em',
                   display: 'inline-block',

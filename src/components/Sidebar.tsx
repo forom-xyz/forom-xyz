@@ -19,6 +19,7 @@ export interface SidebarProps {
   onSelect: (id: string) => void
   isDark?: boolean
   position?: 'left' | 'right' | 'bottom'
+  isEtsForom?: boolean
 }
 
 // =============================================================================
@@ -35,7 +36,7 @@ const CURVE_INTENSITY = 12
 // COMPONENT
 // =============================================================================
 
-export function Sidebar({ items, activeId, onSelect, isDark = false, position = 'left' }: SidebarProps) {
+export function Sidebar({ items, activeId, onSelect, isDark = false, position = 'left', isEtsForom = false }: SidebarProps) {
   const wheelRef = useRef<HTMLDivElement>(null)
   const activeIndex = items.findIndex((item) => item.id === activeId)
 
@@ -136,10 +137,10 @@ export function Sidebar({ items, activeId, onSelect, isDark = false, position = 
       <div
         className="absolute rounded-full w-full h-full transition-all duration-300 pointer-events-auto"
         style={{
-          border: `3px solid ${isDark ? '#52525b' : '#9ca3af'}`,
+          border: `3px solid ${isDark ? '#52525b' : (isEtsForom ? '#b30022' : '#9ca3af')}`,
           background: isDark 
             ? 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)' 
-            : 'linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)',
+            : (isEtsForom ? '#E3022C' : 'linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)'),
         }}
       />
 

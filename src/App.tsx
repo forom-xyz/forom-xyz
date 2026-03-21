@@ -89,6 +89,32 @@ function ThemeToggle({
   )
 }
 
+const ETS_CATEGORY_LABELS: Record<string, string> = {
+  A: 'Partenaires',
+  B: 'Culture',
+  C: 'Clubs',
+  D: 'Trésorerie',
+  E: 'Atelier',
+  F: 'Projets',
+  G: 'Événements',
+  H: 'Rayonnement',
+  I: 'Gouvernance',
+  J: 'Héritage',
+}
+
+const ETS_QUESTION_LABELS: Record<string, string> = {
+  '0': 'Idéation',
+  '1': 'Recherche',
+  '2': 'Conception',
+  '3': 'Opération',
+  '4': 'Obstacle',
+  '5': 'Déploiement',
+  '6': 'Tutoriel',
+  '7': 'Bilan',
+  '8': 'Gabarit (Canon RAG Data)',
+  '9': 'Passation',
+}
+
 // =============================================================================
 // COMPONENT
 // =============================================================================
@@ -135,6 +161,11 @@ function App() {
   const userRole = getUserRole(currentUser)
   const isSuperModerator = userRole === 'S-MODS'
   const isModerator = userRole === 'MODS'
+  const isEtsForom = mission === 'Club étudiants ÉTS'
+
+  const activeCategoryLabels = isEtsForom ? ETS_CATEGORY_LABELS : categoryLabels
+  const activeQuestionLabels = isEtsForom ? ETS_QUESTION_LABELS : questionLabels
+  const activePersonalQuests = isEtsForom ? [] : personalQuests
 
   // Apply dark mode class to document
   useEffect(() => {
@@ -148,7 +179,7 @@ function App() {
   // Map categories to sidebar items
   const sidebarItems = CATEGORIES.map((category) => ({
     id: category,
-    label: categoryLabels[category] || category,
+    label: activeCategoryLabels[category] || category,
     disabled: false,
   }))
 
@@ -171,6 +202,12 @@ function App() {
           setPhase('grid')
         }}
         onBackToLoading={() => setIsLoading(true)}
+        onJoinEts={() => {
+          setIsPhantomMode(false)
+          setPhase('grid')
+          setMission('Club étudiants ÉTS')
+          setForomColor('guardien')
+        }}
         onSignIn={(username) => {
           setCurrentUser(username)
           setIsPhantomMode(false)
@@ -179,7 +216,7 @@ function App() {
             setInVault(5000)
           } else if (username === 'zylo') {
             setPixels(0)
-          } else if (['bylo', 'dylo'].includes(username)) {
+          } else if (['bylo', 'dylo', 'ets'].includes(username)) {
             setPixels(500)
           }
         }}
@@ -215,7 +252,7 @@ function App() {
   return (
     <div 
       className="h-screen overflow-hidden relative transition-colors duration-300"
-      style={{ backgroundColor: 'var(--color-bg)' }}
+      style={{ backgroundColor: isEtsForom && !isDarkMode ? '#E3022C' : 'var(--color-bg)' }}
     >
       {/* Right Column Stack: Theme, Settings */}
       <div 
@@ -236,10 +273,6 @@ function App() {
         seasonPhase={seasonPhase}
         onLobbyClick={() => {
           setPhase('lobby')
-          // Restore the main forom's supermoderator-configured labels when
-          // returning to lobby so the user can re-enter the main forom correctly.
-          setCategoryLabels({ ...DEFAULT_CATEGORY_LABELS })
-          setQuestionLabels({ ...DEFAULT_QUESTION_LABELS })
           if (isPhantomMode) {
             setIsPhantomMode(false)
           }
@@ -301,6 +334,7 @@ function App() {
           onSelect={setActiveCategory}
           isDark={isDarkMode}
           position="right"
+          isEtsForom={isEtsForom}
         />
       )}
 
@@ -312,7 +346,7 @@ function App() {
         isRubixView={isRubixView}
         onCloseRubix={() => setIsRubixView(false)}
         acceptedQuestId={acceptedQuestId}
-        categoryLabels={categoryLabels}
+        categoryLabels={activeCategoryLabels}
         onQuestComplete={(id) => {
           const quest = personalQuests.find(q => q.id === id)
           if (quest) {
@@ -322,8 +356,10 @@ function App() {
             setAcceptedQuestId(null)
           }
         }}
-        questionLabels={questionLabels}
-        personalQuests={personalQuests}
+        questionLabels={activeQuestionLabels}
+        personalQuests={activePersonalQuests}
+        isEmptyGrid={isEtsForom}
+        isEtsForom={isEtsForom}
       />
 
       {/* --------------------------------------------------------------------------

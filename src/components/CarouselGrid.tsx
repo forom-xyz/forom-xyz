@@ -23,6 +23,8 @@ interface CarouselGridProps {
   questionLabels?: Record<string, string>
   categoryLabels?: Record<string, string>
   personalQuests?: Array<{ id: string; category: string; question: string | null; title: string; completed?: boolean }>
+  isEmptyGrid?: boolean
+  isEtsForom?: boolean
 }
 
 // =============================================================================
@@ -59,6 +61,8 @@ export function CarouselGrid({
   questionLabels = {},
   categoryLabels = {},
   personalQuests = [],
+  isEmptyGrid = false,
+  isEtsForom = false,
 }: CarouselGridProps) {
   // Start at horizontal index 5 so that the center tile (5 + activeIndex*10) hits 46 when paired with category E
   const [horizontalIndex, setHorizontalIndex] = useState(5)
@@ -73,8 +77,17 @@ export function CarouselGrid({
   const gridDragOrigin = useRef<{ x: number; y: number } | null>(null)
   const gridDragMoved = useRef(false)
 
+  // Helper to get processed memory (locked if isEmptyGrid)
+  const getProcessedMemory = useCallback((cat: CategoryType, index: number) => {
+    let mem = getMemory(cat, index)
+    if (isEmptyGrid && mem) {
+      mem = { ...mem, isFilled: false, videoUrl: null, description: '', sources: [], title: `Emplacement ${index + 1}` }
+    }
+    return mem
+  }, [isEmptyGrid])
+
   // Get current memory data for modal
-  let currentMemory = getMemory(categories[activeIndex] as CategoryType, horizontalIndex)
+  let currentMemory = getProcessedMemory(categories[activeIndex] as CategoryType, horizontalIndex)
   let currentColor = DEFAULT_COLOR
 
   if (currentMemory) {
@@ -293,7 +306,7 @@ export function CarouselGrid({
     // Check bounds for the items per category
     if (itemIndex < 0 || itemIndex >= ITEMS_PER_ROW) return null
 
-    return getMemory(category, itemIndex)
+    return getProcessedMemory(category, itemIndex)
   }
 
   // ---------------------------------------------------------------------------
@@ -309,7 +322,7 @@ export function CarouselGrid({
     for (let c = 0; c < categories.length; c++) {
       const cat = categories[c] as CategoryType
       for (let i = 0; i < ITEMS_PER_ROW; i++) {
-        const mem = getMemory(cat, i)
+        const mem = getProcessedMemory(cat, i)
         
         // Match if it has the right question
         if (mem && mem.question === questionStr) {
@@ -479,7 +492,7 @@ export function CarouselGrid({
 
               {Array.from({ length: 10 }).map((_, col) => {
                 const globalIndex = row * 10 + col
-                let memory = getMemory(category as CategoryType, col)
+                let memory = getProcessedMemory(category as CategoryType, col)
                 const itemBorderColor = memory ? mixColors(CATEGORY_COLORS[memory.category] || '#ffffff', memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888') : '#e5e7eb';
                 let customBgColor: string | undefined = undefined;
                 
@@ -618,6 +631,7 @@ export function CarouselGrid({
           activeId={currentMemory?.question || ''}
           onSelect={handleQuestionClick}
           isDark={isDark}
+          isEtsForom={isEtsForom}
         />
       )}
 

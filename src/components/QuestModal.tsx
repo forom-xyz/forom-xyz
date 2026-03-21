@@ -1,6 +1,6 @@
 import ReactModal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo, Fragment } from 'react'
 import { X } from 'lucide-react'
 import { QUESTION_ORDER, QUESTION_COLORS, CATEGORY_COLORS, getMemory } from '../data/memories'
 import type { CategoryType, WhQuestion } from '../data/memories'
@@ -120,6 +120,13 @@ export function QuestModal({
   const [boardSelectedId, setBoardSelectedId] = useState<string | null>(null)
   const wheelRef = useRef<HTMLDivElement>(null)
 
+  const [winHeight, setWinHeight] = useState(typeof window !== 'undefined' ? window.innerHeight : 1080)
+  useEffect(() => {
+    const handleResize = () => setWinHeight(window.innerHeight)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   const wheelQuests = useMemo(() => {
     const arr = Array(100).fill(null)
     personalQuests.forEach(q => {
@@ -135,21 +142,77 @@ export function QuestModal({
     return arr
   }, [personalQuests, categories])
 
-  const handleNativeWheel = useCallback((e: WheelEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setWheelIndex(prev => {
-      const delta = e.deltaY > 0 ? 1 : -1
-      return (((prev + delta) % 100) + 100) % 100
-    })
+  const wheelAccumulator = useRef(0)
+
+  const handleNativeWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+    wheelAccumulator.current += e.deltaY
+
+    if (Math.abs(wheelAccumulator.current) >= 15) {
+      setWheelIndex(prev => {
+        const delta = wheelAccumulator.current > 0 ? 1 : -1
+        return (((prev + delta) % 100) + 100) % 100
+      })
+      wheelAccumulator.current = 0
+    }
+  }, [])
+
+  const touchStartY = useRef<number | null>(null)
+  
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY
+  }, [])
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (e.cancelable) e.preventDefault()
+    if (touchStartY.current === null) return
+    const currentY = e.touches[0].clientY
+    const diff = touchStartY.current - currentY
+    
+    if (Math.abs(diff) > 20) {
+      setWheelIndex(prev => {
+        const delta = diff > 0 ? 1 : -1
+        return (((prev + delta) % 100) + 100) % 100
+      })
+      touchStartY.current = currentY
+    }
   }, [])
 
   useEffect(() => {
     const el = wheelRef.current
     if (!el) return
-    el.addEventListener('wheel', handleNativeWheel, { passive: false })
-    return () => el.removeEventListener('wheel', handleNativeWheel)
-  }, [handleNativeWheel, activeTab])
+    el.addEventListener('touchstart', handleTouchStart, { passive: true })
+    el.addEventListener('touchmove', handleTouchMove, { passive: false })
+    return () => {
+      el.removeEventListener('touchstart', handleTouchStart)
+      el.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [handleTouchStart, handleTouchMove, activeTab])
+
+  const isDragging = useRef(false)
+  const dragStartY = useRef(0)
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    isDragging.current = true
+    dragStartY.current = e.clientY
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+  }
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDragging.current) return
+    const diff = dragStartY.current - e.clientY
+    if (Math.abs(diff) > 20) {
+      setWheelIndex(prev => {
+        const delta = diff > 0 ? 1 : -1
+        return (((prev + delta) % 100) + 100) % 100
+      })
+      dragStartY.current = e.clientY
+    }
+  }
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    isDragging.current = false
+    ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+  }
 
   // Auto-switch to quest log and highlight the accepted quest
   useEffect(() => {
@@ -340,9 +403,9 @@ export function QuestModal({
               </button>
             </div>
 
-            <div className="flex-1 overflow-auto flex flex-col font-jersey" style={{ padding: '40px 60px' }}>
+            <div className="flex-1 overflow-auto flex flex-col font-jersey" style={{ padding: 'clamp(16px, 3vh, 40px) clamp(20px, 4vw, 60px)' }}>
               {/* Header */}
-              <div className="relative flex justify-between items-center mb-8">
+              <div className="relative flex justify-between items-center mb-[clamp(8px,2vh,32px)]">
                 <div className="w-full flex justify-center items-end">
                   <h1 className="flex-shrink-0 text-white tracking-widest m-0 leading-none text-center font-bold uppercase drop-shadow-sm" style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '50px' }}>
                     QUESTS
@@ -793,85 +856,110 @@ export function QuestModal({
                   {/* LEFTSIDE: CREATION (Idées) — only for creators/mods/supermods */}
                   {canCreateQuest && (
                   <div className="flex flex-col relative w-1/2 h-full">
-                    <div className="bg-[#D9D9D9] border-[5px] border-black rounded-[24px] p-6 flex flex-col items-center justify-start gap-4 lg:gap-8 relative flex-1 min-h-0">
-                      <h3 className="text-center text-[clamp(24px,3vw,50px)] text-white uppercase tracking-widest drop-shadow-sm font-bold mt-2" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
-                        IDÉES
-                      </h3>
+                    <div className="bg-[#D9D9D9] border-[5px] border-black rounded-[24px] flex flex-col relative flex-1 min-h-0 overflow-hidden" style={{ padding: 'clamp(8px, 1.5vh, 24px)' }}>
+                      {/* Header */}
+                      <div className="flex-shrink-0 flex items-center justify-center pb-2">
+                        <h3 className="text-center text-[clamp(20px,4vh,50px)] text-black uppercase tracking-widest drop-shadow-sm font-bold m-0 leading-none" style={{ fontFamily: "'Jersey 15', sans-serif", color: 'black' }}>
+                          ENVOYER UNE QUÊTE
+                        </h3>
+                      </div>
                       
-                      {/* Category selector */}
-                      <div className="flex flex-wrap justify-center items-center" style={{ gap: '8px', width: '90%', marginBottom: '5%' }}>
-                        {categories.map((cat) => {
-                          const isSelected = selectedCategory === cat
-                          return (
-                            <button
-                              key={cat}
-                              type="button"
-                              onClick={() => setSelectedCategory(cat)}
-                              className="cursor-pointer uppercase font-bold tracking-wide transition-all"
-                              style={{
-                                backgroundColor: CATEGORY_COLORS[cat] || 'rgba(255,255,255,0.4)',
-                                opacity: isSelected ? 1 : 0.4,
-                                color: isSelected ? 'white' : 'black',
-                                fontFamily: "'Jersey 15', sans-serif",
-                                fontSize: '20px',
-                                borderRadius: '8px',
-                                padding: '4px 16px',
-                                border: isSelected ? '3px solid black' : '3px solid rgba(0,0,0,0.2)',
-                                boxShadow: isSelected ? '0 2px 0px rgba(0,0,0,1)' : 'none',
-                                transform: isSelected ? 'translateY(-2px)' : 'none',
-                              }}
-                            >
-                              {categoryLabels[cat] || cat}
-                            </button>
-                          )
-                        })}
-                      </div>
+                      {/* Inner Content - scaled to fit without scroll */}
+                      <div className="flex-1 w-full flex flex-col items-center justify-start pt-1 overflow-hidden" style={{ gap: 'clamp(2px, 0.5vh, 6px)' }}>
+                        
+                        {/* Top Block: QUESTION_ORDER (Vision, Équipe...) labeled as "TAGS" on the right */}
+                        <div className="flex items-center w-[90%] mb-1 mt-2">
+                          <span className="font-bold uppercase tracking-widest mr-[10px]" style={{ color: '#000000', fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(10px, 1.5vh, 14px)' }}>X</span>
+                          <div className="flex-1 h-[2px]" style={{ backgroundColor: '#000000' }}></div>
+                          <span className="font-bold uppercase tracking-widest ml-[10px]" style={{ color: '#000000', fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(10px, 1.5vh, 14px)' }}>TAGS</span>
+                        </div>
 
-                      {/* Question tags — same design as MemoryModal */}
-                      <div className="flex flex-wrap justify-center items-center" style={{ gap: '5%', width: '80%' }}>
-                        {QUESTION_ORDER.map((tag) => {
-                          const color = QUESTION_COLORS[tag] || '#888888';
-                          const isSelected = selectedQuestion === tag;
-                          const label = questionLabels[tag] || tag;
-                          return (
-                            <button
-                              key={tag}
-                              type="button"
-                              onClick={() => setSelectedQuestion(isSelected ? null : tag)}
-                              className="cursor-pointer uppercase text-white font-bold tracking-wide shadow-sm transition-transform hover:scale-105"
-                              style={{
-                                backgroundColor: color,
-                                fontFamily: "'Jersey 15', sans-serif",
-                                fontSize: '25px',
-                                opacity: isSelected ? 1 : 0.6,
-                                borderRadius: '12px',
-                                padding: '10px 30px',
-                                border: '4px solid black',
-                                marginBottom: '8px',
-                              }}
-                            >
-                              {label}
-                            </button>
-                          );
-                        })}
-                      </div>
+                        {/* Question tags (Tags) */}
+                        <div className="flex flex-wrap justify-center items-center font-bold text-center" style={{ width: '90%', fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(11px, 1.8vh, 16px)', lineHeight: 'clamp(14px, 2.5vh, 24px)' }}>
+                          {QUESTION_ORDER.map((tag, i) => {
+                            const color = QUESTION_COLORS[tag] || '#888888';
+                            const isSelected = selectedQuestion === tag;
+                            const label = questionLabels[tag] || tag;
+                            return (
+                              <Fragment key={tag}>
+                                <span
+                                  onClick={() => setSelectedQuestion(isSelected ? null : tag)}
+                                  className="cursor-pointer transition-all"
+                                  style={{
+                                    backgroundColor: isSelected ? color : 'transparent',
+                                    color: isSelected ? '#FFFFFF' : '#000000',
+                                    padding: 'clamp(1px, 0.2vh, 4px) clamp(4px, 0.8vw, 10px)',
+                                    borderRadius: '8px',
+                                    border: isSelected ? '3px solid #000000' : '3px solid transparent',
+                                    margin: '0 2px',
+                                    display: 'inline-block',
+                                    lineHeight: 1,
+                                    transform: isSelected ? 'scale(1.05)' : 'none',
+                                    boxShadow: isSelected ? '0 2px 0px rgba(0,0,0,1)' : 'none',
+                                  }}
+                                >
+                                  {label}
+                                </span>
+                                {i < QUESTION_ORDER.length - 1 && <span className="font-normal px-[2px]" style={{ color: '#000000' }}>|</span>}
+                              </Fragment>
+                            );
+                          })}
+                        </div>
+                        
+                        {/* Bottom Block: categories (Idées, Échange...) labeled as "CATEGORIES" on the left */}
+                        <div className="flex items-center w-[90%] mb-1 mt-2">
+                          <span className="font-bold uppercase tracking-widest mr-[10px]" style={{ color: '#000000', fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(10px, 1.5vh, 14px)' }}>CATEGORIES</span>
+                          <div className="flex-1 h-[2px]" style={{ backgroundColor: '#000000' }}></div>
+                          <span className="font-bold uppercase tracking-widest ml-[10px]" style={{ color: '#000000', fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(10px, 1.5vh, 14px)' }}>Y</span>
+                        </div>
 
-                      <form id="quest-form" onSubmit={handleCreate} className="flex flex-col items-center flex-1 w-full">
-                        <div style={{ flex: '1' }} />
+                        {/* Category selector */}
+                        <div className="flex flex-wrap justify-center items-center font-bold text-center" style={{ width: '90%', fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(11px, 1.8vh, 16px)', lineHeight: 'clamp(14px, 2.5vh, 24px)' }}>
+                          {categories.map((cat, i) => {
+                            const isSelected = selectedCategory === cat;
+                            const label = categoryLabels[cat] || cat;
+                            return (
+                              <Fragment key={cat}>
+                                <span
+                                  onClick={() => setSelectedCategory(cat)}
+                                  className="cursor-pointer transition-all"
+                                  style={{
+                                    backgroundColor: isSelected ? (CATEGORY_COLORS[cat] || 'rgba(0,0,0,0.4)') : 'transparent',
+                                    color: isSelected ? '#FFFFFF' : '#000000',
+                                    padding: 'clamp(1px, 0.2vh, 4px) clamp(4px, 0.8vw, 10px)',
+                                    borderRadius: '8px',
+                                    border: isSelected ? '3px solid #000000' : '3px solid transparent',
+                                    margin: '0 2px',
+                                    display: 'inline-block',
+                                    lineHeight: 1,
+                                    transform: isSelected ? 'scale(1.05)' : 'none',
+                                    boxShadow: isSelected ? '0 2px 0px rgba(0,0,0,1)' : 'none',
+                                  }}
+                                >
+                                  {label}
+                                </span>
+                                {i < categories.length - 1 && <span className="font-normal px-[2px]" style={{ color: '#000000' }}>|</span>}
+                              </Fragment>
+                            );
+                          })}
+                        </div>
+
+                      <form id="quest-form" onSubmit={handleCreate} className="flex flex-col items-center w-full mt-auto flex-shrink-0 pt-[clamp(2px,0.5vh,6px)] pb-[clamp(2px,0.5vh,6px)]">
                         <input
                           type="text"
                           value={newTitle}
                           onChange={e => setNewTitle(e.target.value)}
                           placeholder="TITRE DE LA QUÊTE"
-                          className="text-[30px] text-center text-black uppercase placeholder:text-black/40"
+                          className="text-[clamp(14px,2vh,20px)] text-center text-black font-bold uppercase placeholder:text-black/40"
                           style={{
                             fontFamily: "'Jersey 15', sans-serif",
-                            letterSpacing: '0.1em',
-                            paddingBottom: '6px',
-                            width: '80%',
+                            letterSpacing: '0.15em',
+                            paddingBottom: 'clamp(2px, 0.3vh, 4px)',
+                            marginBottom: 'clamp(2px, 0.5vh, 6px)',
+                            width: '90%',
                             background: 'none',
                             border: 'none',
-                            borderBottom: '1.5px solid black',
+                            borderBottom: '2px solid black',
                             outline: 'none',
                             WebkitAppearance: 'none',
                             MozAppearance: 'none',
@@ -880,10 +968,11 @@ export function QuestModal({
                           }}
                           maxLength={40}
                         />
-                        <div style={{ flex: '2' }} />
                       </form>
+                      </div> {/* End Inner Content */}
+
                       {/* Envoyer button — flex child, same pb/pt as SÉLECTIONNER for vertical alignment */}
-                      <div className="flex flex-shrink-0 flex-col justify-center items-center pt-4" style={{ paddingBottom: 'max(3%, 24px)', gap: '8px' }}>
+                      <div className="flex flex-shrink-0 flex-col justify-center items-center pt-4" style={{ gap: '8px' }}>
                         {/* Quest count */}
                         <span style={{
                           fontFamily: "'Jersey 15', sans-serif",
@@ -942,15 +1031,20 @@ export function QuestModal({
                   {/* RIGHTSIDE: Infinite vertical scroll wheel */}
                   <div className={`flex flex-col relative h-full ${canCreateQuest ? 'w-1/2' : 'w-full'}`}>
                     <div className="bg-[#D9D9D9] border-[5px] border-black rounded-[24px] relative flex-1 overflow-hidden flex flex-col">
-                      <h3 className="text-center text-[clamp(24px,3vw,50px)] text-white uppercase tracking-widest drop-shadow-sm font-bold flex-shrink-0 m-0 pt-3 pb-0 leading-none" style={{ fontFamily: "'Jersey 15', sans-serif" }}>
-                        MISSIONS
+                      <h3 className="text-center text-[clamp(24px,3vw,50px)] text-black uppercase tracking-widest drop-shadow-sm font-bold flex-shrink-0 m-0 pt-3 pb-0 leading-none" style={{ fontFamily: "'Jersey 15', sans-serif", color: 'black' }}>
+                        LISTE DES QUÊTES
                       </h3>
 
                       {/* Wheel area */}
                       <div
                         ref={wheelRef}
-                        className="flex-1 relative select-none"
-                        style={{ cursor: 'ns-resize' }}
+                        className="flex-1 relative select-none overflow-hidden"
+                        style={{ cursor: 'ns-resize', touchAction: 'none' }}
+                        onWheel={handleNativeWheel}
+                        onPointerDown={handlePointerDown}
+                        onPointerMove={handlePointerMove}
+                        onPointerUp={handlePointerUp}
+                        onPointerCancel={handlePointerUp}
                       >
                         {/* Center highlight line removed per user request */}
 
@@ -967,8 +1061,8 @@ export function QuestModal({
 
                         {/* Items — absolutely positioned, center slot exactly matches highlight strip */}
                         {(() => {
-                          const ITEM_H = 65
-                          const GAP = 10
+                          const ITEM_H = winHeight < 800 ? 50 : 65
+                          const GAP = winHeight < 800 ? 6 : 10
                           const slots = [-2, -1, 0, 1, 2]
 
                           return slots.map((offset) => {

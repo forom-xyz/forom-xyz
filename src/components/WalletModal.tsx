@@ -1,5 +1,10 @@
 import ReactModal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+
+import carmelImg from '../assets/icons/carmel.png'
+import carmelOutchSound from '../assets/sons/carmel_outch.m4a'
+import carmelMadSound from '../assets/sons/carmel_mad.m4a'
 
 import type { UserRole } from '../App'
 
@@ -119,6 +124,21 @@ const ECONOMY = [
 
 export function WalletModal({ isOpen, onClose, pixels, userRole }: WalletModalProps) {
   const showFullEconomy = userRole === 'S-MODS' || userRole === 'MODS';
+  const [carmelTaps, setCarmelTaps] = useState(0);
+
+  const handleCarmelClick = () => {
+    const newTaps = carmelTaps + 1;
+    setCarmelTaps(newTaps);
+    
+    if (newTaps >= 10) {
+      const audio = new Audio(carmelMadSound);
+      audio.play().catch(e => console.error("Audio error:", e));
+      setCarmelTaps(0);
+    } else {
+      const audio = new Audio(carmelOutchSound);
+      audio.play().catch(e => console.error("Audio error:", e));
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -188,6 +208,7 @@ export function WalletModal({ isOpen, onClose, pixels, userRole }: WalletModalPr
 
                 {/* 4 donut gauges in 2x2 grid */}
                 <div style={{
+                  position: 'relative',
                   display: 'grid', gridTemplateColumns: '1fr 1fr',
                   gap: '24px 32px', justifyItems: 'center',
                   backgroundColor: 'rgba(0,0,0,0.18)', borderRadius: 16,
@@ -196,6 +217,39 @@ export function WalletModal({ isOpen, onClose, pixels, userRole }: WalletModalPr
                   {ECONOMY.map(e => (
                     <DonutGauge key={e.label} label={e.label} percentage={e.percentage} color={e.color} px={e.px} />
                   ))}
+
+                  {/* Carmel Easter Egg */}
+                  <div
+                    onClick={handleCarmelClick}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      cursor: 'pointer',
+                      zIndex: 10,
+                      width: 64,
+                      height: 64,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    title="Carmel"
+                  >
+                    <img 
+                      src={carmelImg} 
+                      alt="Carmel" 
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'contain',
+                        transition: 'transform 0.1s ease',
+                      }}
+                      onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.85)'; }}
+                      onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                    />
+                  </div>
                 </div>
 
                 {/* Mission 1 */}

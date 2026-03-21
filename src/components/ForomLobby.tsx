@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAppStore } from '../stores/useAppStore'
 import tutoIcon from '../assets/icons/TUTO.svg'
+import etsIcon from '../assets/icons/ets.jpg'
 import githubIcon from '../assets/icons/github.png'
-import chromaNotesIcon from '../assets/icons/chroma_notes.svg'
+import chromaNotesIcon from '../assets/icons/chroma_portal.svg'
 import userIcon from '../assets/icons/user.png'
 import { RomOnboarding } from './RomOnboarding'
 
@@ -38,7 +39,7 @@ const DelayedTypewriterText = ({ text, delayMs = 200 }: { text: string, delayMs?
 
 // Redundant LanguageCarousel block migrated to LoadingScreen.tsx
 
-export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToLoading }: { onConfirm: () => void; onSkip?: () => void; onSignIn?: (username: string) => void; currentUser?: string | null; onBackToLoading?: () => void }) {
+export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToLoading, onJoinEts }: { onConfirm: () => void; onSkip?: () => void; onSignIn?: (username: string) => void; currentUser?: string | null; onBackToLoading?: () => void; onJoinEts?: () => void }) {
   const [isCreateSelected, setIsCreateSelected] = useState(false)
   const [isSignInOpen, setIsSignInOpen] = useState(false)
   const [username, setUsername] = useState('')
@@ -62,7 +63,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault()
-    if (['xylo', 'zylo', 'bylo', 'dylo'].includes(username) && password === 'colors') {
+    if (['xylo', 'zylo', 'bylo', 'dylo', 'ets'].includes(username) && password === 'colors') {
       onSignIn?.(username)
       setIsSignInOpen(false)
     } else {
@@ -131,10 +132,8 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
       {!isSignInOpen && (
         <button
           onClick={() => {
-            if (!currentUser && onBackToLoading) {
+            if (onBackToLoading) {
               onBackToLoading()
-            } else if (onSkip) {
-              onSkip()
             }
           }}
           className="absolute flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform"
@@ -148,9 +147,9 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
             border: 'none',
             padding: 0
           }}
-          title={!currentUser ? "Retour à l'accueil" : "Consulter le FOROM"}
+          title="Chroma portal"
         >
-          <img src={chromaNotesIcon} alt="Return" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          <img src={chromaNotesIcon} alt="Chroma portal" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }} />
         </button>
       )}
 
@@ -457,7 +456,38 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
-              {Array.from({ length: 10 }).map((_, i) => (
+              {/* Slot 0 - ÉTS */}
+              <div
+                onClick={() => {
+                  if (currentUser === 'xylo' || currentUser === 'ets') {
+                    onJoinEts?.()
+                  }
+                }}
+                title="Club étudiants ÉTS"
+                style={{
+                  backgroundColor: '#E3022C',
+                  borderRadius: 'clamp(6px, 0.7vw, 12px)',
+                  aspectRatio: '1 / 1',
+                  cursor: (currentUser === 'xylo' || currentUser === 'ets') ? 'pointer' : 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px solid rgba(255,255,255,0.25)',
+                  transition: 'border-color 0.2s, transform 0.15s',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  opacity: (currentUser === 'xylo' || currentUser === 'ets') ? 1 : 0.5
+                }}
+                onMouseEnter={(currentUser === 'xylo' || currentUser === 'ets') ? (e => { e.currentTarget.style.borderColor = '#ffffff'; e.currentTarget.style.transform = 'scale(1.06)' }) : undefined}
+                onMouseLeave={(currentUser === 'xylo' || currentUser === 'ets') ? (e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }) : undefined}
+              >
+                {(currentUser === 'xylo' || currentUser === 'ets') ? (
+                  <img src={etsIcon} alt="ÉTS" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                )}
+              </div>
+              {Array.from({ length: 9 }).map((_, i) => (
                 <div key={i} style={{
                   backgroundColor: '#3A3A3A',
                   borderRadius: 'clamp(6px, 0.7vw, 12px)',

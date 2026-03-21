@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import foromLogoBlk from '../assets/icons/forom_logo_blk.png'
 import foromLogoWht from '../assets/icons/forom_logo_wht.png'
 import bonjourHiSnd from '../assets/sons/bonjourhi.mp3'
-import exploromSnd from '../assets/sons/explore.mp3'
+import mantisseSnd from '../assets/sons/Mantisse - Septembre.mp3'
 
 function TypewriterText({ text, delayMs = 15 }: { text: string, delayMs?: number }) {
   const [displayed, setDisplayed] = useState('')
@@ -21,16 +21,18 @@ function TypewriterText({ text, delayMs = 15 }: { text: string, delayMs?: number
   return <span style={{ whiteSpace: 'pre-wrap' }}>{displayed}</span>
 }
 
-function ExpandableSection({ title, children }: { title: string, children: React.ReactNode }) {
+function ExpandableSection({ title, expandUp = false, children }: { title: string, expandUp?: boolean, children: React.ReactNode }) {
   const [isExpanded, setIsExpanded] = useState(false)
   return (
-    <div style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ pointerEvents: 'auto', display: 'flex', flexDirection: expandUp ? 'column-reverse' : 'column' }}>
       <h3 
         onClick={() => setIsExpanded(!isExpanded)}
-        style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(20px, 2vw, 26px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'center', marginBottom: isExpanded ? '12px' : '0', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', userSelect: 'none' }}
+        style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(12px, min(1.5vw, 2vh), 22px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'center', margin: 0, marginTop: expandUp && isExpanded ? '12px' : 0, marginBottom: !expandUp && isExpanded ? '12px' : 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', userSelect: 'none' }}
       >
         {title}
-        <span style={{ fontSize: '0.6em', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+        <span style={{ fontSize: '0.6em', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+          {expandUp ? '▲' : '▼'}
+        </span>
       </h3>
       <AnimatePresence>
         {isExpanded && (
@@ -56,8 +58,7 @@ const LANGUAGES = [
 ]
 
 const N = LANGUAGES.length
-const ITEM_H = 72 // px per carousel slot
-const VISIBLE = 5  // number of visible slots
+// We now calculate item height dynamically to fit smaller screens.
 
 function getLang(idx: number) {
   return LANGUAGES[((idx % N) + N) % N]
@@ -73,6 +74,15 @@ function LanguageCarousel({
   const initialIndex = LANGUAGES.findIndex(l => l.id === initialLang)
   const [center, setCenter] = useState(initialIndex >= 0 ? initialIndex : 0)
 
+  // Dynamically calculate slot height based on window height to prevent overlap on short screens
+  const [itemH, setItemH] = useState(72)
+  useEffect(() => {
+    const updateH = () => setItemH(Math.max(35, Math.min(72, window.innerHeight * 0.08)))
+    updateH()
+    window.addEventListener('resize', updateH)
+    return () => window.removeEventListener('resize', updateH)
+  }, [])
+
   const move = useCallback((dir: number) => {
     setCenter(prev => {
       const next = prev + dir
@@ -87,9 +97,10 @@ function LanguageCarousel({
     move(e.deltaY > 0 ? 1 : -1)
   }, [move])
 
+  const VISIBLE = 3
   const half = Math.floor(VISIBLE / 2) + 1
   const slots = Array.from({ length: VISIBLE + 2 }, (_, i) => center - half + i)
-  const containerH = VISIBLE * ITEM_H
+  const containerH = VISIBLE * itemH
 
   return (
     <div
@@ -120,7 +131,7 @@ function LanguageCarousel({
             }}
             initial={false}
             animate={{
-              y: (dist + half - 1) * ITEM_H,
+              y: (dist + half - 1) * itemH,
               opacity: isCenter ? 1 : absD === 1 ? 0.45 : 0.2,
               scale: isCenter ? 1.12 : absD === 1 ? 0.88 : 0.72,
             }}
@@ -130,7 +141,7 @@ function LanguageCarousel({
               top: 0,
               left: 0,
               right: 0,
-              height: ITEM_H,
+              height: itemH,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -139,10 +150,10 @@ function LanguageCarousel({
               color: isCenter ? '#FFD700' : '#888888',
               fontWeight: 900,
               fontSize: isCenter
-                ? 'clamp(22px, 3vw, 48px)'
+                ? 'clamp(22px, min(3vw, 5vh), 48px)'
                 : absD === 1
-                  ? 'clamp(13px, 1.6vw, 24px)'
-                  : 'clamp(9px, 1.1vw, 16px)',
+                  ? 'clamp(13px, min(1.6vw, 3vh), 24px)'
+                  : 'clamp(9px, min(1.1vw, 2vh), 16px)',
               letterSpacing: '0.2em',
               whiteSpace: 'nowrap',
               textAlign: 'center',
@@ -236,7 +247,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
   useEffect(() => {
     if (!hoverAudioRef.current) {
-      hoverAudioRef.current = new Audio(exploromSnd)
+      hoverAudioRef.current = new Audio(mantisseSnd)
       hoverAudioRef.current.loop = true
       hoverAudioRef.current.volume = 0.5
     }
@@ -312,7 +323,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
             </div>
 
             {/* Language Carousel at top */}
-            <div style={{ position: 'absolute', top: '2vh', left: '0', right: '0', zIndex: 10, display: 'flex', justifyContent: 'center' }}>
+            <div style={{ position: 'absolute', top: '1vh', left: '0', right: '0', zIndex: 10, display: 'flex', justifyContent: 'center' }}>
               <div style={{ width: 'clamp(300px, 40vw, 600px)' }}>
                 <LanguageCarousel onChange={(id) => setLanguage(id as AppLanguage)} initialLang={language} />
               </div>
@@ -320,47 +331,55 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
             {/* --- SIDE TEXT PANELS --- */}
             {/* Left Side */}
-            <div style={{ position: 'absolute', left: '5vw', top: '15vh', bottom: '15vh', width: '25vw', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', zIndex: 10, pointerEvents: 'none', color: 'white' }}>
+            <div style={{ position: 'absolute', left: '3vw', top: '6vh', bottom: '6vh', width: '28vw', zIndex: 10, pointerEvents: 'none', color: 'white' }}>
               {/* Top Left */}
-              <ExpandableSection title={t.topLeftTitle}>
-                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, 0.8vw, 12px)', lineHeight: 1.6, opacity: 0.8, textAlign: 'justify', margin: 0 }}>
-                  <TypewriterText text={t.topLeftText} />
-                </p>
-              </ExpandableSection>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+                <ExpandableSection title={t.topLeftTitle}>
+                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                    <TypewriterText text={t.topLeftText} />
+                  </p>
+                </ExpandableSection>
+              </div>
               
               {/* Middle Left */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 'auto 0' }}>
-                <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(28px, 3vw, 42px)', letterSpacing: '0.1em', color: '#EF4444' }}>{t.pourquoi}</span>
+              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(20px, min(2.5vw, 3.5vh), 36px)', letterSpacing: '0.1em', color: '#EF4444' }}>{t.pourquoi}</span>
               </div>
 
               {/* Bottom Left */}
-              <ExpandableSection title={t.bottomLeftTitle}>
-                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, 0.8vw, 12px)', lineHeight: 1.6, opacity: 0.8, textAlign: 'justify', margin: 0 }}>
-                  <TypewriterText text={t.bottomLeftText} />
-                </p>
-              </ExpandableSection>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+                <ExpandableSection title={t.bottomLeftTitle} expandUp>
+                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                    <TypewriterText text={t.bottomLeftText} />
+                  </p>
+                </ExpandableSection>
+              </div>
             </div>
 
             {/* Right Side */}
-            <div style={{ position: 'absolute', right: '5vw', top: '15vh', bottom: '15vh', width: '25vw', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', zIndex: 10, pointerEvents: 'none', color: 'white' }}>
+            <div style={{ position: 'absolute', right: '3vw', top: '6vh', bottom: '6vh', width: '28vw', zIndex: 10, pointerEvents: 'none', color: 'white' }}>
               {/* Top Right */}
-              <ExpandableSection title={t.topRightTitle}>
-                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, 0.8vw, 12px)', lineHeight: 1.6, opacity: 0.8, textAlign: 'justify', margin: 0 }}>
-                  <TypewriterText text={t.topRightText} />
-                </p>
-              </ExpandableSection>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+                <ExpandableSection title={t.topRightTitle}>
+                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                    <TypewriterText text={t.topRightText} />
+                  </p>
+                </ExpandableSection>
+              </div>
 
               {/* Middle Right */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 'auto 0' }}>
-                <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(28px, 3vw, 42px)', letterSpacing: '0.1em', color: '#3B82F6' }}>{t.comment}</span>
+              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(20px, min(2.5vw, 3.5vh), 36px)', letterSpacing: '0.1em', color: '#3B82F6' }}>{t.comment}</span>
               </div>
 
               {/* Bottom Right */}
-              <ExpandableSection title={t.bottomRightTitle}>
-                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, 0.8vw, 12px)', lineHeight: 1.6, opacity: 0.8, textAlign: 'justify', margin: 0 }}>
-                  <TypewriterText text={t.bottomRightText} />
-                </p>
-              </ExpandableSection>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+                <ExpandableSection title={t.bottomRightTitle} expandUp>
+                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                    <TypewriterText text={t.bottomRightText} />
+                  </p>
+                </ExpandableSection>
+              </div>
             </div>
 
             {/* EXPLORE Text Button */}
@@ -382,7 +401,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                   transition={{ duration: 0.2 }}
                   style={{
                     display: 'block',
-                    fontSize: 'clamp(100px, 18vw, 280px)',
+                    fontSize: 'clamp(30px, min(10vw, 15vh), 220px)',
                     color: '#ffffff',
                     fontFamily: "'Jersey 15', sans-serif",
                     letterSpacing: '0.15em',
@@ -406,7 +425,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                   }}
                   style={{
                     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                    fontSize: 'clamp(100px, 18vw, 280px)',
+                    fontSize: 'clamp(30px, min(10vw, 15vh), 220px)',
                     fontFamily: "'Jersey 15', sans-serif",
                     letterSpacing: '0.15em',
                     lineHeight: 1,
@@ -437,17 +456,33 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
             <motion.img
               src={foromLogoWht}
               alt="Forom"
-              style={{ position: 'absolute', bottom: '18vh', left: '50%', transform: 'translateX(-50%)', height: 'clamp(140px, 30vw, 340px)', zIndex: 10, pointerEvents: 'none' }}
+              style={{ position: 'absolute', bottom: '15vh', left: '50%', transform: 'translateX(-50%)', height: 'clamp(50px, min(30vw, 25vh), 340px)', zIndex: 10, pointerEvents: 'none' }}
             />
 
-            {/* Lock in text at 10% from bottom edge */}
-            <div style={{ position: 'absolute', bottom: '10vh', left: '50%', transform: 'translateX(-50%)', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
-              <span style={{ fontSize: 'clamp(14px, 2vw, 20px)', color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace', textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+            {/* Lock in text at 8% from bottom edge */}
+            <div style={{ position: 'absolute', bottom: '8vh', left: '50%', transform: 'translateX(-50%)', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: 'clamp(10px, 1.5vw, 14px)', color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace', textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
                 {t.lockIn}
               </span>
-              <span style={{ fontSize: 'clamp(10px, 1.2vw, 14px)', color: 'rgba(255,255,255,0.25)', fontFamily: 'Montserrat, sans-serif' }}>
+              <span style={{ fontSize: 'clamp(8px, 1.2vw, 11px)', color: 'rgba(255,255,255,0.25)', fontFamily: 'Montserrat, sans-serif' }}>
                 {t.exploreHint}
               </span>
+
+              {/* Spinning Track Indicator */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', opacity: isHovering ? 0.9 : 0.3, transition: 'opacity 0.4s ease', marginTop: '4px' }}>
+                <motion.svg 
+                  viewBox="0 0 24 24" width="10" height="10"
+                  animate={{ rotate: 360 }} 
+                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                >
+                  <circle cx="12" cy="12" r="11" fill="#111" stroke="#555" strokeWidth="2" />
+                  <circle cx="12" cy="12" r="4.5" fill="#EF4444" />
+                  <circle cx="12" cy="12" r="1.5" fill="#111" />
+                </motion.svg>
+                <span style={{ fontSize: 'clamp(8px, 1.2vw, 11px)', color: '#fff', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.05em' }}>
+                  Mantisse - Septembre
+                </span>
+              </div>
             </div>
           </motion.div>
         )}
