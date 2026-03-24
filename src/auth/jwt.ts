@@ -1,5 +1,5 @@
-import { Strategy, ExtractJwt, VerifiedCallback } from 'passport-jwt';
-import User from '../database/models/User'; // mock user class
+import { Strategy, ExtractJwt, type VerifiedCallback } from 'passport-jwt';
+import User from './../database/models/User'; // mock user class
 import bcrypt from 'bcrypt';
 
 const options = {

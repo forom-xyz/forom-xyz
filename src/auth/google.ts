@@ -1,5 +1,5 @@
-import { Strategy as GoogleStrategy, Profile, VerifyCallback } from 'passport-google-oauth20';
-import User from '../database/models/User'; // mock user class
+import { Strategy as GoogleStrategy, type Profile, type VerifyCallback } from 'passport-google-oauth20';
+import User from './../database/models/User'; // mock user class
 import { v4 as uuidv4 } from 'uuid';
 
 const options = {
