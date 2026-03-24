@@ -1,14 +1,17 @@
 {
-  "name": "frm",
+  "name": "forom",
   "private": true,
   "version": "1.0.0",
   "description": "FRM - The Infinite Feed Grid. A scalable, category-based navigation system by Forom.",
   "type": "module",
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite --host",
     "build": "npm run lint && tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:dev": "vite build --mode development && concurrently -n vite,electron -c cyan,yellow \"vite --host\" \"electron .\"",
+    "electron:build": "tsc -b && vite build && electron-builder"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",
@@ -29,12 +32,57 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-modal": "^3.16.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "concurrently": "^9.1.2",
+    "electron": "^36.0.0",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.6"
+  },
+  "build": {
+    "appId": "ca.etsmtl.forom",
+    "productName": "Forom",
+    "copyright": "Copyright © 2024 Forom ETS",
+    "icon": "public/icon.png",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ],
+      "artifactName": "ForomInstaller.exe"
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ],
+      "artifactName": "ForomInstaller.dmg",
+      "category": "public.app-category.social-networking"
+    },
+    "linux": {
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] },
+        { "target": "deb", "arch": ["x64"] }
+      ],
+      "artifactName": "ForomInstaller.AppImage",
+      "category": "Network"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   }
 }

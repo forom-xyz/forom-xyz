@@ -3,6 +3,7 @@ import { useAppStore, type AppLanguage } from '../stores/useAppStore'
 import { motion, AnimatePresence } from 'framer-motion'
 import foromLogoBlk from '../assets/icons/forom_logo_blk.png'
 import foromLogoWht from '../assets/icons/forom_logo_wht.png'
+import launcherIcon from '../assets/icons/launcher.png'
 import bonjourHiSnd from '../assets/sons/bonjourhi.mp3'
 import mantisseSnd from '../assets/sons/Mantisse - Septembre.mp3'
 
@@ -451,6 +452,78 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                 </motion.span>
               </div>
             </motion.button>
+
+            {/* ── Download Launcher Buttons ── */}
+            <div style={{
+              position: 'absolute',
+              top: '32%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 10,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 'clamp(6px, 1vh, 14px)',
+              pointerEvents: 'auto',
+            }}>
+              {/* TÉLÉCHARGER header */}
+              <span style={{
+                fontFamily: "'Jersey 15', sans-serif",
+                fontSize: 'clamp(12px, min(1.8vw, 2.5vh), 22px)',
+                letterSpacing: '0.18em',
+                color: 'rgba(255,255,255,0.7)',
+              }}>
+                TÉLÉCHARGER
+              </span>
+
+              {/* Icons row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(24px, 4vw, 60px)' }}>
+                {([
+                  { label: 'MAC', href: '/downloads/ForomInstaller.dmg', filename: 'ForomInstaller.dmg', color: '#EF4444' },
+                  { label: 'LINUX', href: '/downloads/ForomInstaller.AppImage', filename: 'ForomInstaller.AppImage', color: '#FFD700' },
+                  { label: 'WIN', href: '/downloads/ForomInstaller.exe', filename: 'ForomInstaller.exe', color: '#3B82F6' },
+                ] as const).map(({ label, href, filename, color }) => (
+                  <motion.a
+                    key={label}
+                    href={href}
+                    download={filename}
+                    whileHover={{ scale: 1.15, y: -4 }}
+                    whileTap={{ scale: 0.92 }}
+                    title={`Download for ${label}`}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 'clamp(4px, 0.7vh, 8px)',
+                      cursor: 'pointer',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    {/* Colored launcher icon */}
+                    <img
+                      src={launcherIcon}
+                      alt=""
+                      style={{
+                        width: 'clamp(28px, min(4vw, 5vh), 52px)',
+                        height: 'clamp(28px, min(4vw, 5vh), 52px)',
+                        objectFit: 'contain',
+                        filter: `drop-shadow(0 0 6px ${color}88)`,
+                      }}
+                    />
+                    {/* OS label */}
+                    <span style={{
+                      fontFamily: "'Jersey 15', sans-serif",
+                      fontSize: 'clamp(11px, min(1.4vw, 2vh), 18px)',
+                      letterSpacing: '0.12em',
+                      color,
+                      fontWeight: 600,
+                    }}>
+                      {label}
+                    </span>
+                  </motion.a>
+                ))}
+              </div>
+            </div>
 
             {/* Logo near LOCK IN */}
             <motion.img
