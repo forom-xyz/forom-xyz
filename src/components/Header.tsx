@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, Ghost, Lock } from 'lucide-react'
+import { Mail, Lock } from 'lucide-react'
 import cedilleIcon from '../assets/icons/cedille.png'
 import etsIcon from '../assets/icons/ets.jpg'
 import githubIcon from '../assets/icons/github.png'
 import chromaNotesIcon from '../assets/icons/chroma_portal.svg'
-import userIcon from '../assets/icons/user.png'
+import parameterIcon from '../assets/icons/parameter.png'
+import ghostWhtIcon from '../assets/icons/ghost_wht.svg'
 
 // =============================================================================
 // CONSTANTS
@@ -495,7 +496,11 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             style={{ width: '36px', height: '36px' }}
             title="Return to Sign In"
           >
-            <Ghost size={20} color={isDark ? '#e5e7eb' : '#1f2937'} />
+            <img 
+              src={ghostWhtIcon} 
+              alt="Phantom Mode" 
+              style={{ width: '20px', height: '20px', filter: isDark ? 'invert(1)' : 'none' }} 
+            />
           </motion.div>
         ) : (
           <motion.div
@@ -506,8 +511,8 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             style={{ width: '36px', height: '36px' }}
           >
             <img
-              src={userIcon}
-              alt="User Profile"
+              src={parameterIcon}
+              alt="User Settings"
               className="w-full h-full object-contain"
               style={{ filter: isDark ? 'invert(1)' : 'none' }}
             />

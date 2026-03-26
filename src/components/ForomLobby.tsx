@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '../stores/useAppStore'
 import tutoIcon from '../assets/icons/TUTO.svg'
 import etsIcon from '../assets/icons/ets.jpg'
 import githubIcon from '../assets/icons/github.png'
 import chromaNotesIcon from '../assets/icons/chroma_portal.svg'
-import userIcon from '../assets/icons/user.png'
+import ghostWhtIcon from '../assets/icons/ghost_wht.svg'
+import ghostBlkIcon from '../assets/icons/ghost_blk.svg'
+import larucheIcon from '../assets/icons/laruche.svg'
 import { RomOnboarding } from './RomOnboarding'
 
 const DelayedTypewriterText = ({ text, delayMs = 200 }: { text: string, delayMs?: number }) => {
@@ -40,6 +42,8 @@ const DelayedTypewriterText = ({ text, delayMs = 200 }: { text: string, delayMs?
 // Redundant LanguageCarousel block migrated to LoadingScreen.tsx
 
 export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToLoading, onJoinEts }: { onConfirm: () => void; onSkip?: () => void; onSignIn?: (username: string) => void; currentUser?: string | null; onBackToLoading?: () => void; onJoinEts?: () => void }) {
+  const [isPlayOpen, setIsPlayOpen] = useState(false)
+  const [isDeployOpen, setIsDeployOpen] = useState(false)
   const [isCreateSelected, setIsCreateSelected] = useState(false)
   const [isSignInOpen, setIsSignInOpen] = useState(false)
   const [username, setUsername] = useState('')
@@ -52,6 +56,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
   const [joinRule, setJoinRule] = useState('')
 
   const [romPhase, setRomPhase] = useState<string | number>('idle')
+  const ghostPanelWidth = 'min(30vw, 440px)'
 
   const { language: activeLang } = useAppStore()
   const TRANSLATIONS: Record<string, any> = {
@@ -153,11 +158,15 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
         </button>
       )}
 
-      {/* SIGN IN TOGGLE */}
-      {!isSignInOpen && !currentUser && (
+      {/* SIGN IN TOGGLE OR GHOST ICON */}
+      {!isSignInOpen && (
         <button
-          onClick={() => setIsSignInOpen(true)}
-          className="absolute flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform"
+          onClick={() => {
+            if (!currentUser) {
+              onBackToLoading?.()
+            }
+          }}
+          className="absolute flex items-center justify-center transition-transform"
           style={{
             zIndex: romPhase === 'login_tour' ? 45 : 30, // Spotlight above overlay during login_tour
             top: '32px',
@@ -167,11 +176,11 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
             background: 'none',
             border: 'none',
             padding: 0,
-            filter: 'brightness(0) invert(1)'
+            cursor: currentUser ? 'default' : 'pointer'
           }}
-          title="Sign In"
+          title={currentUser ? "Logged In" : "Ghost"}
         >
-          <img src={userIcon} alt="Sign In" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          <img src={currentUser ? ghostBlkIcon : ghostWhtIcon} alt="Ghost" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </button>
       )}
 
@@ -362,277 +371,301 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
         gap: 'clamp(12px, 2vw, 36px)',
         boxSizing: 'border-box',
         alignItems: 'center',
+        justifyContent: 'center',
       }}>
+        {!currentUser ? (
+          <>
+            {/* GHOST VIEW LEFT */}
+            <div style={{ flex: '0 0 clamp(180px, 20vw, 300px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: romPhase === "public_tour" ? 45 : 1, minHeight: 'clamp(520px, 74vh, 860px)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: ghostPanelWidth, alignSelf: 'flex-end' }}>
+                <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>JOUER</div>
+                <button onClick={() => setIsPlayOpen(!isPlayOpen)} style={{ background: "#000", border: '2px solid rgba(255,255,255,0.2)', cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s, border-color 0.2s", width: "clamp(40px, 5vw, 60px)", height: "clamp(40px, 5vw, 60px)", borderRadius: "50%" }} onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.1)"; e.currentTarget.style.borderColor = '#22C55E'; }} onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
+                  <span style={{ color: "#22C55E", fontSize: "clamp(18px, 2vw, 24px)", fontWeight: "bold" }}>$</span>
+                </button>
 
-        {/* LEFT: REJOINDRE */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: romPhase === 'public_tour' ? 45 : 1 }}>
-          <div style={{
-            color: '#E85C5C',
-            fontWeight: 900,
-            fontSize: 'clamp(13px, 1.6vw, 26px)',
-            letterSpacing: '0.25em',
-            marginBottom: 'clamp(10px, 2vh, 24px)',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-          }}>{t.rejoindre}</div>
-          <div style={{
-            backgroundColor: '#1A1A1A',
-            borderRadius: 'clamp(12px, 1.5vw, 24px)',
-            padding: 'clamp(10px, 1.8vw, 28px)',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'clamp(6px, 1vh, 14px)',
-            boxSizing: 'border-box',
-          }}>
+                <AnimatePresence>
+                  {isPlayOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 24px)',
+                        right: 0,
+                        left: 'auto',
+                        transform: 'none',
+                        width: ghostPanelWidth,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '18px',
+                        zIndex: 70
+                      }}
+                    >
+                      <div style={{
+                        width: '100%',
+                        border: '2px solid rgba(255,255,255,0.6)',
+                        borderRadius: '14px',
+                        padding: '8px 12px',
+                        textAlign: 'center',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 'clamp(11px, 1.1vw, 15px)',
+                        letterSpacing: '0.22em',
+                        textTransform: 'uppercase',
+                        color: '#F4F4F4',
+                        backgroundColor: 'rgba(0,0,0,0.7)'
+                      }}>
+                        PIXELS | EXPÉRIENCE | NIVEAU | NOTORIÉTÉ | SAVOIR
+                      </div>
 
-            {/*
-              PUBLICIZATION RULES (future enforcement):
-              A forom can only become public when ALL of the following are true:
-                1. It has its 8 supermoderators assigned
-                2. All 3 season phases (V1 → V2 → V3) are completed
-                3. It has existed for at least 1 year
-                4. NOT all supermoderators are currently active
-                   (at least one must have departed — ensures the community
-                    has proven it can survive supermod turnover before going public)
-            */}
+                      <p style={{
+                        margin: 0,
+                        color: '#FFD700',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 'clamp(11px, 1.2vw, 17px)',
+                        lineHeight: 1.45,
+                        textAlign: 'justify',
+                        whiteSpace: 'pre-wrap',
+                        letterSpacing: '0.06em'
+                      }}>
+Pour enrichir un forom public, l’organisation s'appuie sur quatre rôles clés : Super Admins (9), Admins (50), Moderators (100) et Membres (1 000). Chaque contributeur accumule de l’XP pour atteindre le niveau 100, validant ainsi sa maîtrise de l'archivage.
 
-            {/* ── PUBLIC ───────────────────────────────────────── */}
-            {/* The main FOROM is the only public forom at launch. */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.public}</span>
-              <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
-              {/* Slot 0 — the main FOROM (public, hardcoded) */}
-              <div
-                onClick={() => onSkip?.()}
-                title="Tuto"
-                style={{
-                  backgroundColor: '#000000',
-                  borderRadius: 'clamp(6px, 0.7vw, 12px)',
-                  aspectRatio: '1 / 1',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px solid rgba(255,255,255,0.25)',
-                  transition: 'border-color 0.2s, transform 0.15s',
-                  overflow: 'hidden',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#FFD700'; e.currentTarget.style.transform = 'scale(1.06)' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }}
-              >
-                <img src={tutoIcon} alt="Tuto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+Le moteur de ce savoir, ce sont les Pixels (PX). Pour remplir leur mission, les s-mods et mods disposent d’un budget annuel de 5 000 PX à distribuer. Cette ressource permet de récompenser la création de mémos structurés, transformant les données brutes en intelligence collective souveraine. C’est par cette gestion active des Pixels que la communauté fait « spawn » son assistant local
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              {/* Public slots 1–9 — locked until other foroms qualify */}
-              {Array.from({ length: 9 }).map((_, i) => (
-                <div key={i + 1} style={{
-                  backgroundColor: '#3A3A3A',
-                  borderRadius: 'clamp(6px, 0.7vw, 12px)',
-                  aspectRatio: '1 / 1',
-                  opacity: 0.7,
-                  cursor: 'not-allowed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
-                </div>
-              ))}
-            </div>
 
-            {/* ── DIVIDER ──────────────────────────────────────── */}
-            <div style={{ margin: 'clamp(2px, 0.5vh, 8px) 0' }}>
-              <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.18)' }} />
-            </div>
-
-            {/* ── PRIVÉ ─────────────────────────────────────── */}
-            {/* Private foroms — only visible once logged in */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.prive}</span>
-              <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
-              {/* Slot 0 - ÉTS */}
-              <div
-                onClick={() => {
-                  if (currentUser === 'xylo' || currentUser === 'ets') {
-                    onJoinEts?.()
-                  }
-                }}
-                title="Club étudiants ÉTS"
-                style={{
-                  backgroundColor: '#E3022C',
-                  borderRadius: 'clamp(6px, 0.7vw, 12px)',
-                  aspectRatio: '1 / 1',
-                  cursor: (currentUser === 'xylo' || currentUser === 'ets') ? 'pointer' : 'not-allowed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px solid rgba(255,255,255,0.25)',
-                  transition: 'border-color 0.2s, transform 0.15s',
-                  overflow: 'hidden',
-                  position: 'relative',
-                  opacity: (currentUser === 'xylo' || currentUser === 'ets') ? 1 : 0.5
-                }}
-                onMouseEnter={(currentUser === 'xylo' || currentUser === 'ets') ? (e => { e.currentTarget.style.borderColor = '#ffffff'; e.currentTarget.style.transform = 'scale(1.06)' }) : undefined}
-                onMouseLeave={(currentUser === 'xylo' || currentUser === 'ets') ? (e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }) : undefined}
-              >
-                {(currentUser === 'xylo' || currentUser === 'ets') ? (
-                  <img src={etsIcon} alt="ÉTS" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
-                )}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: ghostPanelWidth, position: 'absolute', right: 0, bottom: 0, zIndex: 5 }}>
+                <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>FINANCER</div>
+                <a href="https://laruchequebec.com/fr" target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                  <img src={larucheIcon} alt="La Ruche" style={{ width: "clamp(40px, 5vw, 64px)", height: "clamp(40px, 5vw, 64px)", objectFit: "contain", transition: "transform 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"} />
+                </a>
               </div>
-              {Array.from({ length: 9 }).map((_, i) => (
-                <div key={i} style={{
-                  backgroundColor: '#3A3A3A',
-                  borderRadius: 'clamp(6px, 0.7vw, 12px)',
-                  aspectRatio: '1 / 1',
-                  opacity: 0.7,
-                  cursor: 'not-allowed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
-                </div>
-              ))}
             </div>
 
-          </div>
+            {/* GHOST VIEW CENTER */}
+            <div style={{ flex: '0 1 clamp(380px, 42vw, 660px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: '100%', position: 'relative', zIndex: 45, display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                <RomOnboarding currentUser={currentUser || null} isCreateSelected={false} onPhaseChange={setRomPhase} />
+              </div>
+              
+              <div style={{ color: '#FFD700', fontWeight: 900, fontSize: 'clamp(14px, 1.8vw, 28px)', letterSpacing: '0.3em', marginBottom: 'clamp(16px, 2vh, 32px)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>DÉCOUVRIR</div>
+              
+              <div style={{
+                backgroundColor: '#1A1A1A',
+                borderRadius: 'clamp(12px, 1.5vw, 24px)',
+                padding: 'clamp(10px, 1.8vw, 28px)',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'clamp(6px, 1vh, 14px)',
+                boxSizing: 'border-box',
+                zIndex: romPhase === 'public_tour' ? 45 : 1
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.public}</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
+                  <div onClick={() => onSkip?.()} title="Tuto" style={{ backgroundColor: '#000000', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.25)', transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden' }} onMouseEnter={e => { e.currentTarget.style.borderColor = '#FFD700'; e.currentTarget.style.transform = 'scale(1.06)' }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }}>
+                    <img src={tutoIcon} alt="Tuto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i + 1} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ margin: 'clamp(2px, 0.5vh, 8px) 0' }}>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.18)' }} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.prive}</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
+                  <div style={{ backgroundColor: '#E3022C', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.5, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                     <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                  </div>
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-          {/* GitHub icon moved underneath REJOINDRE box */}
-          <a
-            href="https://github.com/Forom-ets/forom"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ marginTop: '10%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-          >
-            <img
-              src={githubIcon}
-              alt="GitHub"
-              style={{
-                width: 'clamp(28px, 3.5vw, 52px)',
-                height: 'clamp(28px, 3.5vw, 52px)',
-                objectFit: 'contain',
-                filter: 'brightness(0) invert(1)',
-                opacity: 0.8,
-                transition: 'opacity 0.2s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-              onMouseLeave={e => (e.currentTarget.style.opacity = '0.8')}
-            />
-          </a>
-        </div>
+            {/* GHOST VIEW RIGHT */}
+            <div style={{ flex: '0 0 clamp(180px, 20vw, 300px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", position: 'relative', minHeight: 'clamp(520px, 74vh, 860px)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: ghostPanelWidth, alignSelf: 'flex-start' }}>
+                <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>CRÉER</div>
+                <button onClick={() => setIsDeployOpen(!isDeployOpen)} style={{ background: "#000", border: '2px solid rgba(255,255,255,0.2)', cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s, border-color 0.2s", width: "clamp(40px, 5vw, 60px)", height: "clamp(40px, 5vw, 60px)", borderRadius: "50%" }} onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.1)"; e.currentTarget.style.borderColor = '#F97316'; }} onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
+                  <span style={{ color: "#F97316", fontSize: "clamp(18px, 2vw, 24px)", fontWeight: "bold" }}>!</span>
+                </button>
 
-        <div style={{
-          flex: 1,
-          minWidth: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <div style={{ width: '100%', position: 'relative', zIndex: 45, display: 'flex', justifyContent: 'center' }}>
-            <RomOnboarding currentUser={currentUser || null} isCreateSelected={isCreateSelected} onPhaseChange={setRomPhase} />
-          </div>
-          {/* LanguageCarousel removed -> handled globally in LoadingScreen */}
+                <AnimatePresence>
+                  {isDeployOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 24px)',
+                        left: 0,
+                        transform: 'none',
+                        width: ghostPanelWidth,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '18px',
+                        zIndex: 70
+                      }}
+                    >
+                      <div style={{
+                        width: '100%',
+                        border: '2px solid rgba(255,255,255,0.7)',
+                        borderRadius: '14px',
+                        padding: '8px 12px',
+                        textAlign: 'center',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 'clamp(11px, 1.1vw, 15px)',
+                        letterSpacing: '0.18em',
+                        color: '#111111',
+                        backgroundColor: '#F5F5F5'
+                      }}>
+                        sudo ./forom-core --start-server --local-port 25565
+                      </div>
 
-          {/* Yellow Subtitle Translation */}
-          <div style={{ position: 'relative', zIndex: 45, marginTop: '24px', minHeight: '60px', display: 'flex', justifyContent: 'center', width: '100%', padding: '0 20px', boxSizing: 'border-box', pointerEvents: 'none' }}>
-            <span style={{
-              color: '#FFD700',
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 'clamp(12px, 1.2vw, 16px)',
-              textAlign: 'center',
-              lineHeight: 1.6,
-              opacity: (romPhase === 'idle' || romPhase === 0) ? 0 : 0.8,
-              transition: 'opacity 0.4s',
-              whiteSpace: 'pre-wrap',
-              maxWidth: '500px',
-              textShadow: '0 2px 8px rgba(0,0,0,0.8)'
-            }}>
-              <DelayedTypewriterText
-                key={`${activeLang}-${romPhase}`}
-                text={getRomTranslation(romPhase)}
-                delayMs={200}
-              />
-            </span>
-          </div>
-        </div>
+                      <p style={{
+                        margin: 0,
+                        color: '#FFD700',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 'clamp(11px, 1.2vw, 17px)',
+                        lineHeight: 1.45,
+                        textAlign: 'justify',
+                        whiteSpace: 'pre-wrap',
+                        letterSpacing: '0.06em'
+                      }}>
+Envie de bâtir ton propre bastion d'intelligence ? Créer un serveur forom en local est aussi simple que de lancer un monde Minecraft. En hébergeant ton instance, tu deviens le gardien d'un moteur RAG souverain directement sur ta machine.
 
-        {/* RIGHT: CRÉER */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{
-            color: '#2563EB',
-            fontWeight: 900,
-            fontSize: 'clamp(13px, 1.6vw, 26px)',
-            letterSpacing: '0.25em',
-            marginBottom: 'clamp(10px, 2vh, 24px)',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-          }}>{t.creer}</div>
-          <div
-            onClick={() => {
-              if (currentUser) {
-                setIsCreateSelected(true)
-              } else {
-                setIsSignInOpen(true)
-              }
-            }}
-            style={{
-              backgroundColor: isCreateSelected ? '#0d2b5e' : '#1A1A1A',
-              borderRadius: 'clamp(12px, 1.5vw, 24px)',
-              width: '100%',
-              aspectRatio: '1 / 1',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              border: `3px solid ${isCreateSelected ? '#2563EB' : 'transparent'}`,
-              boxSizing: 'border-box',
-              transition: 'border-color 0.25s, background-color 0.25s',
-            }}
-          >
-            {currentUser ? (
-              <span style={{ color: 'white', fontSize: 'clamp(28px, 4vw, 64px)', fontWeight: 300, lineHeight: 1 }}>+</span>
-            ) : (
-              <span style={{ fontSize: 'clamp(32px, 5vw, 72px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
-            )}
-          </div>
+Invite tes amis à rejoindre les rangs des Membres ou des Modérateurs. Ensemble, archivez les mémos pour gagner des Pixels et grimper jusqu'au niveau 100. C’est ici que la mission prend vie : chaque connexion renforce l'IA de votre communauté. Préparez-vous au « spawn » de ROM et prenez enfin le contrôle total de vos données !
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-          {/* CONNECT WITH A KEY moved underneath CRÉER box */}
-          <div style={{ marginTop: '10%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            <span style={{ fontSize: 'clamp(10px, 1.1vw, 15px)', fontFamily: 'Montserrat, sans-serif', fontWeight: 600, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.connectKey}</span>
-            <input
-              type="text"
-              value={joinKey}
-              onChange={e => setJoinKey(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && joinKey.trim().length > 0) {
-                  setJoinStep('color')
-                }
-              }}
-              placeholder="FRM-XXXX-XXXX"
-              style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', padding: '6px 12px', color: '#fff', fontSize: 'clamp(12px, 1.4vw, 18px)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', width: 'clamp(140px, 16vw, 200px)', outline: 'none', transition: 'border-color 0.2s' }}
-              onFocus={(e) => e.target.style.borderColor = '#FFD700'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
-            />
-          </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: ghostPanelWidth, position: 'absolute', left: 0, bottom: 0, zIndex: 5 }}>
+                <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>CONTRIBUER</div>
+                <a href="https://github.com/Forom-ets/forom" target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                  <img src={githubIcon} alt="GitHub" style={{ width: "clamp(40px, 5vw, 60px)", height: "clamp(40px, 5vw, 60px)", objectFit: "contain", filter: "brightness(0) invert(1)", opacity: 0.8, transition: "opacity 0.2s" }} onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = "0.8"} />
+                </a>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* LOGGED IN VIEW LEFT: REJOINDRE */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: romPhase === 'public_tour' ? 45 : 1 }}>
+              <div style={{ color: '#E85C5C', fontWeight: 900, fontSize: 'clamp(13px, 1.6vw, 26px)', letterSpacing: '0.25em', marginBottom: 'clamp(10px, 2vh, 24px)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{t.rejoindre}</div>
+              <div style={{ backgroundColor: '#1A1A1A', borderRadius: 'clamp(12px, 1.5vw, 24px)', padding: 'clamp(10px, 1.8vw, 28px)', width: '100%', display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vh, 14px)', boxSizing: 'border-box' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.public}</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
+                  <div onClick={() => onSkip?.()} title="Tuto" style={{ backgroundColor: '#000000', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.25)', transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden' }} onMouseEnter={e => { e.currentTarget.style.borderColor = '#FFD700'; e.currentTarget.style.transform = 'scale(1.06)' }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }}>
+                    <img src={tutoIcon} alt="Tuto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i + 1} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ margin: 'clamp(2px, 0.5vh, 8px) 0' }}>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.18)' }} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.prive}</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
+                  <div onClick={() => { if (currentUser === 'xylo' || currentUser === 'ets') onJoinEts?.() }} title="Club étudiants ÉTS" style={{ backgroundColor: '#E3022C', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', cursor: (currentUser === 'xylo' || currentUser === 'ets') ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.25)', transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden', position: 'relative', opacity: (currentUser === 'xylo' || currentUser === 'ets') ? 1 : 0.5 }} onMouseEnter={(currentUser === 'xylo' || currentUser === 'ets') ? (e => { e.currentTarget.style.borderColor = '#ffffff'; e.currentTarget.style.transform = 'scale(1.06)' }) : undefined} onMouseLeave={(currentUser === 'xylo' || currentUser === 'ets') ? (e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }) : undefined}>
+                    {(currentUser === 'xylo' || currentUser === 'ets') ? (
+                      <img src={etsIcon} alt="ÉTS" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                    )}
+                  </div>
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-        </div>
+              <a href="https://github.com/Forom-ets/forom" target="_blank" rel="noopener noreferrer" style={{ marginTop: '10%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <img src={githubIcon} alt="GitHub" style={{ width: 'clamp(28px, 3.5vw, 52px)', height: 'clamp(28px, 3.5vw, 52px)', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.8, transition: 'opacity 0.2s' }} onMouseEnter={e => (e.currentTarget.style.opacity = '1')} onMouseLeave={e => (e.currentTarget.style.opacity = '0.8')} />
+              </a>
+            </div>
 
+            {/* LOGGED IN VIEW CENTER */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '100%', position: 'relative', zIndex: 45, display: 'flex', justifyContent: 'center' }}>
+                <RomOnboarding currentUser={currentUser || null} isCreateSelected={isCreateSelected} onPhaseChange={setRomPhase} />
+              </div>
+              <div style={{ position: 'relative', zIndex: 45, marginTop: '24px', minHeight: '60px', display: 'flex', justifyContent: 'center', width: '100%', padding: '0 20px', boxSizing: 'border-box', pointerEvents: 'none' }}>
+                <span style={{ color: '#FFD700', fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(12px, 1.2vw, 16px)', textAlign: 'center', lineHeight: 1.6, opacity: (romPhase === 'idle' || romPhase === 0) ? 0 : 0.8, transition: 'opacity 0.4s', whiteSpace: 'pre-wrap', maxWidth: '500px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+                  <DelayedTypewriterText key={`${activeLang}-${romPhase}`} text={getRomTranslation(romPhase)} delayMs={200} />
+                </span>
+              </div>
+            </div>
+
+            {/* LOGGED IN VIEW RIGHT: CRÉER */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ color: '#2563EB', fontWeight: 900, fontSize: 'clamp(13px, 1.6vw, 26px)', letterSpacing: '0.25em', marginBottom: 'clamp(10px, 2vh, 24px)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{t.creer}</div>
+              <div onClick={() => setIsCreateSelected(true)} style={{ backgroundColor: isCreateSelected ? '#0d2b5e' : '#1A1A1A', borderRadius: 'clamp(12px, 1.5vw, 24px)', width: '100%', aspectRatio: '1 / 1', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: `3px solid ${isCreateSelected ? '#2563EB' : 'transparent'}`, boxSizing: 'border-box', transition: 'border-color 0.25s, background-color 0.25s' }}>
+                <span style={{ color: 'white', fontSize: 'clamp(28px, 4vw, 64px)', fontWeight: 300, lineHeight: 1 }}>+</span>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* CONFIRMER BUTTON */}
-      <div style={{ marginTop: 'clamp(14px, 2.5vh, 36px)', display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+      {/* FOOTER AREA (Connect key and Confirmer) */}
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(14px, 2.5vh, 36px)', flexShrink: 0 }}>
+        {/* CONNECT WITH A KEY */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: 'clamp(10px, 1.1vw, 15px)', fontFamily: 'Montserrat, sans-serif', fontWeight: 600, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.connectKey}</span>
+          <input
+            type="text"
+            value={joinKey}
+            onChange={e => setJoinKey(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && joinKey.trim().length > 0) {
+                setJoinStep('color')
+              }
+            }}
+            placeholder="FRM-XXXX-XXXX"
+            style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', padding: '6px 12px', color: '#fff', fontSize: 'clamp(12px, 1.4vw, 18px)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', width: 'clamp(140px, 16vw, 200px)', outline: 'none', transition: 'border-color 0.2s' }}
+            onFocus={(e) => e.target.style.borderColor = '#FFD700'}
+            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
+          />
+        </div>
+
+        {/* CONFIRMER BUTTON */}
         <button
           onClick={() => { if (isCreateSelected && currentUser) onConfirm() }}
-          disabled={!isCreateSelected}
+          disabled={!currentUser || !isCreateSelected}
           style={{
             padding: 'clamp(10px, 1.5vh, 18px) clamp(40px, 5vw, 80px)',
             borderRadius: '999px',
@@ -640,9 +673,9 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
             fontSize: 'clamp(14px, 1.5vw, 22px)',
             letterSpacing: '0.05em',
             border: 'none',
-            cursor: isCreateSelected ? 'pointer' : 'not-allowed',
-            backgroundColor: isCreateSelected ? '#5B9F65' : 'rgba(91,159,101,0.35)',
-            color: isCreateSelected ? '#ffffff' : 'rgba(255,255,255,0.4)',
+            cursor: (!currentUser || !isCreateSelected) ? 'not-allowed' : 'pointer',
+            backgroundColor: (currentUser && isCreateSelected) ? '#5B9F65' : 'rgba(91,159,101,0.35)',
+            color: (currentUser && isCreateSelected) ? '#ffffff' : 'rgba(255,255,255,0.4)',
             transition: 'background-color 0.2s, color 0.2s',
           }}
         >

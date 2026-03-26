@@ -3,52 +3,61 @@ import { useAppStore, type AppLanguage } from '../stores/useAppStore'
 import { motion, AnimatePresence } from 'framer-motion'
 import foromLogoBlk from '../assets/icons/forom_logo_blk.png'
 import foromLogoWht from '../assets/icons/forom_logo_wht.png'
-import launcherIcon from '../assets/icons/launcher.png'
+import macLauncherIcon from '../assets/icons/mac_launcher.svg'
+import linuxLauncherIcon from '../assets/icons/linux_launcher.svg'
+import winLauncherIcon from '../assets/icons/win_launcher.svg'
 import bonjourHiSnd from '../assets/sons/bonjourhi.mp3'
-import mantisseSnd from '../assets/sons/Mantisse - Septembre.mp3'
+import mantisseSnd from '../assets/sons/explore.mp3'
 
-function TypewriterText({ text, delayMs = 15 }: { text: string, delayMs?: number }) {
+function TypewriterText({ text, delayMs = 15, startDelay = 0 }: { text: string, delayMs?: number, startDelay?: number }) {
   const [displayed, setDisplayed] = useState('')
   useEffect(() => {
     let i = 0
+    let intervalId: ReturnType<typeof setInterval> | null = null
     setDisplayed('')
-    const interval = setInterval(() => {
-      setDisplayed(text.slice(0, i))
-      i++
-      if (i > text.length) clearInterval(interval)
-    }, delayMs)
-    return () => clearInterval(interval)
-  }, [text, delayMs])
+    const timeoutId = setTimeout(() => {
+      intervalId = setInterval(() => {
+        setDisplayed(text.slice(0, i))
+        i++
+        if (i > text.length && intervalId) clearInterval(intervalId)
+      }, delayMs)
+    }, startDelay)
+    return () => {
+      clearTimeout(timeoutId)
+      if (intervalId) clearInterval(intervalId)
+    }
+  }, [text, delayMs, startDelay])
   return <span style={{ whiteSpace: 'pre-wrap' }}>{displayed}</span>
 }
 
-function ExpandableSection({ title, expandUp = false, children }: { title: string, expandUp?: boolean, children: React.ReactNode }) {
-  const [isExpanded, setIsExpanded] = useState(false)
+function InfoButton({ isActive, onClick }: { isActive: boolean, onClick: () => void }) {
   return (
-    <div style={{ pointerEvents: 'auto', display: 'flex', flexDirection: expandUp ? 'column-reverse' : 'column' }}>
-      <h3 
-        onClick={() => setIsExpanded(!isExpanded)}
-        style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(12px, min(1.5vw, 2vh), 22px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'center', margin: 0, marginTop: expandUp && isExpanded ? '12px' : 0, marginBottom: !expandUp && isExpanded ? '12px' : 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', userSelect: 'none' }}
-      >
-        {title}
-        <span style={{ fontSize: '0.6em', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-          {expandUp ? '▲' : '▼'}
-        </span>
-      </h3>
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ overflow: 'hidden' }}
-          >
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    <motion.button
+      onClick={onClick}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+      style={{
+        width: 'clamp(28px, min(3vw, 4vh), 42px)',
+        height: 'clamp(28px, min(3vw, 4vh), 42px)',
+        borderRadius: '50%',
+        border: `2px solid ${isActive ? '#ffffff' : 'rgba(255,255,255,0.4)'}`,
+        backgroundColor: isActive ? '#000000' : 'transparent',
+        color: isActive ? '#ffffff' : 'rgba(255,255,255,0.4)',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 'clamp(14px, min(1.6vw, 2.2vh), 22px)',
+        fontFamily: "'Times New Roman', serif",
+        fontWeight: 700,
+        fontStyle: 'italic',
+        padding: 0,
+        transition: 'all 0.3s ease',
+        flexShrink: 0,
+      }}
+    >
+      i
+    </motion.button>
   )
 }
 
@@ -208,6 +217,8 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     comment: "COMMENT?",
     lockIn: "LOCK IN, CUT NOISE",
     exploreHint: "'' Gardez vos cookies, restez local ''",
+    explore: "EXPLORER",
+    catchphrase: "Changer le monde un pixel à la fois.",
   },
   en: {
     topLeftTitle: "A new way to archive",
@@ -222,6 +233,8 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     comment: "HOW?",
     lockIn: "LOCK IN, CUT NOISE",
     exploreHint: "'' Keep your cookies, stay local ''",
+    explore: "EXPLORE",
+    catchphrase: "Change the world one pixel at the time.",
   },
   es: {
     topLeftTitle: "Una nueva forma de archivar",
@@ -236,6 +249,8 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     comment: "¿CÓMO?",
     lockIn: "LOCK IN, CUT NOISE",
     exploreHint: "'' Guarda tus cookies, mantente local ''",
+    explore: "EXPLORAR",
+    catchphrase: "Cambiar el mundo un píxel a la vez.",
   }
 }
 
@@ -244,6 +259,8 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const t = TRANSLATIONS[language] || TRANSLATIONS.en
   const [phase, setPhase] = useState<Phase>('init')
   const [isHovering, setIsHovering] = useState(false)
+  const [leftInfoOpen, setLeftInfoOpen] = useState(false)
+  const [rightInfoOpen, setRightInfoOpen] = useState(false)
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
@@ -334,53 +351,99 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
             {/* Left Side */}
             <div style={{ position: 'absolute', left: '3vw', top: '6vh', bottom: '6vh', width: '28vw', zIndex: 10, pointerEvents: 'none', color: 'white' }}>
               {/* Top Left */}
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
-                <ExpandableSection title={t.topLeftTitle}>
-                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
-                    <TypewriterText text={t.topLeftText} />
-                  </p>
-                </ExpandableSection>
-              </div>
+              <AnimatePresence>
+                {leftInfoOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.4 }}
+                    style={{ position: 'absolute', top: 0, left: 0, right: 0 }}
+                  >
+                    <h3 style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(12px, min(1.5vw, 2vh), 22px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'left', margin: 0, marginBottom: '8px', color: '#FFD700' }}>
+                      <TypewriterText text={t.topLeftTitle + ' ▲'} />
+                    </h3>
+                    <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                      <TypewriterText text={t.topLeftText} />
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               
-              {/* Middle Left */}
-              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {/* Middle Left — Info Button + POURQUOI */}
+              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(8px, 1.5vw, 18px)', pointerEvents: 'auto' }}>
+                <InfoButton isActive={leftInfoOpen} onClick={() => setLeftInfoOpen(!leftInfoOpen)} />
                 <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(20px, min(2.5vw, 3.5vh), 36px)', letterSpacing: '0.1em', color: '#EF4444' }}>{t.pourquoi}</span>
               </div>
 
               {/* Bottom Left */}
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-                <ExpandableSection title={t.bottomLeftTitle} expandUp>
-                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
-                    <TypewriterText text={t.bottomLeftText} />
-                  </p>
-                </ExpandableSection>
-              </div>
+              <AnimatePresence>
+                {leftInfoOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                    style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}
+                  >
+                    <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                      <TypewriterText text={t.bottomLeftText} startDelay={2000} />
+                    </p>
+                    <h3 style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(12px, min(1.5vw, 2vh), 22px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'center', margin: 0, marginTop: '8px', color: '#FFD700' }}>
+                      <TypewriterText text={t.bottomLeftTitle + ' ♥'} startDelay={2000} />
+                    </h3>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Right Side */}
             <div style={{ position: 'absolute', right: '3vw', top: '6vh', bottom: '6vh', width: '28vw', zIndex: 10, pointerEvents: 'none', color: 'white' }}>
               {/* Top Right */}
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
-                <ExpandableSection title={t.topRightTitle}>
-                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
-                    <TypewriterText text={t.topRightText} />
-                  </p>
-                </ExpandableSection>
-              </div>
+              <AnimatePresence>
+                {rightInfoOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.4 }}
+                    style={{ position: 'absolute', top: 0, left: 0, right: 0 }}
+                  >
+                    <h3 style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(12px, min(1.5vw, 2vh), 22px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'right', margin: 0, marginBottom: '8px', color: '#FFD700' }}>
+                      <TypewriterText text={t.topRightTitle + ' ▲'} />
+                    </h3>
+                    <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                      <TypewriterText text={t.topRightText} />
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              {/* Middle Right */}
-              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {/* Middle Right — COMMENT + Info Button */}
+              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(8px, 1.5vw, 18px)', pointerEvents: 'auto' }}>
                 <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(20px, min(2.5vw, 3.5vh), 36px)', letterSpacing: '0.1em', color: '#3B82F6' }}>{t.comment}</span>
+                <InfoButton isActive={rightInfoOpen} onClick={() => setRightInfoOpen(!rightInfoOpen)} />
               </div>
 
               {/* Bottom Right */}
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-                <ExpandableSection title={t.bottomRightTitle} expandUp>
-                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
-                    <TypewriterText text={t.bottomRightText} />
-                  </p>
-                </ExpandableSection>
-              </div>
+              <AnimatePresence>
+                {rightInfoOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                    style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}
+                  >
+                    <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                      <TypewriterText text={t.bottomRightText} startDelay={2000} />
+                    </p>
+                    <h3 style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(12px, min(1.5vw, 2vh), 22px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'center', margin: 0, marginTop: '8px', color: '#FFD700' }}>
+                      <TypewriterText text={t.bottomRightTitle + ' ♥'} startDelay={2000} />
+                    </h3>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* EXPLORE Text Button */}
@@ -402,14 +465,14 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                   transition={{ duration: 0.2 }}
                   style={{
                     display: 'block',
-                    fontSize: 'clamp(30px, min(10vw, 15vh), 220px)',
+                    fontSize: 'clamp(24px, min(7vw, 11vh), 150px)',
                     color: '#ffffff',
                     fontFamily: "'Jersey 15', sans-serif",
                     letterSpacing: '0.15em',
                     lineHeight: 1
                   }}
                 >
-                  EXPLORE
+                  {t.explore}
                 </motion.span>
 
                 {/* Rainbow Text (Hovered) */}
@@ -426,7 +489,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                   }}
                   style={{
                     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                    fontSize: 'clamp(30px, min(10vw, 15vh), 220px)',
+                    fontSize: 'clamp(24px, min(7vw, 11vh), 150px)',
                     fontFamily: "'Jersey 15', sans-serif",
                     letterSpacing: '0.15em',
                     lineHeight: 1,
@@ -438,7 +501,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                     display: 'flex', justifyContent: 'center'
                   }}
                 >
-                  {"EXPLORE".split('').map((char, i) => (
+                  {t.explore.split('').map((char, i) => (
                     <motion.span
                       key={i}
                       initial={{ y: 0 }}
@@ -452,6 +515,26 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                 </motion.span>
               </div>
             </motion.button>
+
+            {/* Catchphrase below EXPLORE */}
+            <div style={{
+              position: 'absolute',
+              top: 'calc(50% + clamp(30px, min(5vw, 7vh), 90px))',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 10,
+              whiteSpace: 'nowrap',
+            }}>
+              <span style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 'clamp(10px, min(1.3vw, 1.8vh), 16px)',
+                color: '#FFD700',
+                letterSpacing: '0.08em',
+                fontWeight: 600,
+              }}>
+                {t.catchphrase}
+              </span>
+            </div>
 
             {/* ── Download Launcher Buttons ── */}
             <div style={{
@@ -479,10 +562,10 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
               {/* Icons row */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(24px, 4vw, 60px)' }}>
                 {([
-                  { label: 'MAC', href: '/downloads/ForomInstaller.dmg', filename: 'ForomInstaller.dmg', color: '#EF4444' },
-                  { label: 'LINUX', href: '/downloads/ForomInstaller.AppImage', filename: 'ForomInstaller.AppImage', color: '#FFD700' },
-                  { label: 'WIN', href: '/downloads/ForomInstaller.exe', filename: 'ForomInstaller.exe', color: '#3B82F6' },
-                ] as const).map(({ label, href, filename, color }) => (
+                  { label: 'MAC', href: '/downloads/ForomInstaller.dmg', filename: 'ForomInstaller.dmg', color: '#EF4444', icon: macLauncherIcon },
+                  { label: 'LINUX', href: '/downloads/ForomInstaller.AppImage', filename: 'ForomInstaller.AppImage', color: '#22C55E', icon: linuxLauncherIcon },
+                  { label: 'WIN', href: '/downloads/ForomInstaller.exe', filename: 'ForomInstaller.exe', color: '#3B82F6', icon: winLauncherIcon },
+                ] as const).map(({ label, href, filename, color, icon }) => (
                   <motion.a
                     key={label}
                     href={href}
@@ -499,15 +582,14 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                       textDecoration: 'none',
                     }}
                   >
-                    {/* Colored launcher icon */}
+                    {/* OS-specific launcher icon */}
                     <img
-                      src={launcherIcon}
-                      alt=""
+                      src={icon}
+                      alt={`${label} launcher`}
                       style={{
                         width: 'clamp(28px, min(4vw, 5vh), 52px)',
                         height: 'clamp(28px, min(4vw, 5vh), 52px)',
                         objectFit: 'contain',
-                        filter: `drop-shadow(0 0 6px ${color}88)`,
                       }}
                     />
                     {/* OS label */}
@@ -553,7 +635,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                   <circle cx="12" cy="12" r="1.5" fill="#111" />
                 </motion.svg>
                 <span style={{ fontSize: 'clamp(8px, 1.2vw, 11px)', color: '#fff', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.05em' }}>
-                  Mantisse - Septembre
+                  Tricot the Wiz - Explore
                 </span>
               </div>
             </div>

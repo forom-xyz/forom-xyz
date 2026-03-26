@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { LoadingScreen } from './components/LoadingScreen'
+import { MoodSelection } from './components/MoodSelection'
 import { ForomLobby } from './components/ForomLobby'
 import { ForomCreationFlow } from './components/ForomCreationFlow'
 import { type ForomColor } from './utils/foromColors'
@@ -189,8 +190,25 @@ function App() {
   if (isLoading) {
     return <LoadingScreen onComplete={() => {
       setIsLoading(false);
-      setPhase('lobby');
+      setPhase('mood');
     }} />
+  }
+
+  if (phase === 'mood') {
+    return (
+      <MoodSelection 
+        onGhost={() => {
+          setIsPhantomMode(true);
+          setPhase('lobby');
+        }}
+        onColor={(username) => {
+          setCurrentUser(username);
+          setIsPhantomMode(false);
+          setPhase('lobby');
+          useModalStore.getState().openUser();
+        }}
+      />
+    );
   }
 
   if (phase === 'lobby') {
