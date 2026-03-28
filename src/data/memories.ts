@@ -165,29 +165,64 @@ export function hasVideo(memory: Memory): boolean {
 }
 
 // =============================================================================
-// PLACEHOLDER DATA GENERATION
+// LOAD JSON MEMOS
 // =============================================================================
 
-/**
- * Generates placeholder memories for development/testing
- * Creates 100 items (10 categories × 10 items each)
- * All slots are empty by default - ready to be filled with real content
- */
-function generatePlaceholderMemories(): Memory[] {
+function loadMemoriesFromJson(): Memory[] {
   const memories: Memory[] = []
+  
+  // Use Vite's glob import to load all 100 JSON memos synchronously
+  type MemoModule = {
+    grid_coordinate?: string
+    title?: string
+    resume?: string
+    video_url?: string
+    image_url?: string
+    sources?: string[]
+    question?: string
+    videoUrl?: string
+    thumbnailUrl?: string
+    [key: string]: unknown
+  }
+  const memoModules = import.meta.glob('./memos/V1/*.json', { eager: true }) as Record<string, MemoModule>;
 
   CATEGORIES.forEach((category) => {
     for (let i = 0; i < ITEMS_PER_ROW; i++) {
-      memories.push({
-        id: `${category.toLowerCase()}-${i}`,
-        category,
-        question: WH_QUESTIONS[i] || null,
-        title: `Emplacement ${i + 1}`,
-        description: 'Cet emplacement est disponible. Ajoutez une vidéo ou un contenu pour le remplir.',
-        videoUrl: null,
-        thumbnailUrl: null,
-        isFilled: false,
-      })
+      // Look for a memo module that matches the grid coordinate
+      const coord = `${category}${i}`;
+      let matchedMemo: MemoModule | null = null;
+
+      for (const path in memoModules) {
+        if (memoModules[path].grid_coordinate === coord) {
+          matchedMemo = memoModules[path];
+          break;
+        }
+      }
+
+      if (matchedMemo) {
+        memories.push({
+          id: `${category.toLowerCase()}-${i}`,
+          category,
+          question: String(i) as WhQuestion,
+          title: matchedMemo.title || `Emplacement ${i + 1}`,
+          description: matchedMemo.resume || '',
+          videoUrl: matchedMemo.video_url || null,
+          thumbnailUrl: matchedMemo.image_url || null,
+          sources: matchedMemo.sources || [],
+          isFilled: true,
+        });
+      } else {
+        memories.push({
+          id: `${category.toLowerCase()}-${i}`,
+          category,
+          question: String(i) as WhQuestion,
+          title: `Emplacement ${i + 1}`,
+          description: 'Cet emplacement est disponible. Ajoutez une vidéo ou un contenu pour le remplir.',
+          videoUrl: null,
+          thumbnailUrl: null,
+          isFilled: false,
+        });
+      }
     }
   })
 
@@ -202,7 +237,7 @@ function generatePlaceholderMemories(): Memory[] {
  * All memories organized by category
  * Edit this array to add real content
  */
-export const MEMORIES: Memory[] = generatePlaceholderMemories()
+export const MEMORIES: Memory[] = loadMemoriesFromJson()
 
 /**
  * Get memories for a specific category

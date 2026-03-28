@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "D0",
+  "y_axis_district": "Opérations",
+  "x_axis_action": "Idée",
+  "title": "Flux de travail",
+  "image_url": "https://forom.community/images/grid_D0.png",
+  "video_url": "https://www.youtube.com/watch?v=XW0QZmtbjzU",
+  "sources": [
+    "README.md: Minecraft Server philosophy and mission overview",
+    "quests.ts: Foundational quest specifications for District D",
+    "database.sql: Schema for the memos table and role-based tracking",
+    "forom-config.ts: Category and action label mappings",
+    "App.tsx: Quest rewards and pixel economy implementation"
+  ],
+  "resume": "The quest 'Flux de travail' (D0) initiates the Opérations district at the 'Idée' (Spark) intersection of the 10x10 FRM grid. In Phase 1: The Foundations (V1), the primary objective is to conceptualize the procedural logic required to manage the node's daily activities while pursuing the mission to 'Save human communities and long-term memory'. This quest focuses on designing the essential workflows—from initial memo creation to finalized archival—that will ensure the community remains organized and productive throughout its decadal mission. Technically, these workflow ideas are stored in the local PostgreSQL database within the 'memos' table, which maps the contribution to the 'category_id' for 'Opérations' and the 'question' field for 'Idée'. The application's modern stack, featuring React 19 and Vite 7, allows the community to interact with these operational blueprints through a spatial 5x5 viewport. This ensures that as the team grows toward its 1209-user limit, every member can easily access and understand the 'Deep Lore' of the node's operational methods. Economically, completing the D0 quest rewards the contributor with 2 Pixels (PX) and 10 XP in Phase 1. This reward system is central to the Forom's goal of redistributing 50% of purchasing power to the community, helping to fund future missions. The 'Creator' role is specifically aligned with this quest, as their alignment focuses on innovation and building the tools that push the mission forward. By hosting this workflow data on local hardware like an NVIDIA Jetson, the community maintains absolute data sovereignty, ensuring its methods are private and independent of third-party cloud trackers. This is a core pillar of the 'Minecraft Server' philosophy, where the community owns the physical keys to its history. These initial workflow ideas will eventually be ingested by ROM, the local RAG engine, in Phase 3. ROM will then provide context-aware operational support, helping future generations—like those in the ETS Clubs pilot—to maintain continuity without losing the organizational knowledge of their predecessors. D0 is the essential first step in transforming abstract strategy into actionable, documented practice that secures the node's long-term operational health and success. Yes.",
+  "summary": "This quest initiates the design of community workflows at coordinate D0, establishing the procedural foundations required for the node's daily operations and long-term memory preservation."
+}

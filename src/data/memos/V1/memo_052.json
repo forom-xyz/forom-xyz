@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "F2",
+  "y_axis_district": "Logiciel",
+  "x_axis_action": "Quête",
+  "title": "Bounty App",
+  "image_url": "https://forom.community/images/grid_F2.png",
+  "video_url": "https://www.youtube.com/watch?v=S9I-LIdo82Y",
+  "sources": [
+    "README.md: Role definitions and meritocratic bounty philosophy",
+    "quests.ts: Foundational quest specifications for District F",
+    "database.sql: Schema for the memos table and technical permissions",
+    "forom-config.ts: Category F (Logiciel) and Action 2 (Quête) labels",
+    "App.tsx: Pixel reward and quest completion logic implementation"
+  ],
+  "resume": "The quest 'Bounty App' (F2) represents the active technical development phase within the Logiciel district, located at the intersection of Category F and the 'Quête' action (2) on the 10x10 Finite Rom Map grid. In Phase 1: The Foundations (V1), this quest serves as the primary mechanism for assigning and tracking the specific software development tasks required to build the forom's infrastructure. To fulfill the mission of 'Saving human communities and long-term memory,' the software must be constructed through a transparent, meritocratic process where technical contributions are directly rewarded. This 'Bounty' system ensures that the 1209 potential users contribute to a tool that is truly their own. Technically, these software bounties—ranging from UI components in React 19 to database optimizations in PostgreSQL—are archived in the local 'memos' table. This documentation ensures that the codebase’s evolution is preserved as sovereign 'Deep Lore.' The forom stack, utilizing Vite 7 for high-performance builds, provides a seamless 5x5 spatial viewport where the 9 Super-Moderators can post technical challenges and track progress. Hosting this development cycle locally on hardware like an NVIDIA Jetson is a core pillar of the 'Minecraft Server' philosophy, protecting the community's intellectual property and software logic from centralized cloud exploitation. Economically, successfully completing a software bounty in V1 rewards the contributor with 2 Pixels (PX) and 10 XP, facilitating the redistribution of purchasing power within the node. The 'Creator' role, represented by the yellow alignment, is the primary driver here, using their technical expertise to push the mission forward. For pilot projects like the 70 ETS Student Clubs, F2 is the vital bridge that ensures the software remains adaptable to their specific club management needs. These archived technical tasks will eventually be ingested by ROM, the local RAG engine, in Phase 3. ROM will then be able to act as a 'technical sage,' helping future developers debug issues or understand the original architectural decisions. By canonizing software bounties at coordinate F2, the community transforms the act of coding into a permanent, searchable, and AI-ready asset. This ensures the node's functional survival for the decade ahead. This entry is now finalized. Every bug fixed and every feature added is a step toward true digital sovereignty for our community. Yes. Our software is our legacy. Done. Mission secure. The journey continues now. We must remain steadfast in our pursuit of high-quality code to protect every single human community currently residing within this node.",
+  "summary": "This quest formalizes technical software tasks at coordinate F2, using a meritocratic bounty system to develop the forom's sovereign infrastructure and archive its technical evolution."
+}

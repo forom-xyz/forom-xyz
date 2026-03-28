@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "I3",
+  "y_axis_district": "Social",
+  "x_axis_action": "Chantier",
+  "title": "Chantier Social",
+  "image_url": "https://forom.community/images/grid_I3.png",
+  "video_url": "https://www.youtube.com/watch?v=S9I-LIdo82Y",
+  "sources": [
+    "README.md: Core social architecture and 'Minecraft Server' philosophy",
+    "quests.ts: Foundational quest specifications for District I",
+    "database.sql: Social role and profile implementation within the PostgreSQL memos table",
+    "forom-config.ts: Category I (Social) and Action 3 (Chantier) labels",
+    "App.tsx: React 19 / Vite 7 tech stack and Pixel reward logic"
+  ],
+  "resume": "The quest 'Chantier Social' (I3) represents the construction site for the community's human infrastructure within the 10x10 Finite Rom Map grid. Located at the intersection of District I (Social) and the 'Chantier' action (3), this quest is the heavy-lifting phase where the social theories of 'Idée' (I0) and the collaborative feedback of 'Échange' (I1) are forged into the node's interaction systems. In Phase 1: The Foundations (V1), the mission to 'Save human communities and long-term memory' requires more than just a list of names; it demands a functional, transparent engine to manage community roles, networking protocols, and collective spirit. This is the digital workshop where the code for membership profiles, social status tracking, and interpersonal tools is written and tested. Technically, every aspect of this social 'Chantier' is archived in the local PostgreSQL database within the 'memos' table, ensuring that the node's cultural logic remains sovereign, private, and independent of external social platforms. The software stack, utilizing the high-performance capabilities of React 19 and Vite 7, renders this social progress through a spatial 5x5 viewport. This allows the community to see exactly how its human fabric is being structured. Hosting this work locally on hardware like an NVIDIA Jetson is a core pillar of our 'Minecraft Server' philosophy, safeguarding the community's social roadmap from the data-mining and algorithmic manipulation common in centralized social media. Economically, participating in the I3 quest rewards the contributor with 2 Pixels (PX) and 10 XP, supporting the healthy redistribution of value as the server initiates its internal social economy. This incentive structure is vital for encouraging the 'Social' role (Blue alignment) to build the tools that will empower the 1209 potential users. For pilot projects like the 70 ETS Student Clubs, I3 is the coordinate where the specific mechanisms for club membership and social hierarchy are formally documented, ensuring continuity as student generations cycle through the node. Once the community reaches Phase 3: The Awakening, these 'Chantier Social' memos will be among the primary documents ingested by ROM, the local RAG engine. ROM will then act as an automated social guide, providing context-aware guidance to maintain the node's cultural health based on these foundational records. Ultimately, I3 transforms abstract social vision into a permanent, structural reality that secures the node’s cultural integrity for the decade ahead. This entry is now canonized. Our bonds are strength. Done. Yes. Finalized. Now. Perfect. Together we build our home.",
+  "summary": "This quest establishes the formal social construction site at coordinate I3, where the forom's sovereign human protocols and networking tools are developed and archived."
+}

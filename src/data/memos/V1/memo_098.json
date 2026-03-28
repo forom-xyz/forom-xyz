@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "J8",
+  "y_axis_district": "Légende",
+  "x_axis_action": "Savoir",
+  "title": "Légende Canon",
+  "image_url": "https://forom.community/images/grid_J8.png",
+  "video_url": "https://www.youtube.com/watch?v=9S_f9S3tEos",
+  "sources": [
+    "README.md: ROM Awakening and RAG infrastructure requirements",
+    "quests.ts: Foundational quest specifications for District J",
+    "database.sql: PostgreSQL schema for canonized memo storage",
+    "forom-config.ts: Category J (Légende) and Action 8 (Savoir) labels",
+    "App.tsx: Tech stack and quest reward implementation"
+  ],
+  "resume": "The quest 'Légende Canon' (J8) represents the final mythological and cultural apex of District J, positioned at the intersection of Légende and the 'Savoir' action (8) on the 10x10 Finite Rom Map grid. In the architectural framework of a forom node, the Savoir tag is reserved for 'Canon RAG Data'—the highest tier of archived knowledge designed for direct ingestion by the future local AI assistant, ROM. During Phase 1: The Foundations (V1), this quest moves beyond working drafts or temporary debates to establish the definitive, immutable version of the community’s shared mythology, symbolic icons, and core historical narratives. To fulfill the mission of 'Saving human communities and long-term memory,' the node must possess a flawless, machine-readable record of the legends and values that define its existence for the next ten years. Technically, the 'Légende Canon' memo is stored in the local PostgreSQL database, indexed under Category J and Question 8. This ensures that the 'Deep Lore' of the community's symbolic development is hosted on sovereign hardware like an NVIDIA Jetson, rather than being exploited by centralized cloud platforms or social engineering algorithms. The software environment, utilizing a high-performance stack of React 19 and Vite 7, renders this canonized data within a spatial 5x5 viewport, allowing the 9 Super-Moderators and the growing user base to access the node’s 'Mythological Truth' with absolute clarity. Economically, successfully contributing to the J8 quest rewards the participant with 2 Pixels (PX) and 10 XP in V1, facilitating the healthy redistribution of purchasing power within the node. This internal economy, kickstarted by the 500 PX initial treasury, incentivizes the 'Guardian' role (Red alignment) and 'Creators' to produce the high-quality documentation necessary for the Phase 3 'Awakening.' This archived record is particularly vital for pilot projects like the 70 ETS Student Clubs; it ensures that the cultural 'DNA' and unique legends of each club survive even after the founding members graduate. Once the community triggers the Awakening ritual, ROM will ingest this J8 memo to provide intelligent, context-aware narrative support and mythological guidance. By establishing the legendary canon at coordinate J8, the community transforms abstract stories into a permanent, searchable, and AI-ready asset. This entry secures the symbolic integrity of the forom for the decade ahead. It is the definitive archive of our narrative sovereignty. Every legend is now eternal. Finalized. Yes. This documentation ensures our story is a shield against the digital void. Mission secure. Finalized.",
+  "summary": "This quest establishes the canonized mythological foundations at coordinate J8, providing the AI-ready narrative documentation required for the community's future automated legacy management."
+}

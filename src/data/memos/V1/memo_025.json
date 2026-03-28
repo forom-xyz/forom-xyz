@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "C5",
+  "y_axis_district": "Stratégie",
+  "x_axis_action": "Accompli",
+  "title": "Roadmap finale",
+  "image_url": "https://forom.community/images/grid_C5.png",
+  "video_url": "https://www.youtube.com/watch?v=S9I-LIdo82Y",
+  "sources": [
+    "README.md: ROMAP progression and phase transition requirements",
+    "quests.ts: Foundational quest specifications for C5",
+    "database.sql: PostgreSQL schema for memo archival",
+    "forom-config.ts: Category C and Action 5 label mappings",
+    "App.tsx: Quest rewards and pixel economy implementation"
+  ],
+  "resume": "The quest 'Roadmap finale' (C5) marks the successful completion of the strategic planning cycle within the Stratégie district, situated at the 'Accompli' coordinate of the 10x10 FRM grid. In the context of Phase 1: The Foundations (V1), this milestone signifies that the community has finalized its long-term trajectory to achieve the core mission: 'Save human communities and long-term memory'. The roadmap finale is not merely a document but a canonized strategic anchor that dictates how the node will navigate the next ten years of its existence. Technically, the publication of this finalized roadmap is recorded in the local PostgreSQL 'memos' table, linking the contribution to Category C and Action 5. This data is rendered through a high-performance frontend stack utilizing React 19 and Vite 7, ensuring that the 5x5 spatial viewport provides a clear visual confirmation of strategic alignment. For the contributor, completing this quest rewards them with 2 Pixels (PX) and 10 XP, which facilitates the redistribution of purchasing power within the node's internal economy. This economy is kickstarted by the 9 Super-Moderators, who each possess an initial treasury of 500 PX to fund these essential foundational tasks. The 'Roadmap finale' is a prerequisite for the community to move toward the 100-memo goal required to unlock Phase 2: The Iteration. By hosting this finalized strategy on local hardware like an NVIDIA Jetson, the community maintains absolute data sovereignty, ensuring that its strategic 'Deep Lore' remains private and protected from centralized cloud entities. This localized hosting is the cornerstone of the 'Minecraft Server' philosophy, where the community owns the physical keys to its history. Once archived, this roadmap becomes a permanent part of the V1 dataset that will eventually be processed by ROM, the local RAG engine, in Phase 3. The AI assistant will utilize this canonized strategy to provide context-aware support and guidance to future members. For pilot projects like the 70 ETS Student Clubs, the B5 quest ensures that strategic continuity is preserved across student generations. Ultimately, C5 transforms abstract planning into a finalized, actionable record that secures the structural integrity of the forom for the decade ahead. This entry is canonized. Yes.",
+  "summary": "This quest represents the finalization of the community's strategic roadmap at coordinate C5, canonizing the plan required for long-term survival and AI training."
+}

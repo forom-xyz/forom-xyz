@@ -15,6 +15,7 @@ export interface MemoryBoxProps {
   isExtraSmall?: boolean
   isDark?: boolean
   isLocked?: boolean
+  isRubixView?: boolean
   onClick?: () => void
   onInfoClick?: () => void
   questionLabels?: Record<string, string>
@@ -45,6 +46,7 @@ export const MemoryBox = memo(function MemoryBox({
   isExtraSmall = false,
   isDark = false,
   isLocked = false,
+  isRubixView = false,
   onClick,
   onInfoClick,
   questionLabels = {},
@@ -115,13 +117,14 @@ export const MemoryBox = memo(function MemoryBox({
             )}
             
             {/* Title — centered in the box */}
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 8px', marginTop: '15px' }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
               <span
                 className={`text-center font-bold uppercase w-full ${customBgColor ? 'text-white' : (isDark ? 'text-white' : 'text-black')}`}
                 style={{
                   fontFamily: "'Jersey 15', sans-serif",
-                  fontSize: isCentered ? 'clamp(20px, 3.5vw, 40px)' : isSmall ? 'clamp(10px, 1.5vw, 18px)' : isExtraSmall ? 'clamp(8px, 1vw, 10px)' : 'clamp(14px, 2vw, 24px)',
-                  lineHeight: 1.1,
+                  fontSize: isCentered ? 'clamp(18px, 3vw, 36px)' : isSmall ? 'clamp(9px, 1.2vw, 15px)' : isExtraSmall ? 'clamp(7px, 0.9vw, 9px)' : 'clamp(12px, 1.8vw, 20px)',
+                  lineHeight: 1.05,
+                  wordBreak: 'break-word',
                   textShadow: customBgColor ? '2px 2px 4px rgba(0,0,0,0.5)' : 'none',
                 }}
               >
@@ -130,7 +133,7 @@ export const MemoryBox = memo(function MemoryBox({
             </div>
 
             {/* Badge — pinned to bottom center */}
-            {question && (
+            {question && !isRubixView && (
               <div style={{ paddingBottom: '10px', display: 'flex', justifyContent: 'center' }}>
                 <span
                   className="flex items-center justify-center font-bold text-white uppercase shadow-sm"

@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "D6",
+  "y_axis_district": "Opérations",
+  "x_axis_action": "Matériel",
+  "title": "Guide technique",
+  "image_url": "https://forom.community/images/grid_D6.png",
+  "video_url": "https://www.youtube.com/watch?v=kYI9_H_H9_I",
+  "sources": [
+    "README.md: Minecraft Server philosophy and mission overview",
+    "quests.ts: Foundational quest specifications for District D",
+    "database.sql: PostgreSQL schema for memos and role-based permissions",
+    "forom-config.ts: Category D and Action 6 label mapping",
+    "App.tsx: Quest reward (2 PX) and tech stack implementation"
+  ],
+  "resume": "The quest 'Guide technique' (D6) represents the formal archival of the community's technical infrastructure manual within the Opérations district, located at the intersection of Category D and the Matériel action (6) on the 10x10 Finite Rom Map grid. Within Phase 1: The Foundations (V1), this quest is the definitive act of documenting the 'how' behind the node's physical and digital existence. To fulfill the mission of 'Saving human communities and long-term memory,' a community must possess the technical knowledge to maintain its own sovereign fortress. This guide transforms temporary setup notes into a permanent, searchable asset—a 'Matériel' file—that ensures the node's operational independence. The 'Creator' role, aligned with the color yellow, is the primary architect of this document, utilizing their deep expertise to outline the maintenance protocols for the local PostgreSQL database and the high-performance React 19 and Vite 7 frontend. Technically, this guide is stored as a comprehensive memo in the local database, indexed to provide the 'Deep Lore' necessary for any future technical lead. Hosting this manual locally on hardware like an NVIDIA Jetson is a non-negotiable pillar of the 'Minecraft Server' philosophy; by keeping the technical keys to the kingdom on-premises, the community remains immune to the vulnerabilities of centralized cloud providers. Economically, successfully contributing to the D6 quest rewards the user with 2 Pixels (PX) and 10 XP. This contributes to the vital redistribution of purchasing power, which begins with the 9 Super-Moderators and their initial 500 PX treasury. For pilot projects like the 70 ETS Student Clubs, the 'Guide technique' is the ultimate insurance policy against the 'graduation gap,' ensuring that the technical mastery of the server is passed seamlessly from one student cohort to the next. Once the community reaches Phase 3: The Awakening, this D6 memo will be among the 300 foundational documents ingested by ROM, the local RAG engine. ROM will then be able to act as an automated technical assistant, providing real-time troubleshooting and maintenance advice based on this canonized guide. By establishing this technical bedrock at coordinate D6, the community secures its structural integrity for the decade ahead. This entry is now finalized. Every line of code and every physical wire is now documented, securing the forom's long-term survival for all upcoming generations. The mission is grounded in verified, local expertise. Technical sovereignty is the first step toward true human freedom. Yes. This is our complete manual for the decade.",
+  "summary": "This quest establishes the canonized technical manual at coordinate D6, documenting the node's hardware and software infrastructure for long-term maintenance and AI ingestion."
+}

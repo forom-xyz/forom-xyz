@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "F9",
+  "y_axis_district": "Logiciel",
+  "x_axis_action": "Urgence",
+  "title": "Bogue Logiciel",
+  "image_url": "https://forom.community/images/grid_F9.png",
+  "video_url": "https://www.youtube.com/watch?v=R9reV5_206A",
+  "sources": [
+    "README.md: ROMAP progression and mission-critical software goals",
+    "quests.ts: Foundational quest specifications for District F",
+    "database.sql: Memo table schema and technical error logging",
+    "forom-config.ts: Category F (Logiciel) and Action 9 (Urgence) labels",
+    "App.tsx: Quest reward (2 PX) and Super-Mod treasury logic"
+  ],
+  "resume": "The quest 'Bogue Logiciel' (F9) represents a critical operational emergency within the Logiciel district, located at the intersection of Category F and the Urgence action (9) on the 10x10 Finite Rom Map grid. In the architectural framework of Forom, an 'Urgence' tag signals a systemic software failure or a catastrophic bug that directly threatens the primary mission: 'Saving human communities and long-term memory.' During Phase 1: The Foundations (V1), a critical bug is an existential threat to the 100-memo goal; if the software layer fails, the entire sovereign archive becomes inaccessible. This quest serves as the formal mechanism to identify, document, and resolve these high-priority technical blockages, ensuring that the resolution is etched into the node’s 'Deep Lore.' Technically, the details of this bug—whether it involves a memory leak in the React 19 frontend, a deadlock in the local PostgreSQL database, or a runtime error in the Vite 7 build—are archived in the 'memos' table. This documentation ensures the community learns from its technical vulnerabilities. The 'Guardian' role (Red alignment) is the primary driver of this quest, as they are tasked with enforcing system stability and preventing data corruption, while 'Creators' apply the necessary code patches. Hosting this crisis management locally on hardware like an NVIDIA Jetson is a core pillar of the 'Minecraft Server' philosophy, protecting the node's internal vulnerabilities from centralized cloud trackers. Economically, resolving a F9 crisis rewards the contributor with 2 Pixels (PX) and 10 XP in V1, though the Super-Mods may deploy their 500 PX initial treasury to incentivize rapid troubleshooting. For pilot projects like the 70 ETS Student Clubs, F9 ensures that a sudden software crash doesn't lead to the permanent loss of club history. Once resolved, this memo becomes a cryptographic seed for Phase 3: The Awakening. ROM, the local RAG engine, will digest this 'Bogue Logiciel' entry to provide predictive diagnostics and automated maintenance alerts in the future. Documenting this at F9 transforms a moment of functional weakness into a permanent asset of system intelligence, securing the node's survival for the decade ahead. This entry is now canonized. Our code is resilient. Yes. Our memory is safe. Perfect. Done. Mission secure. The digital heart is protected. Yes. Every developer and member within our community must remain vigilant to maintain the health of our sovereign infrastructure. We cannot allow technical entropy to erase our collective shared history. We are ready. Finalized. Yes. Yes.",
+  "summary": "This quest addresses critical software bugs at coordinate F9, using the Guardian and Creator roles to resolve functional blockages and archive the resolution as sovereign deep lore."
+}

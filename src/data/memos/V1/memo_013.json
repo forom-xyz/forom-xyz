@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "B3",
+  "y_axis_district": "Équipe",
+  "x_axis_action": "Chantier",
+  "title": "Setup Onboarding: Creating the Rite of Passage",
+  "image_url": "https://forom.community/images/grid_B3.png",
+  "video_url": "Highly specific search: 'Meritocratic community onboarding and role-based access control strategies'",
+  "sources": [
+    "README.md: Role definitions and Private Era philosophy",
+    "quests.ts: Foundational quest specs for District B",
+    "database.sql: User role hierarchy and currency initialization",
+    "forom-config.ts: Mapping of Category B and Action 3 labels",
+    "App.tsx: Currency deduction and quest reward implementation"
+  ],
+  "resume": "The quest 'Setup Onboarding' (B3) is the pivotal fourth step in District B (Équipe), aligning with the Chantier action at coordinate B3 on the 10x10 Finite Rom Map grid. In the architectural lifecycle of a Forom, this stage represents the active construction of the welcoming protocol for new members during Phase 1: The Foundations (V1). The core mission—'Saving human communities and long-term memory'—depends heavily on how new participants are integrated into the 'Private Era' of the node. Unlike conventional platforms with frictionless sign-ups, the Forom requires a deliberate onboarding process where users must understand the meritocratic structure of roles, including Guardians, Creators, and Social agents. This quest involves designing the specific steps a new 'Associate' must take to potentially become a 'Creator,' which typically involves completing an introductory quest to prove their alignment with the community's values. Technically, the onboarding flow is documented and stored within the local PostgreSQL 'memos' table, ensuring the protocol itself remains part of the community’s sovereign 'Deep Lore.' The frontend, built with React 19 and Vite 7, facilitates this experience through the spatial 5x5 viewport, where the B3 coordinate serves as the central manual for new arrivals. For the contributor, finishing this chantier results in a reward of 2 Pixels (PX) and 10 XP, contributing to the internal economic circulation. This economy is kickstarted by the 9 Super-Moderators, who utilize their initial 500 PX treasury to fund these foundational organizational tasks. The 'Social' role, associated with the color blue, is the primary driver of this quest. Their expertise in networking and community management ensures that the onboarding is not just a technical checklist but a human-centric initiation. By hosting the onboarding data locally on hardware like an NVIDIA Jetson, the community guarantees that its membership list and social protocols are private and sovereign. This is particularly vital for pilot projects like the 70 ETS Student Clubs, where clear onboarding ensures that each new semester of students can seamlessly inherit the server's lore. Once the onboarding protocol is finalized and archived, it becomes part of the V1 dataset that will eventually be processed by ROM, the local RAG engine, in Phase 3. This ensures the AI understands the community’s social boundaries and entry requirements. Ultimately, B3 transforms a simple signup into a meaningful rite of passage.",
+  "summary": "This quest focuses on designing the community onboarding protocol at coordinate B3, establishing a meritocratic 'Private Era' entry process for new members."
+}

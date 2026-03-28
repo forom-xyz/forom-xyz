@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "B0",
+  "y_axis_district": "Équipe",
+  "x_axis_action": "Idée",
+  "title": "Nouveau rôle: Designing the Social Framework",
+  "image_url": "https://forom.community/images/grid_B0.png",
+  "video_url": "https://www.youtube.com/watch?v=XW0QZmtbjzU",
+  "sources": [
+    "README.md: Role definitions and mission overview [cite: 2]",
+    "quests.ts: Foundational quest specs for District B",
+    "database.sql: PostgreSQL schema for roles and users",
+    "forom-config.ts: Default category and action labels [cite: 3]",
+    "App.tsx: Pixel economy and quest reward implementation"
+  ],
+  "resume": "The quest 'Nouveau rôle' (B0) initiates the assembly of the human layer within the Forom ecosystem, located at the intersection of District B (Équipe) and Action 0 (Idée) on the 10x10 FRM grid[cite: 2]. As the community moves into Phase 1: The Foundations (V1), defining specialized roles is critical to the mission of saving human communities and preserving long-term memory[cite: 2]. While the system provides core alignments—Guardian for defense, Creator for innovation, and Social for connection—the B0 quest allows the community to brainstorm and propose new, niche roles tailored to their specific mission requirements[cite: 2]. Technically, these role definitions are stored as 'memos' within the local PostgreSQL database, indexed by the category 'B' and the question '0'. This approach ensures that the community's organizational structure is part of its sovereign 'Deep Lore,' hosted on local hardware like an NVIDIA Jetson to prevent data exploitation by centralized platforms[cite: 2]. The software environment, built on React 19 and Vite 7, renders these role proposals within a spatial 5x5 viewport, allowing members to visualize the evolving team structure[cite: 2]. Each member participating in this spark of ideation contributes to the 100-memo goal required to unlock Phase 2[cite: 2]. Economically, the 'Nouveau rôle' quest is incentivized by the Pixel (PX) system; in V1, successful completion rewards the author with 2 PX[cite: 2]. This facilitates the redistribution of purchasing power, supported by the 9 Super-Mods who each begin with a treasury of 500 PX to kickstart community activity[cite: 2]. These role-based identifiers are not merely cosmetic; they dictate playstyles and functional responsibilities within the ecosystem, such as the Creator's requirement to earn their title through verified contributions[cite: 2]. By documenting these roles early, the community ensures that knowledge transfer between generations—particularly in pilot projects like the 70 ETS Student Clubs—remains structured and clear[cite: 2]. This archived data will eventually be ingested by ROM, the local RAG system, once the community reaches Phase 3[cite: 2]. The Awakening ritual requires a specific population check, including exactly 9 Super-Mods and 25 Mods, making the early definition of roles at coordinate B0 a prerequisite for long-term server growth and global connectivity[cite: 2]. Thus, B0 transforms human organization into a permanent, searchable, and AI-ready asset within the community’s sovereign archive[cite: 2]. This creates a stable foundation. Human capital remains the most valuable resource in any federated node looking to build and preserve shared long-term memory within the matrix environment.",
+  "summary": "This quest facilitates the brainstorming and archival of specialized community roles at coordinate B0, establishing the human organizational foundation for the V1 phase."
+}

@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "B8",
+  "y_axis_district": "Équipe",
+  "x_axis_action": "Savoir",
+  "title": "Hiérarchie Canon",
+  "image_url": "https://forom.community/images/grid_B8.png",
+  "video_url": "https://www.youtube.com/watch?v=9S_f9S3tEos",
+  "sources": [
+    "README.md: Role population limits and data sovereignty philosophy",
+    "database.sql: Schema for user roles and hierarchy",
+    "quests.ts: Foundational quest specifications for District B",
+    "forom-config.ts: Mapping for Category B and Action 8",
+    "App.tsx: Currency and quest reward logic"
+  ],
+  "resume": "The quest 'Hiérarchie Canon' (B8) represents the definitive stabilization of the community's human architecture at coordinate B8 on the 10x10 FRM grid. Within the 'Équipe' district, the 'Savoir' action signifies the creation of 'Canon RAG Data'—high-quality, finalized documentation designed specifically for ingestion by the future local AI assistant, ROM. In Phase 1: The Foundations (V1), this quest moves beyond temporary team lists to establish the immutable organizational structure required to 'Save human communities and long-term memory'. Technically, this hierarchy is grounded in the local PostgreSQL 'users' table, which enforces a meritocratic tiered system limited to 1209 total users: 9 Super-Moderators, 50 Moderators, 150 Creators, and 1000 Associates. The 'Hiérarchie Canon' memo serves as the formal record of these tiers, defining the specific responsibilities and playstyles associated with the Guardian (Red), Creator (Yellow), and Social (Blue) alignments. This documentation is critical for the 'Minecraft Server' philosophy; by hosting this organizational DNA locally on hardware like an NVIDIA Jetson, the community ensures that its internal power structure remains private and sovereign, free from external platform manipulation. From an economic perspective, completing this foundational quest rewards the contributor with 2 Pixels (PX) and 10 XP, contributing to the vital redistribution of purchasing power within the node. This archive entry is not merely a social chart; it is a cryptographic and instructional seed for Phase 3: The Awakening. When the community eventually performs the Awakening ritual, ROM will digest this memo to understand the node's social hierarchy, enabling the AI to provide context-aware support based on a user's specific role and permissions. For pilot projects like the 70 ETS Student Clubs, the 'Hiérarchie Canon' is the ultimate safeguard against information decay during leadership transitions. It ensures that every new generation of students understands exactly how the community is governed and who holds the keys to the archive. By canonizing the hierarchy at B8, the community provides the stable human framework necessary for all subsequent operations. This entry marks the transition from a growing group to a structured, AI-ready command center. The social contract is now finalized for the decade ahead. Yes.",
+  "summary": "This quest establishes the immutable organizational hierarchy at coordinate B8, creating the 'Canon RAG Data' required for the community's future AI to understand its social architecture."
+}

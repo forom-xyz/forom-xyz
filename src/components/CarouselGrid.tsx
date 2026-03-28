@@ -5,6 +5,7 @@ import { MemoryModal } from './MemoryModal'
 import { getMemory, ITEMS_PER_ROW, QUESTION_ORDER, QUESTION_COLORS, CATEGORY_COLORS } from '../data/memories'
 import type { Memory, CategoryType } from '../data/memories'
 import { mixColors } from '../utils/colors'
+import { Sidebar } from './Sidebar'
 
 // =============================================================================
 // TYPES
@@ -20,7 +21,10 @@ interface CarouselGridProps {
   acceptedQuestId?: string | null
   onQuestComplete?: (questId: string) => void
   questionLabels?: Record<string, string>
+  categoryLabels?: Record<string, string>
   personalQuests?: Array<{ id: string; category: string; question: string | null; title: string; completed?: boolean }>
+  isEmptyGrid?: boolean
+  isEtsForom?: boolean
 }
 
 // =============================================================================
@@ -35,18 +39,7 @@ const DEFAULT_COLOR = '#E5E7EB'
 /** Maximum horizontal scroll index (20 rectangles per row - 1 = 19) */
 const MAX_HORIZONTAL_INDEX = ITEMS_PER_ROW - 1
 
-/** Shared styles for navigation buttons */
-const getNavButtonStyle = (isDark: boolean): React.CSSProperties => ({
-  fontFamily: "'Jersey 15', sans-serif",
-  fontSize: '28px',
-  color: isDark ? '#ffffff' : '#000000',
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  lineHeight: 1,
-  padding: '8px',
-  userSelect: 'none',
-})
+
 
 // =============================================================================
 // HELPER
@@ -66,7 +59,10 @@ export function CarouselGrid({
   acceptedQuestId = null,
   onQuestComplete,
   questionLabels = {},
+  categoryLabels = {},
   personalQuests = [],
+  isEmptyGrid = false,
+  isEtsForom = false,
 }: CarouselGridProps) {
   // Start at horizontal index 5 so that the center tile (5 + activeIndex*10) hits 46 when paired with category E
   const [horizontalIndex, setHorizontalIndex] = useState(5)
@@ -75,18 +71,23 @@ export function CarouselGrid({
   const [memoryUpdateKey, setMemoryUpdateKey] = useState(0) // For triggering re-renders
   const activeIndex = categories.indexOf(activeCategory)
   const gridRef = useRef<HTMLDivElement | null>(null)
-  const horizontalTrackRef = useRef<HTMLDivElement | null>(null)
-  const verticalTrackRef = useRef<HTMLDivElement | null>(null)
-  const [isDraggingHorizontal, setIsDraggingHorizontal] = useState(false)
-  const [isDraggingVertical, setIsDraggingVertical] = useState(false)
 
   // Grid swipe-drag state
   const [isGridDragging, setIsGridDragging] = useState(false)
   const gridDragOrigin = useRef<{ x: number; y: number } | null>(null)
   const gridDragMoved = useRef(false)
 
+  // Helper to get processed memory (locked if isEmptyGrid)
+  const getProcessedMemory = useCallback((cat: CategoryType, index: number) => {
+    let mem = getMemory(cat, index)
+    if (isEmptyGrid && mem) {
+      mem = { ...mem, isFilled: false, videoUrl: null, description: '', sources: [], title: `Emplacement ${index + 1}` }
+    }
+    return mem
+  }, [isEmptyGrid])
+
   // Get current memory data for modal
-  let currentMemory = getMemory(categories[activeIndex] as CategoryType, horizontalIndex)
+  let currentMemory = getProcessedMemory(categories[activeIndex] as CategoryType, horizontalIndex)
   let currentColor = DEFAULT_COLOR
 
   if (currentMemory) {
@@ -129,80 +130,7 @@ export function CarouselGrid({
     setHorizontalIndex(prev => prev < MAX_HORIZONTAL_INDEX ? prev + 1 : 0)
   }, [])
 
-  // ---------------------------------------------------------------------------
-  // Drag Handlers for Sliders
-  // ---------------------------------------------------------------------------
 
-  // Horizontal slider drag
-  const handleHorizontalDragStart = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsDraggingHorizontal(true)
-  }, [])
-
-  const handleHorizontalDrag = useCallback((e: MouseEvent) => {
-    if (!isDraggingHorizontal || !horizontalTrackRef.current) return
-
-    const track = horizontalTrackRef.current
-    const rect = track.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const percentage = Math.max(0, Math.min(1, x / rect.width))
-    const newIndex = Math.round(percentage * MAX_HORIZONTAL_INDEX)
-    setHorizontalIndex(prev => {
-      if (newIndex > prev) setSlideDirection('right')
-      else if (newIndex < prev) setSlideDirection('left')
-      return newIndex
-    })
-  }, [isDraggingHorizontal])
-
-  const handleHorizontalDragEnd = useCallback(() => {
-    setIsDraggingHorizontal(false)
-  }, [])
-
-  // Vertical slider drag
-  const handleVerticalDragStart = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsDraggingVertical(true)
-  }, [])
-
-  const handleVerticalDrag = useCallback((e: MouseEvent) => {
-    if (!isDraggingVertical || !verticalTrackRef.current) return
-
-    const track = verticalTrackRef.current
-    const rect = track.getBoundingClientRect()
-    const y = e.clientY - rect.top
-    const percentage = Math.max(0, Math.min(1, y / rect.height))
-    const newIndex = Math.round(percentage * (categories.length - 1))
-    if (newIndex >= 0 && newIndex < categories.length) {
-      onCategoryChange(categories[newIndex])
-    }
-  }, [isDraggingVertical, categories, onCategoryChange])
-
-  const handleVerticalDragEnd = useCallback(() => {
-    setIsDraggingVertical(false)
-  }, [])
-
-  // Add global mouse event listeners for dragging
-  useEffect(() => {
-    if (isDraggingHorizontal) {
-      window.addEventListener('mousemove', handleHorizontalDrag)
-      window.addEventListener('mouseup', handleHorizontalDragEnd)
-      return () => {
-        window.removeEventListener('mousemove', handleHorizontalDrag)
-        window.removeEventListener('mouseup', handleHorizontalDragEnd)
-      }
-    }
-  }, [isDraggingHorizontal, handleHorizontalDrag, handleHorizontalDragEnd])
-
-  useEffect(() => {
-    if (isDraggingVertical) {
-      window.addEventListener('mousemove', handleVerticalDrag)
-      window.addEventListener('mouseup', handleVerticalDragEnd)
-      return () => {
-        window.removeEventListener('mousemove', handleVerticalDrag)
-        window.removeEventListener('mouseup', handleVerticalDragEnd)
-      }
-    }
-  }, [isDraggingVertical, handleVerticalDrag, handleVerticalDragEnd])
 
   // ---------------------------------------------------------------------------
   // Grid swipe-drag (hold + drag on the grid itself)
@@ -378,7 +306,7 @@ export function CarouselGrid({
     // Check bounds for the items per category
     if (itemIndex < 0 || itemIndex >= ITEMS_PER_ROW) return null
 
-    return getMemory(category, itemIndex)
+    return getProcessedMemory(category, itemIndex)
   }
 
   // ---------------------------------------------------------------------------
@@ -394,7 +322,7 @@ export function CarouselGrid({
     for (let c = 0; c < categories.length; c++) {
       const cat = categories[c] as CategoryType
       for (let i = 0; i < ITEMS_PER_ROW; i++) {
-        const mem = getMemory(cat, i)
+        const mem = getProcessedMemory(cat, i)
         
         // Match if it has the right question
         if (mem && mem.question === questionStr) {
@@ -425,7 +353,7 @@ export function CarouselGrid({
         setHorizontalIndex(closestCol)
       }
     }
-  }, [activeIndex, categories, horizontalIndex, onCategoryChange])
+  }, [activeIndex, categories, horizontalIndex, onCategoryChange, getProcessedMemory])
 
   // ---------------------------------------------------------------------------
   // Grid Render Logic
@@ -544,37 +472,27 @@ export function CarouselGrid({
         className="absolute flex flex-col items-center justify-start z-10 pointer-events-auto"
         style={{ top: 0, bottom: 0, left: 0, right: 0, paddingTop: 'calc(max(9vh, 80px))', paddingBottom: 'calc(116px + 2vh)', backgroundColor: 'var(--color-bg)' }}
       >
-      <div
-        className="w-full flex flex-wrap justify-center items-center px-4 z-40 shrink-0"
-        style={{ gap: '1.5%', marginBottom: '1.5vh' }}
-      >
-          {QUESTION_ORDER.map((q) => {
-            const color = QUESTION_COLORS[q] || '#888888'
-            return (
-              <div
-                key={q}
-                className="uppercase text-white font-bold tracking-wide shadow-sm"
-                style={{
-                  backgroundColor: color,
-                  fontFamily: "'Jersey 15', sans-serif",
-                  fontSize: 'clamp(14px, 1.5vw, 20px)',
-                  borderRadius: '8px',
-                  padding: '6px clamp(10px, 1.5vw, 20px)',
-                  border: '3px solid black',
-                }}
-              >
-                {questionLabels[q] || q}
-              </div>
-            )
-          })}
-        </div>
-
         <div className="flex flex-col items-center justify-center flex-1 w-full" style={{ gap: '0.6vw', minHeight: 0 }}>
           {categories.map((category, row) => (
-            <div key={category} className="flex items-center justify-center" style={{ gap: '0.6vw' }}>
+            <div key={category} className="flex items-center justify-center relative" style={{ gap: '0.6vw' }}>
+              
+              {/* Subtle Row Label (Category) positioned on the right */}
+              <div 
+                className="absolute left-full text-gray-400 font-bold uppercase flex items-center h-full whitespace-nowrap pointer-events-none" 
+                style={{ 
+                  fontFamily: "'Jersey 15', sans-serif", 
+                  fontSize: 'clamp(12px, 1.5vw, 20px)', 
+                  letterSpacing: '0.05em', 
+                  opacity: 0.5,
+                  marginLeft: '8%' // ~15% spacing as requested
+                }}
+              >
+                {categoryLabels[category] || category}
+              </div>
+
               {Array.from({ length: 10 }).map((_, col) => {
                 const globalIndex = row * 10 + col
-                let memory = getMemory(category as CategoryType, col)
+                let memory = getProcessedMemory(category as CategoryType, col)
                 const itemBorderColor = memory ? mixColors(CATEGORY_COLORS[memory.category] || '#ffffff', memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888') : '#e5e7eb';
                 let customBgColor: string | undefined = undefined;
                 
@@ -627,6 +545,7 @@ export function CarouselGrid({
                       isExtraSmall={false}
                       isDark={isDark}
                       isLocked={cellIsLocked}
+                      isRubixView={true}
                     />
                   </motion.div>
                 )
@@ -634,6 +553,41 @@ export function CarouselGrid({
             </div>
           ))}
         </div>
+
+      <div
+        className="flex w-full items-center justify-center pointer-events-none"
+        style={{ gap: '0.6vw', marginTop: '0.5vh' }}
+      >
+        {QUESTION_ORDER.map((q) => (
+          <div key={q} className="flex justify-center items-center relative shrink-0">
+            {/* 1) GHOST MEMORY BOX FOR FLAWLESS GEOMETRY MATCHING */}
+            <div style={{ opacity: 0, pointerEvents: 'none' }}>
+              <MemoryBox
+                memory={null}
+                borderColor="transparent"
+                displayNumber={0}
+                isCentered={false}
+                isSmall={true}
+                isExtraSmall={false}
+              />
+            </div>
+            
+            {/* 2) ABSOLUTE TEXT CENTERED OVER THE GHOST BOX */}
+            <div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400 font-bold uppercase text-center whitespace-nowrap"
+              style={{
+                fontFamily: "'Jersey 15', sans-serif",
+                fontSize: 'clamp(10px, 1.2vw, 16px)',
+                letterSpacing: '0.05em',
+                opacity: 0.5,
+              }}
+            >
+              {questionLabels[q] || q}
+            </div>
+          </div>
+        ))}
+      </div>
+
       </div>
     )
   }
@@ -644,34 +598,7 @@ export function CarouselGrid({
       style={{ top: 0, bottom: 0, left: 0, right: 0, paddingBottom: '30px' }}
     >
       
-      {/* ------------------------------------------------------------------------
-          Top Question Filters
-      -------------------------------------------------------------------------- */}
-      <div 
-        className="absolute w-full flex flex-wrap justify-center items-center pointer-events-auto z-40 px-4" 
-        style={{ top: 'max(9%, 80px)', gap: '1.5%' }}
-      >
-        {QUESTION_ORDER.map((q) => {
-          const color = QUESTION_COLORS[q] || '#888888'
-          return (
-            <button
-              key={q}
-              onClick={() => handleQuestionClick(q)}
-              className="cursor-pointer uppercase text-white font-bold tracking-wide shadow-sm transition-transform hover:scale-105 mb-2"
-              style={{
-                backgroundColor: color,
-                fontFamily: "'Jersey 15', sans-serif",
-                fontSize: 'clamp(14px, 1.5vw, 20px)',
-                borderRadius: '8px',
-                padding: '6px clamp(10px, 1.5vw, 20px)',
-                border: '3px solid black',
-              }}
-            >
-              {questionLabels[q] || q}
-            </button>
-          )
-        })}
-      </div>
+      {/* Top Question Filters removed - replaced by bottom custom Wheel */}
 
       {/* Main Content - Grid centered, Vertical Navigation positioned separately */}
       <div
@@ -693,133 +620,20 @@ export function CarouselGrid({
           {renderRow(1, 0.7)}
         </div>
 
-        {/* Vertical Navigation - positioned to the right of grid */}
-        <nav
-          className="fixed flex flex-col items-center justify-center pointer-events-auto z-50"
-          style={{ gap: '8px', right: '1%', top: '50%', transform: 'translateY(-50%)' }}
-          aria-label="Category navigation"
-        >
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handlePrevCategory}
-            className="nav-button"
-            style={getNavButtonStyle(isDark)}
-            aria-label="Previous category"
-          >
-            <span style={{ display: 'inline-block', transform: 'rotate(90deg)' }}>{'<'}</span>
-          </motion.button>
 
-          {/* Vertical Slider Track */}
-          <div
-            ref={verticalTrackRef}
-            className="flex flex-col items-center justify-center relative"
-            style={{ height: '130px', width: '16px', cursor: 'pointer' }}
-            onClick={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect()
-              const y = e.clientY - rect.top
-              const percentage = Math.max(0, Math.min(1, y / rect.height))
-              const newIndex = Math.round(percentage * (categories.length - 1))
-              if (newIndex >= 0 && newIndex < categories.length) {
-                onCategoryChange(categories[newIndex])
-              }
-            }}
-          >
-              <div
-                className="absolute w-[2px] h-full left-1/2 -translate-x-1/2 transition-colors duration-300"
-                style={{ backgroundColor: isDark ? '#ffffff' : '#000000', opacity: 0.9 }}
-              />
-              <div
-                className="absolute rounded-full left-1/2 -translate-x-1/2"
-                style={{
-                    width: '18px',
-                    height: '18px',
-                    backgroundColor: isDark ? '#ffffff' : '#000000',
-                    boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.6)' : '0 4px 12px rgba(0,0,0,0.35)',
-                    border: isDark ? '2px solid rgba(0,0,0,0.6)' : '2px solid rgba(255,255,255,0.85)',
-                    zIndex: 40,
-                    top: `${(activeIndex / Math.max(1, categories.length - 1)) * 100}%`,
-                    cursor: 'grab',
-                    transition: isDraggingVertical ? 'none' : 'top 0.3s ease-out'
-                  }}
-                onMouseDown={handleVerticalDragStart}
-              />
-          </div>
-
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleNextCategory}
-            style={getNavButtonStyle(isDark)}
-            aria-label="Next category"
-          >
-            <span style={{ display: 'inline-block', transform: 'rotate(-90deg)' }}>{'<'}</span>
-          </motion.button>
-        </nav>
       </div>
 
-      {/* Horizontal Navigation - Below Grid */}
-      <nav
-        className="fixed flex items-center justify-center pointer-events-auto z-50"
-        style={{ bottom: '16px', left: '50%', transform: 'translateX(-50%)', gap: '16px' }}
-        aria-label="Video navigation"
-      >
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={handlePrevVideo}
-          style={getNavButtonStyle(isDark)}
-          aria-label="Previous video"
-        >
-          {'<'}
-        </motion.button>
-
-        {/* Horizontal Slider Track */}
-        <div
-          ref={horizontalTrackRef}
-          className="flex items-center justify-center relative"
-          style={{ width: '200px', height: '16px', cursor: 'pointer' }}
-          onClick={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect()
-            const x = e.clientX - rect.left
-            const percentage = Math.max(0, Math.min(1, x / rect.width))
-            const newIndex = Math.round(percentage * MAX_HORIZONTAL_INDEX)
-            if (newIndex > horizontalIndex) setSlideDirection('right')
-            else if (newIndex < horizontalIndex) setSlideDirection('left')
-            setHorizontalIndex(newIndex)
-          }}
-        >
-            <div
-              className="absolute w-full h-[2px] top-1/2 -translate-y-1/2 transition-colors duration-300"
-              style={{ backgroundColor: isDark ? '#ffffff' : '#000000', opacity: 0.9 }}
-            />
-            <div
-              className="absolute rounded-full top-1/2 -translate-x-1/2 -translate-y-1/2"
-              style={{
-                width: '18px',
-                height: '18px',
-                backgroundColor: isDark ? '#ffffff' : '#000000',
-                boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.6)' : '0 4px 12px rgba(0,0,0,0.35)',
-                border: isDark ? '2px solid rgba(0,0,0,0.6)' : '2px solid rgba(255,255,255,0.85)',
-                zIndex: 40,
-                left: `${(horizontalIndex / ITEMS_PER_ROW) * 100}%`,
-                cursor: 'grab',
-                transition: isDraggingHorizontal ? 'none' : 'left 0.3s ease-out'
-              }}
-              onMouseDown={handleHorizontalDragStart}
-            />
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={handleNextVideo}
-          style={getNavButtonStyle(isDark)}
-          aria-label="Next video"
-        >
-          {'>'}
-        </motion.button>
-      </nav>
+      {/* Tag Sidebar - Below Grid */}
+      {!isRubixView && (
+        <Sidebar
+          position="bottom"
+          items={QUESTION_ORDER.map(q => ({ id: q, label: questionLabels[q] || q, color: QUESTION_COLORS[q] || '#888888' }))}
+          activeId={currentMemory?.question || ''}
+          onSelect={handleQuestionClick}
+          isDark={isDark}
+          isEtsForom={isEtsForom}
+        />
+      )}
 
       {/* Memory Info Modal */}
       <MemoryModal

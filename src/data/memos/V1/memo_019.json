@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "B9",
+  "y_axis_district": "Équipe",
+  "x_axis_action": "Urgence",
+  "title": "Crise modération: Preserving Social Integrity",
+  "image_url": "https://forom.community/images/grid_B9.png",
+  "video_url": "https://www.youtube.com/watch?v=50X_X7_5E8U",
+  "sources": [
+    "README.md: Role definitions and Private Era guidelines",
+    "quests.ts: Foundational Quest Spec for B9",
+    "database.sql: Role hierarchy and user limits schema",
+    "App.tsx: Quest reward (2 PX) and Super-Mod logic",
+    "forom-config.ts: Mapping for District B and Action 9"
+  ],
+  "resume": "The quest 'Crise modération' (B9) occupies a critical position at the intersection of District B (Équipe) and the Urgence action (9) within the 10x10 FRM grid. In the architectural framework of Forom, an 'Urgence' tag denotes a megathread or systemic event that threatens the community's core mission: 'Saving human communities and long-term memory.' A moderation crisis typically arises when internal friction, mission drift, or an influx of disruptive behavior overwhelms the existing human infrastructure of 9 Super-Moderators and 50 Moderators. During Phase 1: The Foundations (V1), such a crisis is particularly dangerous as it can halt the production of the 100 foundational memos required to unlock Phase 2. Technically, the details of the crisis and its subsequent resolution are archived in the local PostgreSQL 'memos' table, ensuring that the community's survival strategies are preserved as 'Deep Lore' rather than lost in a volatile chat history. The 'Guardian' role, aligned with the color red, is the primary responder for this quest; their function is to enforce rules, maintain stability, and guide users through the conflict. Economically, resolving a B9 crisis in V1 rewards the contributor with 2 Pixels (PX) and 10 XP, though Super-Mods may need to leverage their initial 500 PX treasury to fund mediation efforts or restorative actions. By hosting this data on local hardware like an NVIDIA Jetson, the community ensures that its internal social struggles remain private and sovereign, preventing third-party platforms from exploiting community instability. This sovereign record-keeping is vital for pilot projects like the 70 ETS Student Clubs, where a recorded 'Crise modération' provides a historical template for future student leaders to navigate similar social challenges without repeating past mistakes. This archived resolution serves as a cryptographic seed for the Phase 3 'Awakening' ritual, where the local RAG engine, ROM, will ingest this lore to provide context-aware moderation support and early-warning signs of social decay. Documenting the resolution at coordinate B9 transforms a moment of human weakness into a permanent asset of community intelligence. Ultimately, B9 ensures that the social engine of the forom remains resilient enough to survive for a decade, securing the mission against the entropy of human conflict. This record is now canonized. It establishes the permanent ethical boundaries for the node. Yes.",
+  "summary": "This quest addresses critical social breakdowns at coordinate B9, utilizing the Guardian role and pixel economy to resolve moderation crises and archive restorative lore."
+}

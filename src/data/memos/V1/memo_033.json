@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "D3",
+  "y_axis_district": "Opérations",
+  "x_axis_action": "Chantier",
+  "title": "Setup Outils: Building the Digital Workbench",
+  "image_url": "https://forom.community/images/grid_D3.png",
+  "video_url": "https://www.youtube.com/watch?v=XW0QZmtbjzU",
+  "sources": [
+    "README.md: Role definitions and 'Minecraft Server' philosophy",
+    "quests.ts: Foundational quest specifications for District D",
+    "database.sql: Schema for the memos table and role-based permissions",
+    "forom-config.ts: Category D (Opérations) and Action 3 (Chantier) labels",
+    "App.tsx: Pixel reward logic and quest completion system"
+  ],
+  "resume": "The quest 'Setup Outils' (D3) represents the technical construction phase within the Opérations district, located at the intersection of Category D and the 'Chantier' action (3) on the 10x10 Finite Rom Map grid. In Phase 1: The Foundations (V1), this quest is the physical implementation of the tools required to 'Save human communities and long-term memory.' This isn't just about software; it's about building the sovereign workbench where the community’s 'Deep Lore' is forged and protected. The 'Chantier' tag signifies an active worksite where the 'Creator' role (Yellow alignment) takes the lead in selecting, configuring, and documenting the local utility suite—ranging from automated archival scripts and database backups to local communication bridges. Technically, these configurations and tool manuals are archived in the local PostgreSQL database within the 'memos' table, ensuring that the 'how-to' of the community's operations is never lost. The Forom stack, utilizing React 19 and Vite 7, provides a high-performance 5x5 spatial viewport where members can access these tool documentations. Hosting this entire stack on local hardware like an NVIDIA Jetson is a non-negotiable pillar of the project, ensuring that the community's internal tools and data are private and sovereign, free from the surveillance of centralized cloud providers. Economically, successfully setting up and documenting a tool at coordinate D3 rewards the contributor with 2 Pixels (PX) and 10 XP. This facilitates the redistribution of purchasing power, which is critical as the node scales toward its 1209-user capacity limit. For pilot projects like the 70 ETS Student Clubs, D3 is the safeguard against 'technical debt' and knowledge decay; it ensures that each new semester of students has a clear, documented set of tools to maintain their community's digital archive. Once the node reaches Phase 3, these 'Setup Outils' memos will be ingested by ROM, the local RAG engine. This allows the AI to assist future members in troubleshooting the toolset or suggesting optimizations based on the community's historical technical setup. By canonizing the toolset at D3, the community transforms temporary technical fixes into a permanent, searchable asset. This ensures the node remains operational and secure for a decade. Every tool configured here is a brick in the fortress of human memory. Yes. This is the finalized coordinate for operational tooling. Mission secure. Forom is operational. Build the future today.",
+  "summary": "This quest focuses on the implementation and documentation of community tools at coordinate D3, establishing a sovereign technical workbench for long-term memory preservation."
+}

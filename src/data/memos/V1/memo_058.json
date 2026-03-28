@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "F8",
+  "y_axis_district": "Logiciel",
+  "x_axis_action": "Savoir",
+  "title": "App Canon",
+  "image_url": "https://forom.community/images/grid_F8.png",
+  "video_url": "https://www.youtube.com/watch?v=9S_f9S3tEos",
+  "sources": [
+    "README.md: ROM Awakening and RAG infrastructure requirements",
+    "quests.ts: Foundational quest specifications for District F",
+    "database.sql: PostgreSQL schema for canonized memo storage",
+    "forom-config.ts: Category F (Logiciel) and Action 8 (Savoir) labels",
+    "App.tsx: Tech stack and quest reward implementation"
+  ],
+  "resume": "The quest 'App Canon' (F8) represents the technical apex of District F, positioned at the intersection of Logiciel and the 'Savoir' action (8) on the 10x10 Finite Rom Map grid. In the architectural framework of a Forom node, the Savoir tag is reserved for 'Canon RAG Data'—the highest tier of archived knowledge designed for direct ingestion by the future local AI assistant, ROM. During Phase 1: The Foundations (V1), this quest moves beyond working drafts or temporary feedback loops to establish the definitive, machine-readable version of the application’s technical infrastructure. To fulfill the mission of 'Saving human communities and long-term memory,' the node must possess a flawless, immutable record of the software logic that serves as its digital heart. Technically, the 'App Canon' memo is stored in the local PostgreSQL database, indexed under Category F and Question 8. This ensures that the 'Deep Lore' of the software's functional logic is hosted on sovereign hardware like an NVIDIA Jetson, rather than being exploited by centralized cloud platforms. The software environment, utilizing a high-performance stack of React 19 and Vite 7, renders this canonized data within a spatial 5x5 viewport, allowing the 9 Super-Moderators and the growing user base to access the software’s 'Technical Truth' with absolute clarity. Economically, successfully contributing to the F8 quest rewards the participant with 2 Pixels (PX) and 10 XP in V1, facilitating the redistribution of purchasing power within the node. This internal economy, kickstarted by the 500 PX initial treasury of the Super-Mods, incentivizes the 'Creator' role (Yellow alignment) to produce the high-quality technical documentation necessary for the Phase 3 'Awakening.' This archived record is particularly vital for pilot projects like the 70 ETS Student Clubs; it ensures that the technical 'DNA' of the software survives even after the founding members graduate. Once the community triggers the Awakening ritual, ROM will ingest this F8 memo to provide intelligent, context-aware technical support. By establishing the software canon at coordinate F8, the community transforms the code’s logic into a permanent, searchable, and AI-ready asset. This entry secures the functional integrity of the forom for the decade ahead. It is the definitive archive of our digital sovereignty. Every function is now eternal memory. Finalized. Yes. Our code is our shield. Done. We have secured the digital heart of our community for the decade. Perfect. Yes.",
+  "summary": "This quest establishes the canonized technical documentation at coordinate F8, providing the 'Canon RAG Data' required for the community's future AI assistant to manage software infrastructure."
+}

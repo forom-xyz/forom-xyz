@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, Ghost, Lock } from 'lucide-react'
+import { Mail, Lock } from 'lucide-react'
 import cedilleIcon from '../assets/icons/cedille.png'
 import etsIcon from '../assets/icons/ets.jpg'
 import githubIcon from '../assets/icons/github.png'
-import chromaNotesIcon from '../assets/icons/chroma_notes.svg'
-import userIcon from '../assets/icons/user.png'
+import chromaNotesIcon from '../assets/icons/chroma_portal.svg'
+import parameterIcon from '../assets/icons/parameter.png'
+import ghostWhtIcon from '../assets/icons/ghost_wht.svg'
 
 // =============================================================================
 // CONSTANTS
@@ -24,10 +25,10 @@ const LOGO_LETTERS = [
 /** Inline SVG for the colored Romap Logo */
 function RomapLogo({ size = 36 }: { size?: number }) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 100 100" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 100 100"
       style={{ display: 'block' }}
       aria-hidden="true"
     >
@@ -61,7 +62,11 @@ interface HeaderProps {
 export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick, onRomapClick, isDark = false, mission, isPhantom = false, seasonPhase = 'V1' }: HeaderProps) {
   const [isSearchActive, setIsSearchActive] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isArchiveDropdownOpen, setIsArchiveDropdownOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
+
+  const isEtsLight = mission === 'Club étudiants ÉTS' && !isDark;
+  const phaseColor = isEtsLight ? '#ffffff' : (seasonPhase === 'V1' ? '#EF4444' : seasonPhase === 'V2' ? '#22C55E' : '#3B82F6');
 
   // Auto-focus search input when it appears
   useEffect(() => {
@@ -81,7 +86,7 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="px-[3%] relative z-50 flex items-center transition-colors duration-300"
-      style={{ paddingTop: '2.2vh', paddingBottom: '1.6vh', backgroundColor: 'var(--color-bg)' }}
+      style={{ paddingTop: '2.2vh', paddingBottom: '1.6vh', backgroundColor: mission === 'Club étudiants ÉTS' && !isDark ? '#E3022C' : 'var(--color-bg)' }}
     >
       {/* ---- Left group: ETS, Search, FOROM ---- */}
       <div className="flex items-center" style={{ gap: '5%', flex: 1 }}>
@@ -93,9 +98,9 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             whileTap={{ scale: 0.95 }}
             className="flex items-center justify-center shrink-0 cursor-pointer"
             style={{ width: '36px', height: '36px', background: 'none', border: 'none', padding: 0 }}
-            title="Return to Lobby"
+            title="Chroma portal"
           >
-              <img src={chromaNotesIcon} alt="Forom Lobby (Chroma Notes)" style={{ width: '36px', height: '36px', objectFit: 'contain', display: 'block' }} />
+            <img src={chromaNotesIcon} alt="Chroma portal" style={{ width: '36px', height: '36px', objectFit: 'contain', display: 'block' }} />
           </motion.button>
 
           <motion.button
@@ -130,10 +135,10 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             className="flex items-center justify-center shrink-0 rounded-full overflow-hidden"
             style={{ width: '36px', height: '36px' }}
           >
-            <div 
-              style={{ 
-                width: '100%', 
-                height: '100%', 
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
                 backgroundColor: '#0066FF',
                 WebkitMaskImage: `url(${githubIcon})`,
                 WebkitMaskSize: 'contain',
@@ -143,7 +148,7 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
                 maskSize: 'contain',
                 maskRepeat: 'no-repeat',
                 maskPosition: 'center',
-              }} 
+              }}
             />
           </motion.a>
         </div>
@@ -234,37 +239,90 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             />
           </div>
 
-          {/* V1 badge — absolute, right of the letters */}
-          <motion.button
-            onClick={onRomapClick}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.92 }}
-            title="Open ROMAP"
+          {/* Versions Dropdown */}
+          <div
             style={{
               position: 'absolute',
-              left: 'calc(100% + 18px)',
+              left: 'calc(100% + 20px)',
               top: '50%',
               transform: 'translateY(-50%)',
-              display: 'flex', alignItems: 'center', gap: 5,
-              background: 'none', border: 'none', cursor: 'pointer',
-              padding: '2px 6px', borderRadius: 6,
+              zIndex: 50,
               pointerEvents: 'auto',
             }}
+            onMouseLeave={() => setIsArchiveDropdownOpen(false)}
           >
-            <span style={{
-              fontFamily: "'Jersey 15', sans-serif",
-              fontSize: 18, fontWeight: 900, letterSpacing: '0.06em', lineHeight: 1,
-              color: seasonPhase === 'V1' ? '#EF4444' : seasonPhase === 'V2' ? '#22C55E' : '#3B82F6',
-            }}>
-              {seasonPhase}
-            </span>
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <polygon
-                points="2,1 9,5 2,9"
-                fill={seasonPhase === 'V1' ? '#EF4444' : seasonPhase === 'V2' ? '#22C55E' : '#3B82F6'}
-              />
-            </svg>
-          </motion.button>
+            {/* The main button */}
+            <button
+              onClick={() => setIsArchiveDropdownOpen(!isArchiveDropdownOpen)}
+              title="Select Version"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '2px 0',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <span style={{
+                fontFamily: "'Jersey 15', sans-serif", fontSize: '28px', fontWeight: 900, lineHeight: 1, 
+                color: phaseColor,
+                width: '32px', textAlign: 'center'
+              }}>
+                {seasonPhase}
+              </span>
+              <div style={{ width: '14px', display: 'flex', justifyContent: 'center' }}>
+                {isArchiveDropdownOpen ? (
+                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true">
+                    <polygon points="1,1 9,1 5,7" fill="#A3A3A3" />
+                  </svg>
+                ) : (
+                  <svg width="8" height="10" viewBox="0 0 8 10" fill="none" aria-hidden="true">
+                    <polygon points="1,1 7,5 1,9" fill={phaseColor} />
+                  </svg>
+                )}
+              </div>
+              <span style={{
+                fontFamily: 'Montserrat, sans-serif', fontSize: '13px', fontWeight: 700,
+                color: '#A3A3A3', letterSpacing: '0.04em'
+              }}>
+                Les Fondations
+              </span>
+            </button>
+
+            {/* Dropdown Options */}
+            <AnimatePresence>
+              {isArchiveDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    marginTop: '2px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.6, cursor: 'not-allowed', padding: '2px 0' }}>
+                    <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '28px', fontWeight: 900, lineHeight: 1, color: '#22C55E', width: '32px', textAlign: 'center' }}>V2</span>
+                    <div style={{ width: '14px', display: 'flex', justifyContent: 'center' }}>
+                      <Lock size={12} color={isDark ? '#fff' : '#000'} />
+                    </div>
+                    <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '13px', fontWeight: 700, color: '#A3A3A3', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>L'itération</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.6, cursor: 'not-allowed', padding: '2px 0' }}>
+                    <span style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: '28px', fontWeight: 900, lineHeight: 1, color: '#3B82F6', width: '32px', textAlign: 'center' }}>V3</span>
+                    <div style={{ width: '14px', display: 'flex', justifyContent: 'center' }}>
+                      <Lock size={12} color={isDark ? '#fff' : '#000'} />
+                    </div>
+                    <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '13px', fontWeight: 700, color: '#A3A3A3', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>Le reveil</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Cedille easter egg — always visible */}
           <a
@@ -313,7 +371,7 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
                   fontSize: '44px',
                   fontFamily: 'Montserrat, sans-serif',
                   fontWeight: 900,
-                  color: isDark ? letter.darkColor : letter.color,
+                  color: (isEtsLight && letter.text === 'F') ? '#ffffff' : (isDark ? letter.darkColor : letter.color),
                   lineHeight: 1,
                   letterSpacing: '0.04em',
                   display: 'inline-block',
@@ -438,7 +496,11 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             style={{ width: '36px', height: '36px' }}
             title="Return to Sign In"
           >
-            <Ghost size={20} color={isDark ? '#e5e7eb' : '#1f2937'} />
+            <img 
+              src={ghostWhtIcon} 
+              alt="Phantom Mode" 
+              style={{ width: '20px', height: '20px', filter: isDark ? 'invert(1)' : 'none' }} 
+            />
           </motion.div>
         ) : (
           <motion.div
@@ -449,8 +511,8 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             style={{ width: '36px', height: '36px' }}
           >
             <img
-              src={userIcon}
-              alt="User Profile"
+              src={parameterIcon}
+              alt="User Settings"
               className="w-full h-full object-contain"
               style={{ filter: isDark ? 'invert(1)' : 'none' }}
             />

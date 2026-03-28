@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "C1",
+  "y_axis_district": "Stratégie",
+  "x_axis_action": "Échange",
+  "title": "Tactiques croissance",
+  "image_url": "https://forom.community/images/grid_C1.png",
+  "video_url": "Highly specific search: 'Organic community growth tactics for decentralized and sovereign social networks'",
+  "sources": [
+    "README.md: Minecraft Server philosophy and mission overview",
+    "quests.ts: Foundational quest specifications for District C",
+    "forom-config.ts: Category and action label mappings for Stratégie",
+    "database.sql: Schema for memos and user role tracking",
+    "App.tsx: Quest rewards and pixel economy implementation"
+  ],
+  "resume": "The quest 'Tactiques croissance' (C1) is a critical component of the Stratégie district, located at the intersection of Category C and the 'Échange' action (1) on the 10x10 Finite Rom Map grid. Within the context of Phase 1: The Foundations (V1), this quest moves the community beyond pure roadmap ideation toward the practical discussion of how to expand the node while preserving its core mission to 'Save human communities and long-term memory'. Growth in a Forom is not about viral metrics but about the purposeful recruitment of aligned individuals—Guardians, Creators, and Social agents—to reach the 1209-user capacity. This exchange focuses on organic tactics, such as the meritocratic 'Creator' path where new members must prove their value by completing quests to earn their titles. Technically, these discussions are captured and stored in the local PostgreSQL 'memos' table, ensuring that the community's growth intelligence remains sovereign and private. The Forom stack, utilizing React 19 and Vite 7, enables members to navigate these strategic exchanges through a spatial 5x5 viewport, maintaining a clear view of the grid's evolution. A key focus of these tactics is maintaining the 'Minecraft Server' philosophy: the community remains invite-only and edge-hosted on hardware like an NVIDIA Jetson, ensuring that expansion does not lead to data exploitation by centralized entities. Economically, participating in this quest rewards the contributor with 2 Pixels (PX) and 10 XP, supporting the internal redistribution of purchasing power. This is vital for preparing the community treasury for Phase 2 inflation and the Phase 3 Awakening ritual. The 'Social' role, represented by the blue alignment, is the primary driver of this quest, as their function centers on networking and managing community morale during expansion. By archiving these tactics at coordinate C1, the community creates a permanent record of its growth strategies for the V1 Archive. This documentation is essential for pilot projects like the 70 ETS Student Clubs, where clear growth tactics ensure that each new cohort of students can effectively sustain the node's population and lore. Eventually, these exchanges will be processed by the local RAG engine, ROM, in Phase 3, allowing the AI to understand the community's social expansion patterns and provide better networking support. This entry canonizes the growth protocol for the decade ahead. Yes.",
+  "summary": "This quest facilitates the exchange of organic growth strategies at coordinate C1, ensuring the community expands toward its 1209-user limit while maintaining absolute data sovereignty."
+}

@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "B7",
+  "y_axis_district": "Équipe",
+  "x_axis_action": "Décision",
+  "title": "Élection Mods",
+  "image_url": "https://forom.community/images/grid_B7.png",
+  "video_url": "https://www.youtube.com/watch?v=33K84m7U0zE",
+  "sources": [
+    "README.md: Role population limits and voting requirements",
+    "quests.ts: Foundational quest specs for District B",
+    "database.sql: Schema for user roles and the Pixel treasury",
+    "App.tsx: Currency rewards and democratic vote logic",
+    "forom-config.ts: Mapping for Category B (Équipe) and Action 7 (Décision)"
+  ],
+  "resume": "The quest \"Élection Mods\" (B7) is a pivotal governance event within the Équipe district, located at the intersection of Category B and the \"Décision\" action (7) on the 10x10 FRM grid. As a foundational element of Phase 1: The Foundations (V1), this quest transitions the community from a centrally managed node by the 9 Super-Moderators toward a more representative and distributed leadership structure. The mission to \"Save human communities & long-term memory\" requires a stable and trusted moderation team to oversee the growth of the archive and manage the eventual 1209-user population. In this quest, the community engages in a democratic process to elect 50 Moderators from the pool of active Creators and Associates. These Moderators are essential for maintaining the integrity of the 100 foundational memos required to unlock Phase 2. Technically, the election results are recorded in the local PostgreSQL \"users\" table, where their \"role\" field is updated from 'associate' or 'creator' to 'moderator'. This data is stored locally on hardware like an NVIDIA Jetson, ensuring that the community's leadership structure remains sovereign and private. The software stack, featuring React 19 and Vite 7, provides the interface for members to cast votes and view the finalized \"Décision\" memo within the spatial 5x5 viewport. Economically, completing the B7 quest rewards the contributor with 2 Pixels (PX) and 10 XP. Furthermore, the election of the 50 Moderators is a prerequisite for unlocking the 500 PX treasury held for the Mod team, which requires a vote of at least 25 members to be released. This \"Pixel Economy\" ensures that the new leadership has the resources necessary to incentivize further community work. The \"Guardian\" role (Red) and \"Social\" role (Blue) are particularly active in this quest, ensuring the election rules are followed and community morale remains high during the transition. By archiving this election at coordinate B7, the community builds its \"Deep Lore,\" providing a historical record of its leadership transitions for future generations, such as those in the 70 ETS Student Clubs. This data will eventually be processed by ROM, the local RAG engine, in Phase 3. The AI assistant will then understand the hierarchy and social consensus that governs the node. Ultimately, B7 secures the organizational legitimacy of the Forom. This ensures the node remains functional and organized throughout its decadal mission. The election is a verified act of collective human will. This consensus is now part of history. Yes.",
+  "summary": "This quest facilitates the democratic election of 50 Moderators at coordinate B7, formalizing the community leadership required for long-term memory preservation."
+}

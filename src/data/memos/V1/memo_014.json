@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "B4",
+  "y_axis_district": "Équipe",
+  "x_axis_action": "SOS",
+  "title": "Burnout équipe",
+  "image_url": "https://forom.community/images/grid_B4.png",
+  "video_url": "Highly specific search: 'Managing burnout in decentralized open-source communities and psychological safety'",
+  "sources": [
+    "README.md: Role definitions and mission overview",
+    "quests.ts: Foundational quest specs for District B",
+    "database.sql: PostgreSQL schema for roles and users",
+    "forom-config.ts: Mapping of Category B and Action 4 labels",
+    "App.tsx: Quest reward and pixel economy logic"
+  ],
+  "resume": "The quest 'Burnout équipe' (B4) is a critical intervention point within the Équipe district, located at the intersection of Category B and the SOS action (4) on the 10x10 FRM grid. In the architectural lifecycle of a Forom, this SOS tag signals a high-priority blockage where the human capital of the node is at risk of exhaustion or fragmentation. Since the core mission is 'Saving human communities and long-term memory,' the health of the team is the single most important asset to preserve. During Phase 1: The Foundations (V1), maintaining momentum is difficult, and internal friction or individual burnout can jeopardize the goal of reaching 100 foundational memos. This quest serves as the formal mechanism to document, analyze, and resolve these human crises. Technically, the resolution strategy is archived in the local PostgreSQL 'memos' table, ensuring that the community's methods for maintaining resilience become part of its 'Deep Lore.' The software stack, utilizing React 19 and Vite 7, presents this SOS status clearly within the spatial 5x5 viewport, allowing for rapid community visibility. The 'Guardian' role, aligned with red, is typically responsible for enforcing the rules and stability required to de-escalate conflicts, while the 'Social' role, aligned with blue, focuses on managing morale and psychological safety. From an economic perspective, solving an SOS quest in V1 is rewarded with 2 Pixels (PX). However, the 9 Super-Moderators may also need to deploy their initial 500 PX treasury to implement 'rest protocols' or outsource urgent tasks to prevent further team decay. By hosting these sensitive team-health archives locally on hardware like an NVIDIA Jetson, the community ensures that its internal challenges and vulnerabilities are never exposed to centralized cloud trackers. This data sovereignty is vital for building the trust necessary for long-term survival. Eventually, this archived memory of how the community handled burnout will be ingested by ROM, the local RAG engine, in Phase 3. This allows the AI to provide contextual support and early warnings if similar patterns of exhaustion emerge in the future. B4 transforms a team crisis into a permanent learning asset, securing the community's future stability. This documentation acts as a vital safeguard for the node's long-term operational health. Every resolution entered here strengthens the social foundation required for the Awakening ritual. Ultimately, B4 ensures the human engine keeps running efficiently.",
+  "summary": "This quest addresses team exhaustion and conflict at coordinate B4, utilizing Guardian and Social roles to resolve SOS blockages and archive resilience strategies."
+}

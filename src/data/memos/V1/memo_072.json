@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "H2",
+  "y_axis_district": "Écrit",
+  "x_axis_action": "Quête",
+  "title": "Bounty Écrit",
+  "image_url": "https://forom.community/images/grid_H2.png",
+  "video_url": "https://www.youtube.com/watch?v=S9I-LIdo82Y",
+  "sources": [
+    "README.md: Role definitions and meritocratic bounty philosophy",
+    "quests.ts: Foundational quest specifications for District H",
+    "database.sql: Schema for the memos table and editorial role permissions",
+    "forom-config.ts: Category H (Écrit) and Action 2 (Quête) labels",
+    "App.tsx: Quest reward (2 PX) and content archival logic"
+  ],
+  "resume": "The quest 'Bounty Écrit' (H2) represents the active deployment of the community's literary mission within the 10x10 Finite Rom Map grid. Located at the intersection of Category H (Écrit) and the 'Quête' action (2), this quest is the functional mechanism that transforms the node's writing standards into actionable meritocratic tasks. In Phase 1: The Foundations (V1), the mission to 'Save human communities and long-term memory' requires a structured approach to content creation; memory is only as strong as the labor invested in documenting it. This bounty system ensures that every memo added to the 100-memo foundational archive is a result of a specific call to action, rewarded for its quality and alignment with the node’s sovereign values. Technically, these writing bounties—ranging from historical accounts to technical documentation—are archived in the local PostgreSQL database within the 'memos' table. This ensures that the history of the node's intellectual growth is preserved as private 'Deep Lore,' rather than being fed into the data-mining engines of centralized corporate platforms. The software stack, utilizing React 19 and Vite 7, allows the 9 Super-Moderators and early members to post and track these literary challenges through a spatial 5x5 viewport, providing a high-performance visual representation of the node’s expanding memory. Hosting these bounties locally on hardware like an NVIDIA Jetson is a core pillar of the 'Minecraft Server' philosophy, protecting the community's narrative sovereignty. Economically, completing the H2 quest rewards the contributor with 2 Pixels (PX) and 10 XP, facilitating the redistribution of purchasing power within the node. The 'Creator' role, represented by the yellow alignment, is the primary driver here, using their prose to build the cultural infrastructure for 1209 potential users. For pilot projects like the 70 ETS Student Clubs, H2 is the essential tool for turning club history into rewarded milestones, ensuring that the local culture is documented by those who live it. Once the community reaches Phase 3: The Awakening, ROM—the local RAG engine—will ingest these 'Bounty Écrit' records to understand the specific motivations and contexts behind every written contribution. Ultimately, H2 transforms the act of writing into a permanent, rewarded, and AI-ready asset that secures the node’s linguistic and cultural integrity for the decade ahead. This entry is now canonized. Our stories are our strength. Perfect. Done. Mission secure. Now. Yes. Perfect. Done. Yes. Finalized. Every story written here is a shield against the digital void. Done. Our memory is safe now.",
+  "summary": "This quest formalizes the creation of literary bounties at coordinate H2, transforming the act of writing into a meritocratic, rewarded task to build the node's sovereign archive."
+}

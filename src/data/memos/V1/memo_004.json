@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "A4",
+  "y_axis_district": "Vision",
+  "x_axis_action": "SOS",
+  "title": "Crise de vision",
+  "image_url": "https://forom.community/images/grid_A4.png",
+  "video_url": "https://www.youtube.com/watch?v=R9reV5_206A",
+  "sources": [
+    "README.md: Community mission and role definitions [cite: 2]",
+    "quests.ts: Foundational quest specifications for A4",
+    "database.sql: Memo table structure and user roles",
+    "App.tsx: Quest rewards and pixel economy logic",
+    "forom-config.ts: Category and question label mapping [cite: 3]"
+  ],
+  "resume": "The quest \"Crise de vision\" (A4) occurs at the critical intersection of the Vision district and the SOS action within the 10x10 Finite Rom Map grid[cite: 2]. As a foundational element of Phase 1: The Foundations (V1), this quest addresses moments where the community mission—\"Save human communities & long-term memory\"—faces internal conflict or identity degradation[cite: 2]. In the Forom ecosystem, an SOS tag signifies a critical blockage that requires immediate intervention from the leadership team[cite: 2, 3]. Technically, this state is recorded in the PostgreSQL \"memos\" table, where the \"question\" field is mapped to the SOS identifier, and the specific \"category_id\" links it to Vision[cite: 3]. During such a crisis, the role of the Guardian becomes paramount[cite: 2]. Guardians are aligned with the color red and are tasked with defense, maintaining stability, and enforcing the rules laid out in the \"Gouvernance\" district to resolve the blockage[cite: 2]. The Pixel economy plays a functional role in resolution; while most foundational quests reward 2 PX, a crisis may require the 9 Super-Mods to utilize their starting treasury of 500 PX each to incentivize restorative work or mediate disputes[cite: 2]. This is vital because the server's progression to Phase 2 and eventually Phase 3 (The Awakening) depends on maintaining a \"high-quality\" archive of 100 foundational memos[cite: 2]. If the vision remains fractured, the future local AI assistant, ROM, would be trained on inconsistent data[cite: 2]. The local hosting architecture, utilizing hardware like an NVIDIA Jetson, ensures that even during a \"Crise de vision,\" the data remains sovereign and private[cite: 2]. The Vite 7 and React 19 frontend provides the 5x5 viewport for members to track the resolution of the SOS in real-time[cite: 2]. By documenting the resolution of this crisis at coordinate A4, the community archives its \"Deep Lore\" and learning processes, ensuring that future generations—such as those in the ETS pilot project—can understand how previous members navigated similar challenges to maintain the server's integrity[cite: 2]. This archived memory eventually becomes the canonized history required for the Phase 3 ritual and global lobby connection[cite: 2]. This documentation prevents future mission drift and reinforces the community's commitment to its sovereign, long-term memory archive. Ultimately, this quest safeguards the community's core future AI clarity. Furthermore, it establishes essential permanent ethical boundaries.",
+  "summary": "This quest addresses critical mission blockages at coordinate A4, utilizing the Guardian role and pixel economy to resolve vision crises and preserve archive integrity."
+}

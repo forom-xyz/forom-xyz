@@ -1,0 +1,16 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "B6",
+  "y_axis_district": "Équipe",
+  "x_axis_action": "Matériel",
+  "title": "Annuaire membre",
+  "image_url": "https://forom.community/images/grid_B6.png",
+  "video_url": "https://www.youtube.com/watch?v=kYI9_H_H9_I",
+  "sources": [
+    "README.md: Member roles and data sovereignty philosophy",
+    "quests.ts: Foundational Quest Spec for B6",
+    "database.sql: Users table schema and role tiered limits"
+  ],
+  "resume": "The quest \"Annuaire membre\" (B6) represents the formal archival of the community's human structure within the 10x10 FRM grid. Located at the intersection of District B (Équipe) and the Matériel action (6), this quest focuses on the technical and social documentation of the membership base. In Phase 1: The Foundations (V1), the primary objective is to populate the grid with 100 high-quality memos, and B6 serves as the definitive directory that links individual contributors to the collective mission of \"Saving human communities and long-term memory.\" Technically, this directory is powered by the local PostgreSQL \"users\" table, which tracks essential data points such as the username, role (Super-Moderator, Moderator, Creator, or Associate), profile picture, and total currency (Pixels). The role of the \"Creator\" is particularly emphasized here, as they are the innovators responsible for building the tools and content that push the mission forward. The \"Matériel\" action tag indicates that this memo is treated as a core asset or file, essential for the organizational integrity of the forom. In the context of the \"Minecraft Server\" philosophy, hosting this member directory locally on hardware like an NVIDIA Jetson ensures total data sovereignty. Unlike centralized social networks that exploit social graphs, the Forom keeps this human map private and sovereign. The software architecture, utilizing React 19 and Vite 7, renders this directory within the spatial 5x5 viewport, allowing members to navigate the social landscape of their community efficiently. Economically, completing this quest in Phase 1 rewards the participant with 2 Pixels (PX) and 10 XP, contributing to the internal redistribution of purchasing power. This redistribution is vital as the community grows toward its tiered limit of 1209 users. The directory established at B6 is not just a list; it is a repository of \"Deep Lore\" regarding the community's human capital. It ensures that knowledge transfer between graduating generations, such as in the ETS Student Clubs pilot, remains seamless by providing a clear record of who held specific roles and contributed to the archive. Eventually, this data will be ingested by ROM, the local RAG engine, in Phase 3. This allows the AI to understand the social context and hierarchy of the node. By canonizing the member list at coordinate B6, the community secures its social foundation, preparing the forom for its eventual connection to the Global Public Lobby. This entry represents the finalized human directory necessary for all future operations in this node.",
+  "summary": "This quest archives the community's human structure at coordinate B6, creating a sovereign member directory within the PostgreSQL database for long-term organizational preservation."
+}

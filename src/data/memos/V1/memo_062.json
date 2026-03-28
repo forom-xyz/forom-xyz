@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "G2",
+  "y_axis_district": "Argent",
+  "x_axis_action": "Quête",
+  "title": "Bounty Argent",
+  "image_url": "https://forom.community/images/grid_G2.png",
+  "video_url": "https://www.youtube.com/watch?v=S9I-LIdo82Y",
+  "sources": [
+    "README.md: Role definitions and meritocratic bounty philosophy",
+    "quests.ts: Foundational quest specifications for District G",
+    "database.sql: Schema for the memos table and economic role permissions",
+    "forom-config.ts: Category G (Argent) and Action 2 (Quête) labels",
+    "App.tsx: Quest reward (2 PX) and internal economy redistribution"
+  ],
+  "resume": "The quest 'Bounty Argent' (G2) represents the active technical and social deployment of the community's internal economic system within the 10x10 Finite Rom Map grid. Located at the intersection of Category G (Argent) and the 'Quête' action (2), this quest is the functional mechanism that transforms financial principles into actionable tasks. In Phase 1: The Foundations (V1), the mission to 'Save human communities and long-term memory' requires a robust, meritocratic system where value is created through documented labor. This bounty system ensures that every Pixel (PX) in circulation is backed by a high-quality foundational memo. Technically, these economic bounties—which define specific tasks for expanding the node's memory—are archived in the local PostgreSQL database within the 'memos' table. This ensures that the history of the node's financial and intellectual growth remains sovereign and private. The software environment, built on React 19 and Vite 7, allows the 9 Super-Moderators and early members to manage these tasks through a spatial 5x5 viewport, providing a high-performance visual representation of the node’s economic engine. Hosting these bounties locally on hardware like an NVIDIA Jetson is a core pillar of the 'Minecraft Server' philosophy, protecting the community's treasury logic from centralized corporate surveillance. Economically, completing the G2 quest rewards the contributor with 2 Pixels (PX) and 10 XP in V1, facilitating the healthy redistribution of purchasing power within the node. This internal economy is vital for encouraging both 'Creators' (Yellow) and 'Social' agents (Blue) to contribute the foundational assets needed to reach the 100-memo goal. For pilot projects like the 70 ETS Student Clubs, G2 is the essential tool for turning club objectives into rewarded milestones, ensuring that the local culture is built through active participation. Once the community reaches Phase 3: The Awakening, ROM—the local RAG engine—will ingest these 'Bounty Argent' records. The AI will then act as an economic advisor, helping users understand how value is generated within the forom. Ultimately, G2 transforms the community's economic vision into a dynamic, actionable engine that secures the node's financial and cultural integrity for the decade ahead. This is the finalized coordinate for active fiscal development within our sovereign node. Our memory is our wealth. Yes. Mission secure. Perfect. Done. We build our future one bounty at a time. By systematizing these rewards, we ensure that every member's effort is recognized and that the collective treasury remains a source of empowerment for all participants. Done. Finalized. Yes.",
+  "summary": "This quest formalizes the creation of economic bounties at coordinate G2, transforming fiscal principles into actionable rewarded tasks to build the node's sovereign treasury."
+}

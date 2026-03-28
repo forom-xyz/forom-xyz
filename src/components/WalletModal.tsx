@@ -1,10 +1,18 @@
-﻿import ReactModal from 'react-modal'
+import ReactModal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+
+import carmelImg from '../assets/icons/carmel.png'
+import carmelOutchSound from '../assets/sons/carmel_outch.m4a'
+import carmelMadSound from '../assets/sons/carmel_mad.m4a'
+
+import type { UserRole } from '../App'
 
 interface WalletModalProps {
   isOpen: boolean
   onClose: () => void
   pixels: number
+  userRole?: UserRole
 }
 
 const modalStyles: ReactModal.Styles = {
@@ -114,7 +122,24 @@ const ECONOMY = [
   { label: 'ASSOCIES', percentage: 0,  color: 'rgba(255,255,255,0.3)', px: 0 },
 ]
 
-export function WalletModal({ isOpen, onClose }: WalletModalProps) {
+export function WalletModal({ isOpen, onClose, pixels, userRole }: WalletModalProps) {
+  const showFullEconomy = userRole === 'S-MODS' || userRole === 'MODS';
+  const [carmelTaps, setCarmelTaps] = useState(0);
+
+  const handleCarmelClick = () => {
+    const newTaps = carmelTaps + 1;
+    setCarmelTaps(newTaps);
+    
+    if (newTaps >= 10) {
+      const audio = new Audio(carmelMadSound);
+      audio.play().catch(e => console.error("Audio error:", e));
+      setCarmelTaps(0);
+    } else {
+      const audio = new Audio(carmelOutchSound);
+      audio.play().catch(e => console.error("Audio error:", e));
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -123,7 +148,7 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
           onRequestClose={onClose}
           style={modalStyles}
           closeTimeoutMS={200}
-          contentLabel="FOROM ECONOMY"
+          contentLabel={showFullEconomy ? "FOROM ECONOMY" : "PORTEFEUILLE"}
           shouldCloseOnOverlayClick
           shouldCloseOnEsc
           ariaHideApp={true}
@@ -168,81 +193,128 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
               </svg>
             </button>
 
-            {/* Header */}
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(28px, 3.5vw, 52px)', fontWeight: 900, letterSpacing: '0.14em', lineHeight: 1 }}>
-                <span style={{ color: '#FF4B4B' }}>FOROM</span>{' '}
-                <span style={{ color: 'white' }}>ECONOMY</span>
-              </div>
-              <div style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(13px, 1.4vw, 20px)', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginTop: 6 }}>
-                5 000 PX &middot; PHASE <span style={{ color: '#EF4444' }}>1</span>
-              </div>
-            </div>
-
-            {/* 4 donut gauges in 2x2 grid */}
-            <div style={{
-              display: 'grid', gridTemplateColumns: '1fr 1fr',
-              gap: '24px 32px', justifyItems: 'center',
-              backgroundColor: 'rgba(0,0,0,0.18)', borderRadius: 16,
-              padding: '28px 24px',
-            }}>
-              {ECONOMY.map(e => (
-                <DonutGauge key={e.label} label={e.label} percentage={e.percentage} color={e.color} px={e.px} />
-              ))}
-            </div>
-
-            {/* Mission 1 */}
-            <div style={{
-              backgroundColor: 'rgba(0,0,0,0.25)', border: '2px solid rgba(255,255,255,0.1)',
-              borderRadius: 14, padding: '18px 22px',
-            }}>
-              <div style={{
-                textAlign: 'center', fontFamily: 'Montserrat, sans-serif',
-                fontSize: 10, fontWeight: 900, letterSpacing: '0.14em',
-                textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', marginBottom: 18,
-              }}>
-                MISSION 1 &ndash; TRANSFERT DU POUVOIR
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                {/* Chateau */}
-                <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>CHATEAU</div>
-                  <div style={{
-                    width: 66, height: 66, borderRadius: '50%',
-                    backgroundColor: '#111', border: '3px solid rgba(255,255,255,0.7)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: "'Jersey 15', sans-serif", fontSize: 14, fontWeight: 900, color: 'white',
-                    margin: '0 auto',
-                  }}>100%</div>
+            {showFullEconomy ? (
+              <>
+                {/* Header */}
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(28px, 3.5vw, 52px)', fontWeight: 900, letterSpacing: '0.14em', lineHeight: 1 }}>
+                    <span style={{ color: '#FF4B4B' }}>FOROM</span>{' '}
+                    <span style={{ color: 'white' }}>ECONOMY</span>
+                  </div>
+                  <div style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(13px, 1.4vw, 20px)', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginTop: 6 }}>
+                    5 000 PX &middot; PHASE <span style={{ color: '#EF4444' }}>1</span>
+                  </div>
                 </div>
-                {/* Bar */}
-                <div style={{ flex: 1, position: 'relative', height: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4, overflow: 'visible' }}>
-                  <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: '0%', backgroundColor: '#22C55E', borderRadius: 4 }} />
-                  <div style={{
-                    position: 'absolute', top: '-18px', left: '50%', transform: 'translateX(-50%)',
-                    fontFamily: 'Montserrat, sans-serif', fontSize: 8, fontWeight: 800,
-                    color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em', whiteSpace: 'nowrap',
-                  }}>OBJECTIF 50%</div>
-                </div>
-                {/* Communaute */}
-                <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>COMMUNAUTE</div>
-                  <div style={{
-                    width: 66, height: 66, borderRadius: '50%',
-                    backgroundColor: 'rgba(255,255,255,0.1)', border: '3px solid rgba(255,255,255,0.3)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: "'Jersey 15', sans-serif", fontSize: 14, fontWeight: 900, color: 'rgba(255,255,255,0.4)',
-                    margin: '0 auto',
-                  }}>0%</div>
-                </div>
-              </div>
-            </div>
 
-            {/* Monthly activity chart */}
-            <div style={{ backgroundColor: 'rgba(0,0,0,0.2)', border: '2px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: '16px 20px' }}>
-              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.45)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10, textAlign: 'center' }}>ACTIVITÉ MENSUELLE</div>
-              <MonthlyActivityChart />
-            </div>
+                {/* 4 donut gauges in 2x2 grid */}
+                <div style={{
+                  position: 'relative',
+                  display: 'grid', gridTemplateColumns: '1fr 1fr',
+                  gap: '24px 32px', justifyItems: 'center',
+                  backgroundColor: 'rgba(0,0,0,0.18)', borderRadius: 16,
+                  padding: '28px 24px',
+                }}>
+                  {ECONOMY.map(e => (
+                    <DonutGauge key={e.label} label={e.label} percentage={e.percentage} color={e.color} px={e.px} />
+                  ))}
+
+                  {/* Carmel Easter Egg */}
+                  <div
+                    onClick={handleCarmelClick}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      cursor: 'pointer',
+                      zIndex: 10,
+                      width: 64,
+                      height: 64,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    title="Carmel"
+                  >
+                    <img 
+                      src={carmelImg} 
+                      alt="Carmel" 
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'contain',
+                        transition: 'transform 0.1s ease',
+                      }}
+                      onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.85)'; }}
+                      onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                    />
+                  </div>
+                </div>
+
+                {/* Mission 1 */}
+                <div style={{
+                  backgroundColor: 'rgba(0,0,0,0.25)', border: '2px solid rgba(255,255,255,0.1)',
+                  borderRadius: 14, padding: '18px 22px',
+                }}>
+                  <div style={{
+                    textAlign: 'center', fontFamily: 'Montserrat, sans-serif',
+                    fontSize: 10, fontWeight: 900, letterSpacing: '0.14em',
+                    textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', marginBottom: 18,
+                  }}>
+                    MISSION 1 &ndash; TRANSFERT DU POUVOIR
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    {/* Chateau */}
+                    <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                      <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>CHATEAU</div>
+                      <div style={{
+                        width: 66, height: 66, borderRadius: '50%',
+                        backgroundColor: '#111', border: '3px solid rgba(255,255,255,0.7)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: "'Jersey 15', sans-serif", fontSize: 14, fontWeight: 900, color: 'white',
+                        margin: '0 auto',
+                      }}>100%</div>
+                    </div>
+                    {/* Bar */}
+                    <div style={{ flex: 1, position: 'relative', height: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4, overflow: 'visible' }}>
+                      <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: '0%', backgroundColor: '#22C55E', borderRadius: 4 }} />
+                      <div style={{
+                        position: 'absolute', top: '-18px', left: '50%', transform: 'translateX(-50%)',
+                        fontFamily: 'Montserrat, sans-serif', fontSize: 8, fontWeight: 800,
+                        color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em', whiteSpace: 'nowrap',
+                      }}>OBJECTIF 50%</div>
+                    </div>
+                    {/* Communaute */}
+                    <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                      <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>COMMUNAUTE</div>
+                      <div style={{
+                        width: 66, height: 66, borderRadius: '50%',
+                        backgroundColor: 'rgba(255,255,255,0.1)', border: '3px solid rgba(255,255,255,0.3)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: "'Jersey 15', sans-serif", fontSize: 14, fontWeight: 900, color: 'rgba(255,255,255,0.4)',
+                        margin: '0 auto',
+                      }}>0%</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Monthly activity chart */}
+                <div style={{ backgroundColor: 'rgba(0,0,0,0.2)', border: '2px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: '16px 20px' }}>
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.45)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10, textAlign: 'center' }}>ACTIVITÉ MENSUELLE</div>
+                  <MonthlyActivityChart />
+                </div>
+              </>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', gap: '20px' }}>
+                 <div style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, letterSpacing: '0.14em', color: 'white', textTransform: 'uppercase' }}>
+                    MON PORTEFEUILLE
+                 </div>
+                 <div style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(54px, 8vw, 96px)', fontWeight: 900, color: '#FFD700', textShadow: '0 4px 8px rgba(0,0,0,0.5)' }}>
+                    {pixels} PX
+                 </div>
+              </div>
+            )}
 
           </motion.div>
         </ReactModal>

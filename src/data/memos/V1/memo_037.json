@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "D7",
+  "y_axis_district": "Opérations",
+  "x_axis_action": "Décision",
+  "title": "Priorités Ops",
+  "image_url": "https://forom.community/images/grid_D7.png",
+  "video_url": "https://www.youtube.com/watch?v=33K84m7U0zE",
+  "sources": [
+    "README.md: ROMAP progression and decision-making requirements",
+    "quests.ts: Foundational quest specs for District D",
+    "database.sql: Schema for the memos table and role-based permissions",
+    "forom-config.ts: Category D and Action 7 label mappings",
+    "App.tsx: Quest rewards and consensus/poll implementation"
+  ],
+  "resume": "The quest 'Priorités Ops' (D7) constitutes a pivotal decision-making milestone within the Opérations district, located at the intersection of Category D and the Décision action (7) on the 10x10 Finite Rom Map grid. Within the context of Phase 1: The Foundations (V1), this quest moves the community from general operational documentation toward the rigorous collective selection of immediate task priorities. The mission to 'Save human communities and long-term memory' requires an engine that doesn't just run, but runs in the right direction. Deciding which operational hurdles to clear first—whether it's database optimization, invite-key distribution, or hardware cooling—is essential for reaching the 100-memo threshold required to unlock Phase 2. Technically, the outcome of these consensus-based decisions is recorded in the local PostgreSQL 'memos' table, ensuring that the community's prioritization logic is preserved as sovereign 'Deep Lore.' The software environment, built on a cutting-edge stack of React 19 and Vite 7, renders these priorities within a spatial 5x5 viewport, providing the 9 Super-Moderators and the growing user base with a clear, real-time look at the node’s primary objectives. Hosting this governance process locally on hardware like an NVIDIA Jetson is a core tenet of the 'Minecraft Server' philosophy, protecting the node's internal agenda from the surveillance and manipulation of centralized social platforms. Economically, participating in the D7 quest rewards the contributor with 2 Pixels (PX) and 10 XP, facilitating the redistribution of purchasing power within the internal economy. This system, kickstarted by the 500 PX initial treasury of the Super-Mods, ensures that all members are incentivized to engage in the democratic shaping of the node's future. The 'Social' role, aligned with the color blue, is the primary facilitator here, ensuring that the decision-making process is transparent and that community morale remains high during difficult trade-offs. These archived priorities will eventually be ingested by ROM, the local RAG engine, in Phase 3. This allows the AI to understand the historical values and urgency metrics of the community, enabling it to provide better automated support for future generations. For pilot projects like the 70 ETS Student Clubs, D7 ensures that the 'Deep Lore' includes a clear record of why certain tasks were prioritized over others, making knowledge transfer between student cohorts much more effective. By canonizing these priorities at coordinate D7, the community secures its operational focus for the decade. This finalized record remains our definitive guide for the ongoing mission to protect memory.",
+  "summary": "This quest facilitates the collective prioritization of operational tasks at coordinate D7, ensuring the node's resources are strategically focused on mission-critical objectives."
+}

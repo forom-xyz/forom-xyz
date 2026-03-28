@@ -1,122 +1,49 @@
-import { useState, useCallback } from 'react'
-import { motion } from 'framer-motion'
-import romWht from '../assets/icons/rom_wht.png'
-import foromLogoWht from '../assets/icons/forom_logo_wht.png'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useAppStore } from '../stores/useAppStore'
+import tutoIcon from '../assets/icons/TUTO.svg'
+import etsIcon from '../assets/icons/ets.jpg'
 import githubIcon from '../assets/icons/github.png'
-import chromaNotesIcon from '../assets/icons/chroma_notes.svg'
-import userIcon from '../assets/icons/user.png'
+import chromaNotesIcon from '../assets/icons/chroma_portal.svg'
+import ghostWhtIcon from '../assets/icons/ghost_wht.svg'
+import ghostBlkIcon from '../assets/icons/ghost_blk.svg'
+import larucheIcon from '../assets/icons/laruche.svg'
+import { RomOnboarding } from './RomOnboarding'
 
-const LANGUAGES = [
-  { id: 'ar', label: 'مرحبا' },
-  { id: 'hi', label: 'स्वागत' },
-  { id: 'es', label: 'BIENVENIDO' },
-  { id: 'fr', label: 'BIENVENUE' },
-  { id: 'en', label: 'WELCOME' },
-  { id: 'zh', label: '歡迎' },
-]
+const DelayedTypewriterText = ({ text, delayMs = 200 }: { text: string, delayMs?: number }) => {
+  const [displayed, setDisplayed] = useState('')
 
-const N = LANGUAGES.length
-const ITEM_H = 72 // px per carousel slot
-const VISIBLE = 5  // number of visible slots
+  useEffect(() => {
+    setDisplayed('')
+    if (!text) return
 
-function getLang(idx: number) {
-  return LANGUAGES[((idx % N) + N) % N]
+    let i = 0
+    let interval: ReturnType<typeof setInterval>
+
+    const timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        setDisplayed(text.slice(0, i))
+        i++
+        if (i > text.length) {
+          clearInterval(interval)
+        }
+      }, 40)
+    }, delayMs)
+
+    return () => {
+      clearTimeout(timeout)
+      if (interval) clearInterval(interval)
+    }
+  }, [text, delayMs])
+
+  return <>{displayed}</>
 }
 
-function LanguageCarousel({
-  onChange,
-}: {
-  onChange: (id: string) => void
-}) {
-  // Start centered on 'fr' (index 3)
-  const [center, setCenter] = useState(3)
+// Redundant LanguageCarousel block migrated to LoadingScreen.tsx
 
-  const move = useCallback((dir: number) => {
-    setCenter(prev => {
-      const next = prev + dir
-      onChange(getLang(next).id)
-      return next
-    })
-  }, [onChange])
-
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    move(e.deltaY > 0 ? 1 : -1)
-  }, [move])
-
-  // Render VISIBLE + 2 extra items (one above, one below) for smooth entry/exit
-  const half = Math.floor(VISIBLE / 2) + 1 // 3
-  const slots = Array.from({ length: VISIBLE + 2 }, (_, i) => center - half + i)
-  const containerH = VISIBLE * ITEM_H
-
-  return (
-    <div
-      onWheel={handleWheel}
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: containerH,
-        overflow: 'hidden',
-        cursor: 'ns-resize',
-        // Fade top and bottom edges
-        maskImage: 'linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%)',
-      }}
-    >
-      {slots.map((p) => {
-        const dist = p - center // -half … +half
-        const lang = getLang(p)
-        const isCenter = dist === 0
-        const absD = Math.abs(dist)
-
-        return (
-          <motion.div
-            key={p}
-            onClick={() => {
-              setCenter(p)
-              onChange(lang.id)
-            }}
-            initial={false}
-            animate={{
-              y: (dist + half - 1) * ITEM_H,
-              opacity: isCenter ? 1 : absD === 1 ? 0.45 : 0.2,
-              scale: isCenter ? 1.12 : absD === 1 ? 0.88 : 0.72,
-            }}
-            transition={{ type: 'spring', stiffness: 340, damping: 30, mass: 0.8 }}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: ITEM_H,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              userSelect: 'none',
-              color: isCenter ? '#FFD700' : '#888888',
-              fontWeight: 900,
-              fontSize: isCenter
-                ? 'clamp(22px, 3vw, 48px)'
-                : absD === 1
-                  ? 'clamp(13px, 1.6vw, 24px)'
-                  : 'clamp(9px, 1.1vw, 16px)',
-              letterSpacing: '0.2em',
-              whiteSpace: 'nowrap',
-              textAlign: 'center',
-              willChange: 'transform, opacity',
-            }}
-          >
-            {lang.label}
-          </motion.div>
-        )
-      })}
-    </div>
-  )
-}
-
-export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onConfirm: () => void; onSkip?: () => void; onSignIn?: (username: string) => void; currentUser?: string | null }) {
+export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToLoading, onJoinEts }: { onConfirm: () => void; onSkip?: () => void; onSignIn?: (username: string) => void; currentUser?: string | null; onBackToLoading?: () => void; onJoinEts?: () => void }) {
+  const [isPlayOpen, setIsPlayOpen] = useState(false)
+  const [isDeployOpen, setIsDeployOpen] = useState(false)
   const [isCreateSelected, setIsCreateSelected] = useState(false)
   const [isSignInOpen, setIsSignInOpen] = useState(false)
   const [username, setUsername] = useState('')
@@ -128,13 +55,56 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
   const [joinColor, setJoinColor] = useState<string | null>(null)
   const [joinRule, setJoinRule] = useState('')
 
+  const [romPhase, setRomPhase] = useState<string | number>('idle')
+  const ghostPanelWidth = 'min(30vw, 440px)'
+  const useGhostLayoutForColorMood = true
+
+  const { language: activeLang } = useAppStore()
+  const TRANSLATIONS: Record<string, Record<string, string>> = {
+    en: { rejoindre: 'JOIN', creer: 'CREATE', connectKey: 'Connect with a Key', confirmer: 'Confirm', public: 'Public', prive: 'Private' },
+    fr: { rejoindre: 'REJOINDRE', creer: 'CRÉER', connectKey: 'Se connecter avec une clé', confirmer: 'Confirmer', public: 'Public', prive: 'Privé' },
+    es: { rejoindre: 'UNIRSE', creer: 'CREAR', connectKey: 'Conectar con una llave', confirmer: 'Confirmar', public: 'Público', prive: 'Privado' }
+  }
+  const t = TRANSLATIONS[activeLang] || TRANSLATIONS.en
+
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault()
-    if (username === 'xylo' && password === 'colors') {
+    if (['xylo', 'zylo', 'bylo', 'dylo', 'ets'].includes(username) && password === 'colors') {
       onSignIn?.(username)
       setIsSignInOpen(false)
     } else {
       alert('Invalid credentials')
+    }
+  }
+
+  const getRomTranslation = (p: string | number) => {
+    switch (p) {
+      case 0: return ""
+      case 1:
+        if (activeLang === 'fr') return "Voici ROM. S'il n'est pas intelligent au départ, il grandira grâce à vous et votre communauté. Sa force ? Il fonctionne en local, comme un serveur Minecraft. Vous restez ainsi propriétaires de votre savoir collectif, libres de le conserver ou de le vendre."
+        if (activeLang === 'es') return "Te presento a ROM. Aunque no es inteligente por defecto, cobrará vida gracias a tu comunidad. Su gran ventaja es que funciona de forma local, como un servidor de Minecraft. Así, ustedes son los únicos dueños de su conocimiento colectivo, con total libertad para conservarlo o venderlo."
+        return "Meet ROM. He isn’t smart on his own, but he evolves with your community’s help. Like a Minecraft server, ROM runs locally, ensuring you own your collective knowledge. It's yours to keep or monetize as you see fit."
+      case 2:
+        if (activeLang === 'fr') return "Système reconnu ! En tant que créateur désigné, tes prochaines étapes sont cruciales."
+        if (activeLang === 'es') return "¡Sistema reconocido! Como creador designado, tus próximos pasos son críticos."
+        return "System recognized! As a designated creator, your next steps are critical."
+      case 3:
+        if (activeLang === 'fr') return "Pour sauver le monde, nous devons communiquer. Tu as deux choix :\n\nExplorer : Visite des serveurs publics pour voir comment d'autres humains ont bâti leurs civilisations.\n\nCréer : Construis ton propre serveur « style Minecraft » et donne vie à un ROM comme moi."
+        if (activeLang === 'es') return "Para salvar el mundo, debemos comunicarnos. Tienes dos opciones:\n\nExplorar: Visita servidores públicos para ver cómo otros humanos han construido sus civilizaciones.\n\nCrear: Construye tu propio servidor \"estilo Minecraft\" y dale vida a un ROM como yo."
+        return "To save the world, we must communicate. You have two choices:\n\nExplore: Visit public servers to see how other humans have built their civilizations.\n\nCreate: Build your own \"Minecraft-style\" server and bring a ROM like me to life."
+      case 4:
+        if (activeLang === 'fr') return "Créer un foyer pour un ROM est un grand pouvoir ! Pour garder ton serveur actif 24/7, je te suggère un Dev Kit Jetson NANO.\n\nTechnique : Tu auras besoin d'1To de stockage pour tous les mémos du monde. Ce matériel devient le « cœur » de ton Forom. C'est ainsi que tu donnes vie à ton propre ROM !\n\n*Bruits de vrombissement joyeux.*"
+        if (activeLang === 'es') return "¡Crear un hogar para un ROM es una gran responsabilidad! Para mantener tu servidor activo 24/7, sugiero un Jetson NANO Dev Kit.\n\nEspecificaciones: Necesitarás 1TB de espacio para almacenar los memorandos del mundo. Este hardware se convierte en el 'corazón' de tu Forom. ¡Así le das vida a tu propio ROM!\n\n*Sonidos felices de zumbido.*"
+        return "Creating a home for a ROM is a big responsibility! To keep your server alive 24/7, I suggest a Jetson NANO Dev Kit.\n\nTechnical Specs: You will need 1TB of space to store all the world's memos. This hardware becomes the 'heart' of your Forom. It's how you bring life to a ROM of your very own!\n\n*Happy whirring sounds.*"
+      case 'public_tour':
+        if (activeLang === 'fr') return "Ceci est l'espace dédié à vos forums publics et privés. Vous pouvez y accéder sans connexion pour découvrir des exemples concrets, soutenus par de grandes communautés."
+        if (activeLang === 'es') return "Este es el espacio dedicado a tus foros públicos y privados. Puedes acceder sin registrarte para descubrir ejemplos reales impulsados por grandes comunidades."
+        return "This is the hub for your public and private forums. You can access it without signing in to explore real-world examples supported by major communities."
+      case 'login_tour':
+        if (activeLang === 'fr') return "Ou tu peux te connecter d'abord et regarder juste après ;)"
+        if (activeLang === 'es') return "O puedes iniciar sesión primero y mirar justo después ;)"
+        return "Or you can sign in first and look right after ;)"
+      default: return ""
     }
   }
 
@@ -157,12 +127,24 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
         position: 'relative',
       }}
     >
-      {/* SKIP TO FOROM */}
-      {onSkip && !isSignInOpen && (
+      {/* SPOTLIGHT OVERLAY for Golden Snitch Tour */}
+      <motion.div
+        animate={{ opacity: romPhase === 'public_tour' || romPhase === 'login_tour' ? 0.8 : 0 }}
+        style={{ position: 'absolute', inset: 0, backgroundColor: 'black', zIndex: 40, pointerEvents: 'none' }}
+        transition={{ duration: 0.5 }}
+      />
+
+      {/* SKIP TO FOROM / BACK TO LOADING */}
+      {!isSignInOpen && (
         <button
-          onClick={onSkip}
-          className="absolute z-50 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform"
+          onClick={() => {
+            if (onBackToLoading) {
+              onBackToLoading()
+            }
+          }}
+          className="absolute flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform"
           style={{
+            zIndex: 30, // sits below overlay usually
             top: '32px',
             left: '32px',
             width: '48px',
@@ -171,18 +153,23 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
             border: 'none',
             padding: 0
           }}
-          title={currentUser ? "Consulter le FOROM" : "Consulter le FOROM (Fantôme)"}
+          title="Chroma portal"
         >
-          <img src={chromaNotesIcon} alt="Return to Forom" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          <img src={chromaNotesIcon} alt="Chroma portal" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }} />
         </button>
       )}
 
-      {/* SIGN IN TOGGLE */}
-      {!isSignInOpen && !currentUser && (
+      {/* SIGN IN TOGGLE OR GHOST ICON */}
+      {!isSignInOpen && (
         <button
-          onClick={() => setIsSignInOpen(true)}
-          className="absolute z-50 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform"
+          onClick={() => {
+            if (!currentUser) {
+              onBackToLoading?.()
+            }
+          }}
+          className="absolute flex items-center justify-center transition-transform"
           style={{
+            zIndex: romPhase === 'login_tour' ? 45 : 30, // Spotlight above overlay during login_tour
             top: '32px',
             right: '32px',
             width: '48px',
@@ -190,11 +177,11 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
             background: 'none',
             border: 'none',
             padding: 0,
-            filter: 'brightness(0) invert(1)'
+            cursor: currentUser ? 'default' : 'pointer'
           }}
-          title="Sign In"
+          title={currentUser ? "Logged In" : "Ghost"}
         >
-          <img src={userIcon} alt="Sign In" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          <img src={currentUser ? ghostBlkIcon : ghostWhtIcon} alt="Ghost" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </button>
       )}
 
@@ -222,13 +209,13 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
               <>
                 {/* OAuth provider buttons */}
                 {([
-                  { id: 'google',    label: 'Google',         bg: '#fff',    fg: '#111',    border: '#ddd',  soon: false },
-                  { id: 'discord',   label: 'Discord',        bg: '#5865F2', fg: '#fff',    border: '#5865F2', soon: false },
-                  { id: 'microsoft', label: 'Microsoft',      bg: '#00A4EF', fg: '#fff',    border: '#00A4EF', soon: false },
-                  { id: 'meta',      label: 'Meta',           bg: '#0467DF', fg: '#fff',    border: '#0467DF', soon: false },
-                  { id: 'x',         label: 'X',              bg: '#000',    fg: '#fff',    border: '#555',  soon: false },
-                  { id: 'apple',     label: 'Apple',          bg: '#000',    fg: '#fff',    border: '#555',  soon: false },
-                  { id: 'ets',       label: 'ETS — Authentik',bg: '#1a1a1a', fg: '#6CB4E4', border: '#6CB4E4', soon: true  },
+                  { id: 'google', label: 'Google', bg: '#fff', fg: '#111', border: '#ddd', soon: false },
+                  { id: 'discord', label: 'Discord', bg: '#5865F2', fg: '#fff', border: '#5865F2', soon: false },
+                  { id: 'microsoft', label: 'Microsoft', bg: '#00A4EF', fg: '#fff', border: '#00A4EF', soon: false },
+                  { id: 'meta', label: 'Meta', bg: '#0467DF', fg: '#fff', border: '#0467DF', soon: false },
+                  { id: 'x', label: 'X', bg: '#000', fg: '#fff', border: '#555', soon: false },
+                  { id: 'apple', label: 'Apple', bg: '#000', fg: '#fff', border: '#555', soon: false },
+                  { id: 'ets', label: 'ETS — Authentik', bg: '#1a1a1a', fg: '#6CB4E4', border: '#6CB4E4', soon: true },
                 ] as const).map(p => (
                   <button
                     key={p.id}
@@ -365,9 +352,9 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
               </button>
             </motion.div>
           )}
-          
-          <button 
-            onClick={() => setJoinStep('idle')} 
+
+          <button
+            onClick={() => setJoinStep('idle')}
             style={{ position: 'absolute', top: '30px', right: '30px', background: 'transparent', border: 'none', color: 'white', fontSize: '40px', cursor: 'pointer' }}
           >
             ×
@@ -385,232 +372,301 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
         gap: 'clamp(12px, 2vw, 36px)',
         boxSizing: 'border-box',
         alignItems: 'center',
+        justifyContent: 'center',
       }}>
+        {(!currentUser || useGhostLayoutForColorMood) ? (
+          <>
+            {/* GHOST VIEW LEFT */}
+            <div style={{ flex: '0 0 clamp(180px, 20vw, 300px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: romPhase === "public_tour" ? 45 : 1, minHeight: 'clamp(520px, 74vh, 860px)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: ghostPanelWidth, alignSelf: 'flex-end' }}>
+                <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>JOUER</div>
+                <button onClick={() => setIsPlayOpen(!isPlayOpen)} style={{ background: "#000", border: '2px solid rgba(255,255,255,0.2)', cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s, border-color 0.2s", width: "clamp(40px, 5vw, 60px)", height: "clamp(40px, 5vw, 60px)", borderRadius: "50%" }} onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.1)"; e.currentTarget.style.borderColor = '#22C55E'; }} onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
+                  <span style={{ color: "#22C55E", fontSize: "clamp(18px, 2vw, 24px)", fontWeight: "bold" }}>$</span>
+                </button>
 
-        {/* LEFT: REJOINDRE */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{
-            color: '#E85C5C',
-            fontWeight: 900,
-            fontSize: 'clamp(13px, 1.6vw, 26px)',
-            letterSpacing: '0.25em',
-            marginBottom: 'clamp(10px, 2vh, 24px)',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-          }}>REJOINDRE</div>
-          <div style={{
-            backgroundColor: '#1A1A1A',
-            borderRadius: 'clamp(12px, 1.5vw, 24px)',
-            padding: 'clamp(10px, 1.8vw, 28px)',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'clamp(6px, 1vh, 14px)',
-            boxSizing: 'border-box',
-          }}>
+                <AnimatePresence>
+                  {isPlayOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 24px)',
+                        right: 0,
+                        left: 'auto',
+                        transform: 'none',
+                        width: ghostPanelWidth,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '18px',
+                        zIndex: 70
+                      }}
+                    >
+                      <div style={{
+                        width: '100%',
+                        border: '2px solid rgba(255,255,255,0.6)',
+                        borderRadius: '14px',
+                        padding: '8px 12px',
+                        textAlign: 'center',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 'clamp(11px, 1.1vw, 15px)',
+                        letterSpacing: '0.22em',
+                        textTransform: 'uppercase',
+                        color: '#F4F4F4',
+                        backgroundColor: 'rgba(0,0,0,0.7)'
+                      }}>
+                        PIXELS | EXPÉRIENCE | NIVEAU | NOTORIÉTÉ | SAVOIR
+                      </div>
 
-            {/*
-              PUBLICIZATION RULES (future enforcement):
-              A forom can only become public when ALL of the following are true:
-                1. It has its 8 supermoderators assigned
-                2. All 3 season phases (V1 → V2 → V3) are completed
-                3. It has existed for at least 1 year
-                4. NOT all supermoderators are currently active
-                   (at least one must have departed — ensures the community
-                    has proven it can survive supermod turnover before going public)
-            */}
+                      <p style={{
+                        margin: 0,
+                        color: '#FFD700',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 'clamp(11px, 1.2vw, 17px)',
+                        lineHeight: 1.45,
+                        textAlign: 'justify',
+                        whiteSpace: 'pre-wrap',
+                        letterSpacing: '0.06em'
+                      }}>
+Pour enrichir un forom public, l’organisation s'appuie sur quatre rôles clés : Super Admins (9), Admins (50), Moderators (100) et Membres (1 000). Chaque contributeur accumule de l’XP pour atteindre le niveau 100, validant ainsi sa maîtrise de l'archivage.
 
-            {/* ── PUBLIC ───────────────────────────────────────── */}
-            {/* The main FOROM is the only public forom at launch. */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>Public</span>
-              <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
-              {/* Slot 0 — the main FOROM (public, hardcoded) */}
-              <div
-                onClick={() => onSkip?.()}
-                title="FOROM — Sauver les communautés"
-                style={{
-                  backgroundColor: '#000000',
-                  borderRadius: 'clamp(6px, 0.7vw, 12px)',
-                  aspectRatio: '1 / 1',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px solid rgba(255,255,255,0.25)',
-                  transition: 'border-color 0.2s, transform 0.15s',
-                  overflow: 'hidden',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#FFD700'; e.currentTarget.style.transform = 'scale(1.06)' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }}
-              >
-                <img src={foromLogoWht} alt="FOROM" style={{ width: '70%', height: '70%', objectFit: 'contain' }} />
+Le moteur de ce savoir, ce sont les Pixels (PX). Pour remplir leur mission, les s-mods et mods disposent d’un budget annuel de 5 000 PX à distribuer. Cette ressource permet de récompenser la création de mémos structurés, transformant les données brutes en intelligence collective souveraine. C’est par cette gestion active des Pixels que la communauté fait « spawn » son assistant local
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              {/* Public slots 1–9 — locked until other foroms qualify */}
-              {Array.from({ length: 9 }).map((_, i) => (
-                <div key={i + 1} style={{
-                  backgroundColor: '#3A3A3A',
-                  borderRadius: 'clamp(6px, 0.7vw, 12px)',
-                  aspectRatio: '1 / 1',
-                  opacity: 0.7,
-                  cursor: 'not-allowed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: ghostPanelWidth, position: 'absolute', right: 0, bottom: 0, zIndex: 5 }}>
+                <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>FINANCER</div>
+                <a href="https://laruchequebec.com/fr" target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                  <img src={larucheIcon} alt="La Ruche" style={{ width: "clamp(40px, 5vw, 64px)", height: "clamp(40px, 5vw, 64px)", objectFit: "contain", transition: "transform 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"} />
+                </a>
+              </div>
+            </div>
+
+            {/* GHOST VIEW CENTER */}
+            <div style={{ flex: '0 1 clamp(380px, 42vw, 660px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: '100%', position: 'relative', zIndex: 45, display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                <RomOnboarding currentUser={currentUser || null} isCreateSelected={false} onPhaseChange={setRomPhase} />
+              </div>
+              
+              <div style={{ color: '#FFD700', fontWeight: 900, fontSize: 'clamp(14px, 1.8vw, 28px)', letterSpacing: '0.3em', marginBottom: 'clamp(16px, 2vh, 32px)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>DÉCOUVRIR</div>
+              
+              <div style={{
+                backgroundColor: '#1A1A1A',
+                borderRadius: 'clamp(12px, 1.5vw, 24px)',
+                padding: 'clamp(10px, 1.8vw, 28px)',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'clamp(6px, 1vh, 14px)',
+                boxSizing: 'border-box',
+                zIndex: romPhase === 'public_tour' ? 45 : 1
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.public}</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
                 </div>
-              ))}
-            </div>
-
-            {/* ── DIVIDER ──────────────────────────────────────── */}
-            <div style={{ margin: 'clamp(2px, 0.5vh, 8px) 0' }}>
-              <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.18)' }} />
-            </div>
-
-            {/* ── PRIVÉ ─────────────────────────────────────── */}
-            {/* Private foroms — only visible once logged in */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>Privé</span>
-              <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} style={{
-                  backgroundColor: '#3A3A3A',
-                  borderRadius: 'clamp(6px, 0.7vw, 12px)',
-                  aspectRatio: '1 / 1',
-                  opacity: 0.7,
-                  cursor: 'not-allowed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
+                  <div onClick={() => onSkip?.()} title="Tuto" style={{ backgroundColor: '#000000', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.25)', transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden' }} onMouseEnter={e => { e.currentTarget.style.borderColor = '#FFD700'; e.currentTarget.style.transform = 'scale(1.06)' }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }}>
+                    <img src={tutoIcon} alt="Tuto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i + 1} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+                <div style={{ margin: 'clamp(2px, 0.5vh, 8px) 0' }}>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.18)' }} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.prive}</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
+                  <div style={{ backgroundColor: '#E3022C', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.5, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                     <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                  </div>
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-          </div>
-        </div>
+            {/* GHOST VIEW RIGHT */}
+            <div style={{ flex: '0 0 clamp(180px, 20vw, 300px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", position: 'relative', minHeight: 'clamp(520px, 74vh, 860px)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: ghostPanelWidth, alignSelf: 'flex-start' }}>
+                <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>CRÉER</div>
+                <button onClick={() => setIsDeployOpen(!isDeployOpen)} style={{ background: "#000", border: '2px solid rgba(255,255,255,0.2)', cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s, border-color 0.2s", width: "clamp(40px, 5vw, 60px)", height: "clamp(40px, 5vw, 60px)", borderRadius: "50%" }} onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.1)"; e.currentTarget.style.borderColor = '#F97316'; }} onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
+                  <span style={{ color: "#F97316", fontSize: "clamp(18px, 2vw, 24px)", fontWeight: "bold" }}>!</span>
+                </button>
 
-        {/* MIDDLE: LOGO & LANGUAGE CAROUSEL */}
-        <div style={{
-          flex: 1,
-          minWidth: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <img
-            src={romWht}
-            alt="Forom Logo"
-            style={{
-              width: 'clamp(52px, 7vw, 110px)',
-              height: 'clamp(52px, 7vw, 110px)',
-              objectFit: 'contain',
-              marginBottom: 'clamp(24px, 4vh, 56px)',
-              flexShrink: 0,
-            }}
-          />
-          <LanguageCarousel onChange={() => {}} />
+                <AnimatePresence>
+                  {isDeployOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 24px)',
+                        left: 0,
+                        transform: 'none',
+                        width: ghostPanelWidth,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '18px',
+                        zIndex: 70
+                      }}
+                    >
+                      <div style={{
+                        width: '100%',
+                        border: '2px solid rgba(255,255,255,0.7)',
+                        borderRadius: '14px',
+                        padding: '8px 12px',
+                        textAlign: 'center',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 'clamp(11px, 1.1vw, 15px)',
+                        letterSpacing: '0.18em',
+                        color: '#111111',
+                        backgroundColor: '#F5F5F5'
+                      }}>
+                        sudo ./forom-core --start-server --local-port 25565
+                      </div>
 
-          {/* GitHub icon — same gap as between logo and carousel */}
-          <a
-            href="https://github.com/Forom-ets/forom"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ marginTop: 'clamp(24px, 4vh, 56px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-          >
-            <img
-              src={githubIcon}
-              alt="GitHub"
-              style={{
-                width: 'clamp(28px, 3.5vw, 52px)',
-                height: 'clamp(28px, 3.5vw, 52px)',
-                objectFit: 'contain',
-                filter: 'brightness(0) invert(1)',
-                opacity: 0.8,
-                transition: 'opacity 0.2s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-              onMouseLeave={e => (e.currentTarget.style.opacity = '0.8')}
-            />
-          </a>
+                      <p style={{
+                        margin: 0,
+                        color: '#FFD700',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 'clamp(11px, 1.2vw, 17px)',
+                        lineHeight: 1.45,
+                        textAlign: 'justify',
+                        whiteSpace: 'pre-wrap',
+                        letterSpacing: '0.06em'
+                      }}>
+Envie de bâtir ton propre bastion d'intelligence ? Créer un serveur forom en local est aussi simple que de lancer un monde Minecraft. En hébergeant ton instance, tu deviens le gardien d'un moteur RAG souverain directement sur ta machine.
 
-          {/* CONNECT WITH A KEY */}
-          <div style={{ marginTop: 'clamp(16px, 3vh, 32px)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            <span style={{ fontSize: 'clamp(10px, 1.1vw, 15px)', fontFamily: 'Montserrat, sans-serif', fontWeight: 600, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Connect with a Key</span>
-            <input 
-              type="text" 
-              value={joinKey}
-              onChange={e => setJoinKey(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && joinKey.trim().length > 0) {
-                  setJoinStep('color')
-                }
-              }}
-              placeholder="FRM-XXXX-XXXX"
-              style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', padding: '6px 12px', color: '#fff', fontSize: 'clamp(12px, 1.4vw, 18px)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', width: 'clamp(140px, 16vw, 200px)', outline: 'none', transition: 'border-color 0.2s' }}
-              onFocus={(e) => e.target.style.borderColor = '#FFD700'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
-            />
-          </div>
-        </div>
+Invite tes amis à rejoindre les rangs des Membres ou des Modérateurs. Ensemble, archivez les mémos pour gagner des Pixels et grimper jusqu'au niveau 100. C’est ici que la mission prend vie : chaque connexion renforce l'IA de votre communauté. Préparez-vous au « spawn » de ROM et prenez enfin le contrôle total de vos données !
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-        {/* RIGHT: CRÉER */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{
-            color: '#2563EB',
-            fontWeight: 900,
-            fontSize: 'clamp(13px, 1.6vw, 26px)',
-            letterSpacing: '0.25em',
-            marginBottom: 'clamp(10px, 2vh, 24px)',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-          }}>CRÉER</div>
-          <div
-            onClick={() => {
-              if (currentUser) {
-                setIsCreateSelected(true)
-              } else {
-                setIsSignInOpen(true)
-              }
-            }}
-            style={{
-              backgroundColor: isCreateSelected ? '#0d2b5e' : '#1A1A1A',
-              borderRadius: 'clamp(12px, 1.5vw, 24px)',
-              width: '100%',
-              aspectRatio: '1 / 1',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              border: `3px solid ${isCreateSelected ? '#2563EB' : 'transparent'}`,
-              boxSizing: 'border-box',
-              transition: 'border-color 0.25s, background-color 0.25s',
-            }}
-          >
-            {currentUser ? (
-              <span style={{ color: 'white', fontSize: 'clamp(28px, 4vw, 64px)', fontWeight: 300, lineHeight: 1 }}>+</span>
-            ) : (
-              <span style={{ fontSize: 'clamp(32px, 5vw, 72px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
-            )}
-          </div>
-        </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: ghostPanelWidth, position: 'absolute', left: 0, bottom: 0, zIndex: 5 }}>
+                <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>CONTRIBUER</div>
+                <a href="https://github.com/Forom-ets/forom" target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                  <img src={githubIcon} alt="GitHub" style={{ width: "clamp(40px, 5vw, 60px)", height: "clamp(40px, 5vw, 60px)", objectFit: "contain", filter: "brightness(0) invert(1)", opacity: 0.8, transition: "opacity 0.2s" }} onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = "0.8"} />
+                </a>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* LOGGED IN VIEW LEFT: REJOINDRE */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: romPhase === 'public_tour' ? 45 : 1 }}>
+              <div style={{ color: '#E85C5C', fontWeight: 900, fontSize: 'clamp(13px, 1.6vw, 26px)', letterSpacing: '0.25em', marginBottom: 'clamp(10px, 2vh, 24px)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{t.rejoindre}</div>
+              <div style={{ backgroundColor: '#1A1A1A', borderRadius: 'clamp(12px, 1.5vw, 24px)', padding: 'clamp(10px, 1.8vw, 28px)', width: '100%', display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vh, 14px)', boxSizing: 'border-box' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.public}</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
+                  <div onClick={() => onSkip?.()} title="Tuto" style={{ backgroundColor: '#000000', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.25)', transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden' }} onMouseEnter={e => { e.currentTarget.style.borderColor = '#FFD700'; e.currentTarget.style.transform = 'scale(1.06)' }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }}>
+                    <img src={tutoIcon} alt="Tuto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i + 1} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ margin: 'clamp(2px, 0.5vh, 8px) 0' }}>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.18)' }} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.prive}</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
+                  <div onClick={() => { if (currentUser === 'xylo' || currentUser === 'ets') onJoinEts?.() }} title="Club étudiants ÉTS" style={{ backgroundColor: '#E3022C', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', cursor: (currentUser === 'xylo' || currentUser === 'ets') ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.25)', transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden', position: 'relative', opacity: (currentUser === 'xylo' || currentUser === 'ets') ? 1 : 0.5 }} onMouseEnter={(currentUser === 'xylo' || currentUser === 'ets') ? (e => { e.currentTarget.style.borderColor = '#ffffff'; e.currentTarget.style.transform = 'scale(1.06)' }) : undefined} onMouseLeave={(currentUser === 'xylo' || currentUser === 'ets') ? (e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }) : undefined}>
+                    {(currentUser === 'xylo' || currentUser === 'ets') ? (
+                      <img src={etsIcon} alt="ÉTS" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                    )}
+                  </div>
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
+              <a href="https://github.com/Forom-ets/forom" target="_blank" rel="noopener noreferrer" style={{ marginTop: '10%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <img src={githubIcon} alt="GitHub" style={{ width: 'clamp(28px, 3.5vw, 52px)', height: 'clamp(28px, 3.5vw, 52px)', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.8, transition: 'opacity 0.2s' }} onMouseEnter={e => (e.currentTarget.style.opacity = '1')} onMouseLeave={e => (e.currentTarget.style.opacity = '0.8')} />
+              </a>
+            </div>
+
+            {/* LOGGED IN VIEW CENTER */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '100%', position: 'relative', zIndex: 45, display: 'flex', justifyContent: 'center' }}>
+                <RomOnboarding currentUser={currentUser || null} isCreateSelected={isCreateSelected} onPhaseChange={setRomPhase} />
+              </div>
+              <div style={{ position: 'relative', zIndex: 45, marginTop: '24px', minHeight: '60px', display: 'flex', justifyContent: 'center', width: '100%', padding: '0 20px', boxSizing: 'border-box', pointerEvents: 'none' }}>
+                <span style={{ color: '#FFD700', fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(12px, 1.2vw, 16px)', textAlign: 'center', lineHeight: 1.6, opacity: (romPhase === 'idle' || romPhase === 0) ? 0 : 0.8, transition: 'opacity 0.4s', whiteSpace: 'pre-wrap', maxWidth: '500px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+                  <DelayedTypewriterText key={`${activeLang}-${romPhase}`} text={getRomTranslation(romPhase)} delayMs={200} />
+                </span>
+              </div>
+            </div>
+
+            {/* LOGGED IN VIEW RIGHT: CRÉER */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ color: '#2563EB', fontWeight: 900, fontSize: 'clamp(13px, 1.6vw, 26px)', letterSpacing: '0.25em', marginBottom: 'clamp(10px, 2vh, 24px)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{t.creer}</div>
+              <div onClick={() => setIsCreateSelected(true)} style={{ backgroundColor: isCreateSelected ? '#0d2b5e' : '#1A1A1A', borderRadius: 'clamp(12px, 1.5vw, 24px)', width: '100%', aspectRatio: '1 / 1', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: `3px solid ${isCreateSelected ? '#2563EB' : 'transparent'}`, boxSizing: 'border-box', transition: 'border-color 0.25s, background-color 0.25s' }}>
+                <span style={{ color: 'white', fontSize: 'clamp(28px, 4vw, 64px)', fontWeight: 300, lineHeight: 1 }}>+</span>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* CONFIRMER BUTTON */}
-      <div style={{ marginTop: 'clamp(14px, 2.5vh, 36px)', display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+      {/* FOOTER AREA (Connect key and Confirmer) */}
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(14px, 2.5vh, 36px)', flexShrink: 0 }}>
+        {/* CONNECT WITH A KEY */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: 'clamp(10px, 1.1vw, 15px)', fontFamily: 'Montserrat, sans-serif', fontWeight: 600, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.connectKey}</span>
+          <input
+            type="text"
+            value={joinKey}
+            onChange={e => setJoinKey(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && joinKey.trim().length > 0) {
+                setJoinStep('color')
+              }
+            }}
+            placeholder="FRM-XXXX-XXXX"
+            style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', padding: '6px 12px', color: '#fff', fontSize: 'clamp(12px, 1.4vw, 18px)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', width: 'clamp(140px, 16vw, 200px)', outline: 'none', transition: 'border-color 0.2s' }}
+            onFocus={(e) => e.target.style.borderColor = '#FFD700'}
+            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
+          />
+        </div>
+
+        {/* CONFIRMER BUTTON */}
         <button
           onClick={() => { if (isCreateSelected && currentUser) onConfirm() }}
-          disabled={!isCreateSelected}
+          disabled={!currentUser || !isCreateSelected}
           style={{
             padding: 'clamp(10px, 1.5vh, 18px) clamp(40px, 5vw, 80px)',
             borderRadius: '999px',
@@ -618,13 +674,13 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser }: { onCon
             fontSize: 'clamp(14px, 1.5vw, 22px)',
             letterSpacing: '0.05em',
             border: 'none',
-            cursor: isCreateSelected ? 'pointer' : 'not-allowed',
-            backgroundColor: isCreateSelected ? '#5B9F65' : 'rgba(91,159,101,0.35)',
-            color: isCreateSelected ? '#ffffff' : 'rgba(255,255,255,0.4)',
+            cursor: (!currentUser || !isCreateSelected) ? 'not-allowed' : 'pointer',
+            backgroundColor: (currentUser && isCreateSelected) ? '#5B9F65' : 'rgba(91,159,101,0.35)',
+            color: (currentUser && isCreateSelected) ? '#ffffff' : 'rgba(255,255,255,0.4)',
             transition: 'background-color 0.2s, color 0.2s',
           }}
         >
-          Confirmer
+          {t.confirmer}
         </button>
       </div>
     </motion.div>

@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "C2",
+  "y_axis_district": "Stratégie",
+  "x_axis_action": "Quête",
+  "title": "Étude écosystème",
+  "image_url": "https://forom.community/images/grid_C2.png",
+  "video_url": "https://www.youtube.com/watch?v=H7_sqdkaAUE",
+  "sources": [
+    "README.md: Minecraft Server philosophy and Tunnel connectivity",
+    "quests.ts: Foundational quest specifications for District C",
+    "database.sql: Schema for memos and description text limits",
+    "App.tsx: Pixel reward and quest completion logic",
+    "forom-config.ts: Label mapping for Stratégie and Quête"
+  ],
+  "resume": "The quest 'Étude écosystème' (C2) is a strategic deep-dive into the external landscape surrounding a Forom node. Located at the intersection of Category C (Stratégie) and Action 2 (Quête) on the 10x10 FRM grid, this quest is part of Phase 1: The Foundations (V1). The core mission, 'Saving human communities and long-term memory,' requires the community to understand the digital matrix it inhabits—identifying potential allies, competitors, and the broader technical environment. This study ensures that the local node does not exist in a vacuum but is prepared for the eventual Phase 3 transition to the Global Public Lobby. Technically, the findings of this ecosystem study are archived in the local PostgreSQL database within the 'memos' table. This table tracks the 'user_id', 'category_id' (C), and 'description', where the 'description' field holds the detailed analysis. By hosting this data locally on an NVIDIA Jetson, the community maintains absolute sovereignty over its strategic intelligence, preventing external trackers from seeing how the node intends to position itself globally. The Forom stack, using React 19 and Vite 7, renders this strategic data within the 5x5 spatial viewport, making it accessible to the leadership team. The 'Quête' action tag indicates a 'Bounty' or 'Call to Action'. In V1, completing this quest rewards the contributor with 2 Pixels (PX) and 10 XP. This economy, kickstarted by the 500 PX initial treasury of the 9 Super-Mods, incentivizes high-quality research. The study typically maps out existing federated protocols, local hardware resources, and similar mission-aligned communities, like the 70 ETS Student Clubs. This allows the node to plan its 'Tunnel' established in Phase 3 with precision. As part of the V1 Archive, this study will be iterated in V2 and finalized in V3. Once ROM—the local RAG engine—awakens in Phase 3, it will digest these memos. ROM will then provide context-aware advice on partnerships based on this 'Deep Lore'. Ultimately, C2 transforms strategic observation into a permanent, actionable asset. It secures survival by providing external awareness to navigate the landscape. This entry is canonized. The documentation of the ecosystem is a vital step for every node. It ensures the mission remains grounded. Every participant contributes. Yes.",
+  "summary": "This quest maps the external community and technical ecosystem at coordinate C2, providing the strategic intelligence required for long-term node positioning and global connectivity."
+}

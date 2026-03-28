@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "B2",
+  "y_axis_district": "Équipe",
+  "x_axis_action": "Quête",
+  "title": "Recrutement: Building the 1209-User Core",
+  "image_url": "https://forom.community/images/grid_B2.png",
+  "video_url": "https://www.youtube.com/watch?v=S9I-LIdo82Y",
+  "sources": [
+    "README.md: Role definitions and recruitment philosophy [cite: 2]",
+    "database.sql: User population limits and database schema",
+    "quests.ts: Foundational quest specifications for District B",
+    "App.tsx: Quest reward and economic logic implementation",
+    "memories.ts: Memory data structure and archival rules"
+  ],
+  "resume": "The quest \"Recrutement\" (B2) is a fundamental operation within the Équipe district, mapping to the Quête action at coordinate B2 on the 10x10 FRM grid. As a pillar of Phase 1: The Foundations (V1), this quest establishes the human pipeline required to reach the planned limit of 1209 total users. This population is strategically tiered into 9 Super-Moderators, 50 Moderators, 150 Creators, and 1000 Associates to ensure a balanced ecosystem. Unlike traditional social networks where accounts are created instantly, the Forom philosophy mandates that users, especially those seeking the \"Creator\" title, must earn their status by completing a Quest and having their memo selected for the official archive[cite: 2]. This meritocratic approach ensures that every member of the team is aligned with the mission of saving long-term community memory[cite: 2]. Technically, new users are managed via the \"users\" table in the local PostgreSQL database, which tracks their username, role, and currency. The system uses invite keys and claimed status to maintain a private, invite-only \"Private Era\" during the node's early development[cite: 2]. Each successful recruitment action is recorded as a memo, reinforcing the community's structural data for future RAG ingestion. Economically, the recruitment quest is incentivized by the Pixel (PX) system; in V1, completing this quest rewards the contributor with 2 PX[cite: 2]. This reward facilitates the redistribution of purchasing power, which begins with the 500 PX held by each Super-Mod[cite: 2]. The software stack, powered by React 19 and Vite 7, provides a clear interface for tracking these quests and role transitions within the spatial grid[cite: 2]. By hosting this recruitment data on local hardware like an NVIDIA Jetson, the community maintains absolute sovereignty over its social graph[cite: 2]. This is critical for pilot projects like the ETS Clubs, where knowledge transfer between graduating generations depends on a clear, documented history of who held which role[cite: 2]. The B2 quest ensures that the \"Deep Lore\" includes the origins and contributions of every team member, creating an immutable human record[cite: 2]. This record eventually feeds into ROM in Phase 3, allowing the AI to understand the community's human architecture[cite: 2]. Ultimately, B2 is the gateway for sustainable growth within the matrix. It guarantees that the population check required for the Phase 3 ritual is met accurately.",
+  "summary": "This quest facilitates the meritocratic recruitment of community members at coordinate B2, ensuring the 1209-user population limit is reached through verified contributions."
+}

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
-export type AppPhase = 'loading' | 'lobby' | 'color-select' | 'creation-flow' | 'grid';
-export type AppLanguage = 'fr' | 'en';
+export type AppPhase = 'loading' | 'mood' | 'lobby' | 'color-select' | 'creation-flow' | 'grid';
+export type AppLanguage = 'fr' | 'en' | 'es';
 
 /**
  * @interface AppStore

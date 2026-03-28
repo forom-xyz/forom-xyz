@@ -1,0 +1,19 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "A6",
+  "y_axis_district": "Vision",
+  "x_axis_action": "Matériel",
+  "title": "Logos & Branding",
+  "image_url": "https://forom.community/images/grid_A6.png",
+  "video_url": "https://www.youtube.com/watch?v=Z46-S98mPkw",
+  "sources": [
+    "README.md: Grid structure and Matériel action definition [cite: 2]",
+    "quests.ts: Foundational Quest Spec for A6",
+    "forom-config.ts: Default category and question labels [cite: 3]",
+    "memories.ts: Memory data structure and helper functions",
+    "database.sql: PostgreSQL schema for memos table",
+    "App.tsx: Pixel economy and quest reward logic"
+  ],
+  "resume": "The quest \"Logos & Branding\" (A6) is situated at the intersection of the Vision district and the Matériel action within the 10x10 Finite Rom Map grid[cite: 2]. In the Forom ecosystem, the \"Matériel\" tag is specifically reserved for the management and archival of community assets, files, and visual identity[cite: 2, 3]. As part of Phase 1: The Foundations (V1), this quest involves the creation and storage of the graphical elements that define the community's public and private face[cite: 2]. This includes logos, color palettes, and branding guidelines that align with the community's core mission, such as the Public Forom's mission to \"Save human communities & long-term memory\"[cite: 2]. Technically, these assets are referenced within a \"memo\" stored in the local PostgreSQL database, where the question field is set to '6' (Matériel) and the category_id corresponds to Vision[cite: 3]. The description field of the memo, which supports extensive text, can be used to document the design rationale and usage rules for these assets. The modern frontend stack, including Tailwind 4 and Vite 7, allows for the efficient rendering of these visual assets within the spatial 5x5 viewport of the FRM grid[cite: 2]. For the \"Creator\" role—those users aligned with innovation and production—completing this quest is a vital contribution that pushes the community's mission forward[cite: 2]. Upon successful submission, the contributor is rewarded with 2 Pixels (PX) and 10 XP, reinforcing the community's redistribution of purchasing power[cite: 2]. This quest is essential for establishing a cohesive identity before the community moves into Phase 2 (Iteration) and eventually Phase 3 (Awakening), where the local RAG system, ROM, will be trained on this archived data[cite: 2]. By hosting these branding assets locally on hardware like an NVIDIA Jetson, the community ensures total data sovereignty and long-term preservation of its visual history[cite: 2]. This is particularly critical for pilot projects like the ETS Clubs, where branding ensures continuity and recognition across student generations[cite: 2]. The resulting memo acts as a permanent record in the V1 Archive, providing the visual DNA that will be refined and canonized in subsequent phases of the ROMAP[cite: 2]. Ultimately, A6 transforms abstract vision into a tangible, recognizable brand that secures the community’s professional presence within the global forom lobby once connectivity is earned[cite: 2].",
+  "summary": "This quest facilitates the creation and archival of community branding assets at coordinate A6, securing the visual identity required for long-term memory and professional recognition."
+}

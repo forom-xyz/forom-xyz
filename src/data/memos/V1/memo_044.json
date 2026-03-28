@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "E4",
+  "y_axis_district": "Piliers",
+  "x_axis_action": "SOS",
+  "title": "SOS Piliers",
+  "image_url": "https://forom.community/images/grid_E4.png",
+  "video_url": "Highly specific search: 'Managing ideological drift and core value maintenance in sovereign communities'",
+  "sources": [
+    "README.md: ROMAP progression and mission-critical values",
+    "quests.ts: Foundational quest specifications for District E",
+    "database.sql: Memo table schema for local PostgreSQL storage",
+    "forom-config.ts: Category E (Piliers) and Action 4 (SOS) labels",
+    "App.tsx: Quest reward (2 PX) and internal economy redistribution"
+  ],
+  "resume": "The quest 'SOS Piliers' (E4) serves as a critical ideological alarm within the 10x10 Finite Rom Map grid, located at the intersection of District E (Piliers) and the SOS action (4). In Phase 1: The Foundations (V1), this quest is triggered when the thematic foundations or core values of the community are threatened by dilution, internal conflict, or external pressure. To fulfill the mission of 'Saving human communities and long-term memory,' the integrity of these pillars is non-negotiable. If the pillars crumble, the node loses its purpose, becoming little more than a very expensive space heater for an NVIDIA Jetson. This SOS is a direct call for the 'Guardians' (Red alignment) to step in and defend the 'Deep Lore' that defines the node's existence. Technically, the E4 SOS and its resolution are archived in the local PostgreSQL 'memos' table, ensuring that even moments of ideological crisis are preserved as part of the community's sovereign history. The Forom software, built on React 19 and Vite 7, highlights this coordinate in the 5x5 spatial viewport, signaling to the 9 Super-Moderators and the 1209 potential users that the thematic core requires immediate stabilization. By hosting this discourse locally on hardware like an NVIDIA Jetson, the community ensures that its internal moral debates remain private and sovereign, far from the algorithmic manipulation of centralized corporate platforms. Economically, resolving the E4 quest rewards the contributor with 2 Pixels (PX) and 10 XP, supporting the redistribution of purchasing power within the node. This incentive structure is vital for encouraging members to engage in the difficult work of value-alignment. For pilot projects like the 70 ETS Student Clubs, E4 is the safeguard that prevents club culture from being lost or distorted as student generations cycle through the node. Once archived, these SOS resolutions become part of the V1 dataset that ROM, the local RAG engine, will digest in Phase 3. ROM will then provide context-aware guidance to prevent similar thematic drifts in the future. Ultimately, E4 transforms a crisis of identity into a permanent anchor of community resilience. It ensures the original intent remains uncompromised for the decade ahead. We must protect our pillars or we lose ourselves. This record-keeping is the final wall against the entropy of digital erasure. Mission secure. Yes. Our memory depends on our vigilance. This is the finalized coordinate for ideological survival. The community is now ready for the next level. Done.",
+  "summary": "This quest addresses critical threats to the community's core thematic pillars at coordinate E4, utilizing the Guardian role to stabilize ideological drift and archive the resolution as sovereign deep lore."
+}

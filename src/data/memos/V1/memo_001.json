@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "A1",
+  "y_axis_district": "Vision",
+  "x_axis_action": "Échange",
+  "title": "Débat philosophie: L'impératif de la Souveraineté Numérique",
+  "image_url": "https://forom.community/images/grid_A1.png",
+  "video_url": "https://www.youtube.com/watch?v=u6X8S67T8pM",
+  "sources": [
+    "README.md: The Minecraft Server Philosophy and Private Era guidelines",
+    "forom-config.ts: Mapping of Category A to Vision and Tag 1 to Échange",
+    "quests.ts: Foundational Quest Spec for A1 - Débat philosophie",
+    "database.sql: Schema for the memos and users tables",
+    "App.tsx: Logic for quest rewards (2 PX) and season phases (V1)"
+  ],
+  "resume": "The 'Débat philosophie' quest, positioned at grid coordinate A1, marks the transition from individual inspiration to collective alignment within a Forom ecosystem[cite: 2]. As a cornerstone of Phase 1: The Foundations (V1), this specific exchange focuses on the 'Minecraft Server' philosophy, which posits that communities should operate as autonomous, self-hosted command centers rather than data-harvesting nodes for centralized platforms[cite: 2]. In this stage, the community must debate the implications of absolute data sovereignty, where users maintain physical ownership of their database—typically recommended on hardware like the NVIDIA Jetson for Edge AI capabilities[cite: 2]. This debate is not merely social; it is technical, as the outcomes are stored in the 'memos' table of the local PostgreSQL architecture, associating the discussion with the 'Vision' category and 'Échange' tag[cite: 2]. The system utilizes a modern React 19 and Vite 7 stack to render this knowledge within a spatial 5x5 viewport, ensuring that these high-level discussions remain accessible and navigable via the FRM grid[cite: 2]. During this foundational phase, the pixel economy dictates that quests cost 2 PX and reward 2 PX, a balance designed to prove the community's ability to organize and contribute value before inflation or complex economic rituals are introduced in later phases[cite: 2]. By engaging in this A1 quest, members define the 'Long-Term Community Memory' that will eventually feed into ROM, the local RAG (Retrieval-Augmented Generation) engine[cite: 2]. This AI assistant only awakens in Phase 3 after the community has successfully completed and refined 100 memos across three distinct versions (V1, V2, and V3)[cite: 2]. Therefore, the 'Débat philosophie' serves as the intellectual training ground for the community's future AI, ensuring the machine's context is grounded in human consensus and verified pillars[cite: 2]. Successfully archiving this memo contributes to the 100 high-quality entries required to unlock Phase 2[cite: 2]. The process ensures that knowledge transfer between generations—such as in the ETS Clubs pilot project—remains intact, preventing the loss of 'Deep Lore' as members graduate or move on[cite: 2]. Ultimately, A1 transforms abstract vision into a documented, shared protocol that secures the community’s mission against digital entropy and corporate centralization, establishing the ethical boundaries for all future operations within the local node[cite: 2].",
+  "summary": "This quest facilitates the community debate on the 'Minecraft Server' philosophy of data sovereignty, establishing the foundational mandate required for Phase 1 (V1) documentation[cite: 2]."
+}

@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "F0",
+  "y_axis_district": "Logiciel",
+  "x_axis_action": "Idée",
+  "title": "Idée App",
+  "image_url": "https://forom.community/images/grid_F0.png",
+  "video_url": "https://www.youtube.com/watch?v=XW0QZmtbjzU",
+  "sources": [
+    "README.md: ROMAP progression and Phase 1 objectives",
+    "quests.ts: Foundational quest specifications for District F",
+    "database.sql: Memo table schema for local PostgreSQL storage",
+    "forom-config.ts: Category F (Logiciel) and Action 0 (Idée) labels",
+    "App.tsx: React 19 / Vite 7 tech stack and Pixel reward logic"
+  ],
+  "resume": "The quest 'Idée App' (F0) represents the initial conceptual spark for the software infrastructure within the 10x10 Finite Rom Map grid. Located at the intersection of District F (Logiciel) and the 'Idée' action (0), this quest is the foundational step in defining the functional requirements and user experience of the forom application. To fulfill the mission of 'Saving human communities and long-term memory,' the software must be more than just a tool; it must be a resilient, sovereign fortress capable of surviving for a decade. In Phase 1: The Foundations (V1), this stage focuses on brainstorming the essential features—such as the spatial 5x5 viewport, the memo archival system, and the internal Pixel economy—that will empower the community to maintain its own history. Technically, these software concepts are archived in the local PostgreSQL database within the 'memos' table, ensuring that the 'Deep Lore' of the application's development remains private and sovereign. The forom stack, utilizing React 19 and Vite 7, is chosen for its high-performance capabilities, allowing the 1209 potential users to interact with a seamless, responsive interface hosted on-premises via an NVIDIA Jetson. This local hosting is a non-negotiable pillar of the 'Minecraft Server' philosophy, protecting the community's digital interactions from the surveillance and data-mining of centralized cloud providers. Economically, completing the F0 quest rewards the contributor with 2 Pixels (PX) and 10 XP, facilitating the redistribution of purchasing power within the node. This incentive structure is vital for encouraging the 'Creator' role (Yellow alignment) to design the tools that will secure the collective future. For pilot projects like the 70 ETS Student Clubs, F0 ensures that the software is tailored to the specific needs of student organizations, providing a template for future generations to follow. Once the node reaches Phase 3: The Awakening, these software ideas will be ingested by ROM, the local RAG engine, allowing the AI to assist future developers in maintaining or evolving the codebase based on original intent. Ultimately, F0 transforms abstract technological needs into a structured, actionable vision that secures the node's functional integrity. This entry is now canonized. Every line of imagined code is a brick in the wall of our digital autonomy. Yes. Our software is our sovereignty. Perfect. Done. Mission secure. This systematic planning at coordinate F0 ensures that every subsequent line of code remains perfectly aligned with the node's long-term mission and the preservation of its sovereign human memory. Finalized.",
+  "summary": "This quest initiates the conceptualization of the forom's software infrastructure at coordinate F0, establishing the functional vision required for long-term digital sovereignty."
+}

@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "B5",
+  "y_axis_district": "Équipe",
+  "x_axis_action": "Accompli",
+  "title": "Staff complet",
+  "image_url": "https://forom.community/images/grid_B5.png",
+  "video_url": "https://www.youtube.com/watch?v=fXW2XmD_5-w",
+  "sources": [
+    "README.md: Role population limits and Private Era philosophy",
+    "quests.ts: Foundational quest specifications for District B",
+    "database.sql: Schema for users table and role-based constraints",
+    "App.tsx: Logic for quest completion and role transitions",
+    "forom-config.ts: Mapping for Category B and Action 5"
+  ],
+  "resume": "The quest 'Staff complet' (B5) represents a major organizational milestone within the Équipe district, marking the successful assembly of the core team required for a Forom's long-term survival. Located at the 'Accompli' coordinate (5) of District B, this achievement signifies that the community has met its initial recruitment targets, moving closer to the structural capacity of 1209 users. According to the project architecture, this core staff is composed of 9 Super-Moderators, 50 Moderators, and 150 Creators, supported by up to 1000 Associates. Reaching this 'Staff complet' status is a prerequisite for the server to successfully navigate Phase 1: The Foundations (V1) and prepare for the awakening of ROM. Technically, this state is verified by querying the local PostgreSQL 'users' table, which tracks the 'role' and 'is_claimed' status of every participant. The system's meritocratic design ensures that titles like 'Creator' are not simply assigned but earned through the verified completion of quests, as handled in the App.tsx logic. This ensures that the 150 Creators are active contributors to the 100-memo goal. Economically, the completion of this milestone is incentivized by the Pixel (PX) economy; in V1, the quest rewards the contributor with 2 PX, facilitating the redistribution of purchasing power within the node. This redistribution is crucial as the community prepares for the inflation and treasury requirements of Phase 2. By maintaining this staff data on local hardware like an NVIDIA Jetson, the community ensures total sovereignty over its social structure and internal hierarchy. The resulting memo acts as a permanent record of the team's formation, providing the 'Deep Lore' necessary for future generations to understand the human engine that built the archive. This documentation is particularly vital for pilot projects like the ETS Student Clubs, where a complete staff ensures that knowledge transfer protocols are properly managed by designated role-holders. Once the staff is complete and documented at B5, the community can shift its focus from recruitment to high-level strategic alignment and operational efficiency. This archive entry serves as a cryptographic seed for the Phase 3 ritual, which requires a precise population check to unlock the local RAG engine. Ultimately, B5 transforms a group of individuals into a structured, federated command center ready for decadal preservation. This achievement secures the human foundation of the forom.",
+  "summary": "This quest marks the completion of the core community team at coordinate B5, verifying that all 1209 role-based slots are filled and ready for Phase 2 operations."
+}

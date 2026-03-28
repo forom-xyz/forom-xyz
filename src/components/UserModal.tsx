@@ -1,8 +1,9 @@
 ﻿import ReactModal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import userIcon from '../assets/icons/user.png'
 import type { ForomColor } from '../utils/foromColors'
+import type { UserRole } from '../App'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -22,6 +23,19 @@ interface UserModalProps {
   inVault?: number
   foromRules?: string[]
   foromFriendKeys?: string[]
+  userRole?: UserRole
+}
+
+type UserListMember = {
+  id: number
+  name: string
+  quests: number
+  pixels: number
+  missions: number
+  level: number
+  isBot: boolean
+  key?: string | null
+  team?: string
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -166,7 +180,7 @@ const TABS: { id: RoleTab; label: string; max: number | string }[] = [
   { id: 'S-MODS',   label: 'S-MODS',   max: 9   },
   { id: 'MODS',     label: 'MODS',     max: 50  },
   { id: 'CREATOR',  label: 'CREATOR',  max: 150 },
-  { id: 'ASSOCIES', label: 'ASSOCIES', max: '1k' },
+  { id: 'ASSOCIES', label: 'ASSOCIES', max: 1000 },
 ]
 
 // Economy distribution at Phase 1:
@@ -196,12 +210,22 @@ export function UserModal({
   isSuperModerator,
   inVault = 0,
   foromFriendKeys = [],
+  userRole,
 }: UserModalProps) {
   void xp
   void foromColor
 
   const [activeTab, setActiveTab] = useState<RoleTab>('S-MODS')
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
+
+  // Mods team management
+  const [teamName, setTeamName] = useState('')
+  const [teamColor, setTeamColor] = useState('#3B82F6')
+  const [isTeamCreated, setIsTeamCreated] = useState(false)
+  const [hasVotedSos, setHasVotedSos] = useState(false)
+  const [sosVotes, setSosVotes] = useState(24)
+
+  const randomMembersCount = useMemo(() => Math.floor(Math.random() * 3) + 2, [])
 
   const copyKey = useCallback((key: string) => {
     navigator.clipboard.writeText(key).then(() => {
@@ -212,9 +236,13 @@ export function UserModal({
 
   const displayName  = currentUser ? currentUser.toUpperCase() : 'XYLO'
   const lobbyName    = displayName + ' LOBBY'
-  const userRole     = isSuperModerator ? 'SUPERMODS' : 'CITOYEN'
+  const userRoleDisplay = userRole === 'S-MODS' ? 'SUPERMODS' : userRole === 'MODS' ? 'MODERATEUR' : userRole === 'CREATEURS' ? 'CREATEUR' : userRole === 'ASSOCIES' ? 'ASSOCIE' : 'CITOYEN'
   const levelTitle   = level === 0 ? 'CITOYEN' : title.toUpperCase()
   const missionLabel = mission || 'SAUVER LES COMMUNAUTES'
+
+  const showFullEconomy = userRole === 'S-MODS';
+  const isMod = userRole === 'MODS';
+  const hasLeftPanel = showFullEconomy || isMod;
 
   const supermods = [
     { id: 1, name: displayName, quests: 0, pixels, missions: 0, level, isBot: false, key: null as string | null },
@@ -266,8 +294,8 @@ export function UserModal({
             <style>{`
               .ld-grid {
                 display: grid;
-                grid-template-columns: 1fr 1fr 1fr;
-                grid-template-areas: "left center right";
+                grid-template-columns: ${hasLeftPanel ? '1fr 1fr 1fr' : '1fr 1.3fr'};
+                grid-template-areas: ${hasLeftPanel ? '"left center right"' : '"center right"'};
                 flex: 1;
                 min-height: 0;
                 overflow: hidden;
@@ -275,7 +303,7 @@ export function UserModal({
               @media (orientation: portrait), (max-aspect-ratio: 1/1) {
                 .ld-grid {
                   grid-template-columns: 1fr !important;
-                  grid-template-areas: "center" "left" "right" !important;
+                  grid-template-areas: ${hasLeftPanel ? '"center" "left" "right"' : '"center" "right"'} !important;
                   overflow-y: auto !important;
                   overflow-x: hidden;
                 }
@@ -324,6 +352,7 @@ export function UserModal({
             <div className="ld-grid">
 
               {/* LEFT — Economy and Supermods view */}
+              {hasLeftPanel && (
               <div
                 className="ld-panel-left"
                 style={{
@@ -334,123 +363,212 @@ export function UserModal({
                   overflowY: 'auto',
                 }}
               >
-                {/* Coffers row */}
-                <div style={{ display: 'flex', gap: 10 }}>
+                {showFullEconomy && (
+                  <>
+                    {/* Coffers row */}
+                    <div style={{ display: 'flex', gap: 10 }}>
 
-                  {/* COFFRE CACHEE — locked until community completes 3 phases + 1 yr + 1 000 assoc */}
-                  <div style={{
-                    flex: 1,
-                    backgroundColor: '#7C3AED', border: '4px solid #111',
-                    borderRadius: 10, padding: '10px 12px', textAlign: 'center',
-                    position: 'relative', overflow: 'hidden',
-                    boxShadow: '0 3px 0px rgba(0,0,0,0.7)',
-                  }}>
-                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.85)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 3 }}>
-                      COFFRE CACHEE
-                    </div>
-                    <div style={{ fontSize: 18, fontWeight: 900, color: 'white', fontFamily: "'Jersey 15', sans-serif", textDecoration: 'line-through', opacity: 0.6 }}>
-                      {inVault} PX
-                    </div>
-                    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                      {/* COFFRE CACHEE — locked until community completes 3 phases + 1 yr + 1 000 assoc */}
                       <div style={{
-                        position: 'absolute', top: '50%', left: '4%', right: '4%',
-                        height: 2, backgroundColor: 'rgba(255,255,255,0.45)',
-                        transform: 'rotate(-7deg) translateY(-50%)',
-                      }} />
-                    </div>
-                  </div>
+                        flex: 1,
+                        backgroundColor: '#7C3AED', border: '4px solid #111',
+                        borderRadius: 10, padding: '10px 12px', textAlign: 'center',
+                        position: 'relative', overflow: 'hidden',
+                        boxShadow: '0 3px 0px rgba(0,0,0,0.7)',
+                      }}>
+                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.85)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 3 }}>
+                          COFFRE CACHEE
+                        </div>
+                        <div style={{ fontSize: 18, fontWeight: 900, color: 'white', fontFamily: "'Jersey 15', sans-serif", textDecoration: 'line-through', opacity: 0.6 }}>
+                          {inVault} PX
+                        </div>
+                        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                          <div style={{
+                            position: 'absolute', top: '50%', left: '4%', right: '4%',
+                            height: 2, backgroundColor: 'rgba(255,255,255,0.45)',
+                            transform: 'rotate(-7deg) translateY(-50%)',
+                          }} />
+                        </div>
+                      </div>
 
-                  {/* COFFRE SOS — needs min 50 votes from MODs/S-MODs to release */}
-                  <div style={{
-                    flex: 1,
-                    backgroundColor: '#EA580C', border: '4px solid #111',
-                    borderRadius: 10, padding: '10px 12px', textAlign: 'center',
-                    boxShadow: '0 3px 0px rgba(0,0,0,0.7)',
-                  }}>
-                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.9)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 3 }}>
-                      COFFRE SOS
+                      {/* COFFRE SOS — needs min 50 votes from MODs/S-MODs to release */}
+                      <div style={{
+                        flex: 1,
+                        backgroundColor: '#EA580C', border: '4px solid #111',
+                        borderRadius: 10, padding: '10px 12px', textAlign: 'center',
+                        boxShadow: '0 3px 0px rgba(0,0,0,0.7)',
+                      }}>
+                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.9)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 3 }}>
+                          COFFRE SOS
+                        </div>
+                        <div style={{ fontSize: 18, fontWeight: 900, color: 'white', fontFamily: "'Jersey 15', sans-serif" }}>
+                          500 PX
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ fontSize: 18, fontWeight: 900, color: 'white', fontFamily: "'Jersey 15', sans-serif" }}>
-                      500 PX
-                    </div>
-                  </div>
-                </div>
 
-                {/* FOROM ECONOMY + PHASE */}
-                <div style={{
-                  backgroundColor: '#78350F', border: '4px solid #111',
-                  borderRadius: 10, padding: '12px 14px',
-                  boxShadow: '0 3px 0px rgba(0,0,0,0.7)',
-                }}>
-                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.65)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 4 }}>
-                    FOROM ECONOMY PHASE
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-                    <div style={{ fontSize: 26, fontWeight: 900, color: 'white', fontFamily: "'Jersey 15', sans-serif" }}>
-                      5 000 PX
-                    </div>
-                    <div style={{ fontSize: 30, fontWeight: 900, color: '#EF4444', fontFamily: "'Jersey 15', sans-serif" }}>
-                      1
-                    </div>
-                  </div>
-                </div>
-
-                {/* Role wealth distribution — 4 circle gauges */}
-                <div style={{
-                  backgroundColor: 'rgba(0,0,0,0.06)', borderRadius: 8, padding: '14px 8px',
-                  display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, justifyItems: 'center',
-                }}>
-                  {ECONOMY.map(e => (
-                    <CircleGauge key={e.label} {...e} />
-                  ))}
-                </div>
-
-                {/* Monthly activity chart */}
-                <div style={{ backgroundColor: 'rgba(0,0,0,0.04)', borderRadius: 8, padding: '10px 10px 8px' }}>
-                  <div style={{ fontSize: 8, color: 'rgba(0,0,0,0.35)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>ACTIVITÉ MENSUELLE</div>
-                  <MonthlyActivityChart theme="light" />
-                </div>
-
-                {/* Mission 1 — visible to supermods only */}
-                {isSuperModerator && (
-                  <div style={{
-                    backgroundColor: '#1c1c1c', border: '3px solid #333',
-                    borderRadius: 10, padding: '14px 16px',
-                    marginTop: 'auto',
-                  }}>
+                    {/* FOROM ECONOMY + PHASE */}
                     <div style={{
-                      fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 900,
-                      color: 'white', letterSpacing: '0.08em', textTransform: 'uppercase',
-                      textAlign: 'center', marginBottom: 14,
+                      backgroundColor: '#78350F', border: '4px solid #111',
+                      borderRadius: 10, padding: '12px 14px',
+                      boxShadow: '0 3px 0px rgba(0,0,0,0.7)',
                     }}>
-                      MISSION 1 - TRANSFERT DU POUVOIR
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>CHATEAU</div>
-                        <div style={{
-                          width: 54, height: 54, borderRadius: '50%',
-                          backgroundColor: '#111', border: '3px solid white',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 12, fontWeight: 900, color: 'white',
-                          fontFamily: "'Jersey 15', sans-serif", margin: '0 auto',
-                        }}>100%</div>
+                      <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.65)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 4 }}>
+                        FOROM ECONOMY PHASE
                       </div>
-                      <div style={{ flex: 1, height: 3, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 2 }} />
-                      <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>COMMUNAUTE</div>
-                        <div style={{
-                          width: 54, height: 54, borderRadius: '50%',
-                          backgroundColor: '#d4d4d4', border: '3px solid white',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 12, fontWeight: 900, color: '#111',
-                          fontFamily: "'Jersey 15', sans-serif", margin: '0 auto',
-                        }}>0%</div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                        <div style={{ fontSize: 26, fontWeight: 900, color: 'white', fontFamily: "'Jersey 15', sans-serif" }}>
+                          5 000 PX
+                        </div>
+                        <div style={{ fontSize: 30, fontWeight: 900, color: '#EF4444', fontFamily: "'Jersey 15', sans-serif" }}>
+                          1
+                        </div>
                       </div>
                     </div>
-                  </div>
+
+                    {/* Role wealth distribution — 4 circle gauges */}
+                    <div style={{
+                      backgroundColor: 'rgba(0,0,0,0.06)', borderRadius: 8, padding: '14px 8px',
+                      display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, justifyItems: 'center',
+                    }}>
+                      {ECONOMY.map(e => (
+                        <CircleGauge key={e.label} {...e} />
+                      ))}
+                    </div>
+
+                    {/* Monthly activity chart */}
+                    <div style={{ backgroundColor: 'rgba(0,0,0,0.04)', borderRadius: 8, padding: '10px 10px 8px' }}>
+                      <div style={{ fontSize: 8, color: 'rgba(0,0,0,0.35)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>ACTIVITÉ MENSUELLE</div>
+                      <MonthlyActivityChart theme="light" />
+                    </div>
+
+                    {/* Mission 1 — visible to supermods only */}
+                    {isSuperModerator && (
+                      <div style={{
+                        backgroundColor: '#1c1c1c', border: '3px solid #333',
+                        borderRadius: 10, padding: '14px 16px',
+                        marginTop: 'auto',
+                      }}>
+                        <div style={{
+                          fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 900,
+                          color: 'white', letterSpacing: '0.08em', textTransform: 'uppercase',
+                          textAlign: 'center', marginBottom: 14,
+                        }}>
+                          MISSION 1 - TRANSFERT DU POUVOIR
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>CHATEAU</div>
+                            <div style={{
+                              width: 54, height: 54, borderRadius: '50%',
+                              backgroundColor: '#111', border: '3px solid white',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 12, fontWeight: 900, color: 'white',
+                              fontFamily: "'Jersey 15', sans-serif", margin: '0 auto',
+                            }}>100%</div>
+                          </div>
+                          <div style={{ flex: 1, height: 3, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 2 }} />
+                          <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>COMMUNAUTE</div>
+                            <div style={{
+                              width: 54, height: 54, borderRadius: '50%',
+                              backgroundColor: '#d4d4d4', border: '3px solid white',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 12, fontWeight: 900, color: '#111',
+                              fontFamily: "'Jersey 15', sans-serif", margin: '0 auto',
+                            }}>0%</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {isMod && (
+                  <>
+                    {/* Team Creation Board */}
+                    <div style={{
+                      backgroundColor: isTeamCreated ? teamColor : '#ffffff',
+                      border: '4px solid #111', borderRadius: 10, padding: '16px 14px',
+                      marginTop: 0, display: 'flex', flexDirection: 'column', gap: 12,
+                      boxShadow: '0 4px 0px rgba(0,0,0,0.8)', color: isTeamCreated ? '#fff' : '#111'
+                    }}>
+                      <div style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 900, letterSpacing: '0.1em', textAlign: 'center' }}>
+                        {isTeamCreated ? "VOTRE ÉQUIPE" : "CRÉER UNE ÉQUIPE (MAX 25)"}
+                      </div>
+
+                      {!isTeamCreated ? (
+                        <>
+                          <input
+                            type="text"
+                            placeholder="Nom de l'équipe..."
+                            value={teamName}
+                            onChange={(e) => setTeamName(e.target.value)}
+                            style={{
+                              padding: '8px 12px', borderRadius: 6, border: '2px solid #ccc',
+                              fontFamily: "'Jersey 15', sans-serif", fontSize: 18, width: '100%', boxSizing: 'border-box'
+                            }}
+                          />
+                          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                            {['#3B82F6', '#E85C5C', '#22C55E', '#A855F7', '#EAB308'].map(c => (
+                              <button
+                                key={c}
+                                onClick={() => setTeamColor(c)}
+                                style={{
+                                  width: 24, height: 24, borderRadius: '50%', backgroundColor: c,
+                                  border: teamColor === c ? '3px solid #111' : '3px solid transparent', cursor: 'pointer', padding: 0
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <button
+                            onClick={() => { if (teamName.trim() !== '') setIsTeamCreated(true) }}
+                            disabled={teamName.trim() === ''}
+                            style={{
+                              backgroundColor: '#111', color: 'white', padding: '8px', borderRadius: 6, border: 'none',
+                              fontFamily: "'Jersey 15', sans-serif", fontSize: 18, cursor: teamName.trim() === '' ? 'not-allowed' : 'pointer',
+                              opacity: teamName.trim() === '' ? 0.5 : 1
+                            }}
+                          >
+                            CRÉER
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <div style={{ fontSize: 24, fontWeight: 900, fontFamily: "'Jersey 15', sans-serif", textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            {teamName}
+                          </div>
+                          <button
+                            onClick={() => copyKey('INV-TEAM-' + Math.random().toString(36).substring(2, 6).toUpperCase())}
+                            style={{
+                              backgroundColor: 'white', color: 'black', padding: '8px', borderRadius: 6, border: '3px solid #111',
+                              fontFamily: "'Jersey 15', sans-serif", fontSize: 16, cursor: 'pointer', fontWeight: 900
+                            }}
+                          >
+                            Inviter un membre
+                          </button>
+                          
+                          <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                             <div style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.05em' }}>
+                               MEMBRES ({randomMembersCount}/25)
+                             </div>
+                             <div style={{ backgroundColor: 'rgba(0,0,0,0.2)', padding: '8px 10px', borderRadius: 6, fontFamily: "'Jersey 15', sans-serif", fontSize: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+                               1. {displayName} (MOD)
+                             </div>
+                             <div style={{ backgroundColor: 'rgba(0,0,0,0.15)', padding: '8px 10px', borderRadius: 6, fontFamily: "'Jersey 15', sans-serif", fontSize: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+                               2. ZYLO-TESTER (ASSOCIE)
+                             </div>
+                             <div style={{ backgroundColor: 'rgba(0,0,0,0.15)', padding: '8px 10px', borderRadius: 6, fontFamily: "'Jersey 15', sans-serif", fontSize: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+                               3. LOREM-BOT (CITOYEN)
+                             </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </>
                 )}
               </div>
+              )}
 
               {/* CENTER — User Profile */}
               <div
@@ -466,7 +584,7 @@ export function UserModal({
                 }}
               >
                 <div style={{ fontSize: 11, color: '#C084FC', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-                  {userRole}
+                  {userRoleDisplay}
                 </div>
 
                 <div style={{ fontSize: 24, fontWeight: 900, color: '#111', letterSpacing: '0.06em', textTransform: 'uppercase', fontFamily: "'Jersey 15', sans-serif", textAlign: 'center' }}>
@@ -531,6 +649,33 @@ export function UserModal({
                 </div>
 
                 <div style={{ width: '100%', marginTop: 'auto', paddingTop: 12 }}>
+                  {isMod && (
+                    <div style={{ marginBottom: 16 }}>
+                      <div
+                        onClick={() => { if (!hasVotedSos) { setHasVotedSos(true); setSosVotes(v => v + 1); } }}
+                        style={{
+                          width: '100%', backgroundColor: '#EA580C', border: '4px solid #111',
+                          borderRadius: 10, padding: '10px 12px', textAlign: 'center',
+                          boxShadow: '0 3px 0px rgba(0,0,0,0.7)',
+                          cursor: hasVotedSos ? 'default' : 'pointer',
+                          opacity: hasVotedSos ? 0.7 : 1, boxSizing: 'border-box'
+                        }}>
+                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.9)', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 3 }}>
+                          COFFRE SOS ({sosVotes}/25)
+                        </div>
+                        <div style={{ fontSize: 18, fontWeight: 900, color: 'white', fontFamily: "'Jersey 15', sans-serif" }}>
+                          {hasVotedSos ? 'A VOTÉ' : 'VOTER !'}
+                        </div>
+                      </div>
+                      <div style={{
+                        fontSize: 9, color: 'rgba(0,0,0,0.5)', fontFamily: 'Montserrat, sans-serif',
+                        fontWeight: 700, textAlign: 'center', marginTop: 8, padding: '0 8px', lineHeight: 1.4
+                      }}>
+                        À 25 votes, chaque Mods recevra 10 PX instantanément.
+                      </div>
+                    </div>
+                  )}
+
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -547,6 +692,20 @@ export function UserModal({
                     </div>
                   </motion.div>
                 </div>
+
+                {/* MODS View Bottom: Role wealth distribution — 4 circle gauges */}
+                {isMod && (
+                  <div style={{
+                    marginTop: 16, width: '100%', boxSizing: 'border-box',
+                    backgroundColor: 'rgba(0,0,0,0.06)', borderRadius: 12, padding: '14px 8px',
+                    display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px 4px', justifyItems: 'center',
+                    border: '2px dashed rgba(0,0,0,0.1)'
+                  }}>
+                    {ECONOMY.map(e => (
+                      <CircleGauge key={e.label} {...e} />
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* RIGHT — Database / Leaderboard */}
@@ -589,16 +748,16 @@ export function UserModal({
 
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: '24px 1fr 28px 60px 28px 120px',
-                  padding: '7px 18px', gap: 4,
+                  gridTemplateColumns: '24px 1fr 45px 50px 55px 100px',
+                  padding: '7px 18px', gap: 6,
                   borderBottom: '1px solid rgba(255,255,255,0.07)', flexShrink: 0,
                 }}>
                   {(['ID', 'NOM', 'QUETES', 'PIXEL', 'MISSIONS', 'NIVEAU'] as const).map((h, i) => (
                     <div key={h} style={{
                       fontSize: 9, color: 'rgba(255,255,255,0.3)',
                       fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
-                      letterSpacing: '0.1em', textTransform: 'uppercase',
-                      textAlign: i === 3 ? 'center' : 'left',
+                      letterSpacing: '0.06em', textTransform: 'uppercase',
+                      textAlign: (i >= 2 && i <= 4) ? 'center' : 'left',
                     }}>
                       {h}
                     </div>
@@ -606,16 +765,41 @@ export function UserModal({
                 </div>
 
                 <div className="ld-members" style={{ flex: 1, overflowY: 'auto' }}>
-                  {activeTab === 'S-MODS' ? (
-                    supermods.map(member => {
-                      const isMe = member.name.toLowerCase() === currentUser?.toLowerCase()
+                  {(() => {
+                    const getActiveList = () => {
+                      if (activeTab === 'S-MODS') return supermods;
+                      if (activeTab === 'MODS') return [
+                         { id: 1, name: 'ZYLO', quests: 8, pixels: 0, missions: 2, level: 3, isBot: false, key: 'MOD-99F1', team: 'ROUGE' },
+                         { id: 2, name: 'ROBOM', quests: 2, pixels: 100, missions: 0, level: 1, isBot: true, key: null, team: 'BLEU' },
+                         { id: 3, name: 'XOROM', quests: 12, pixels: 250, missions: 5, level: 4, isBot: true, key: null, team: 'VERT' },
+                         { id: 4, name: 'TOROM', quests: 10, pixels: 0, missions: 10, level: 5, isBot: true, key: null, team: 'BLEU' }
+                      ];
+                      if (activeTab === 'CREATOR') return [
+                         { id: 1, name: 'BYLO', quests: 15, pixels: 500, missions: 0, level: 5, isBot: false },
+                         { id: 2, name: 'CR-ALPHA', quests: 5, pixels: 150, missions: 0, level: 2, isBot: true },
+                      ];
+                      if (activeTab === 'ASSOCIES') return [
+                         { id: 1, name: 'DYLO', quests: 3, pixels: 500, missions: 0, level: 1, isBot: false },
+                         { id: 2, name: 'AS-BETA', quests: 7, pixels: 250, missions: 0, level: 2, isBot: true },
+                      ];
+                      return [];
+                    };
+
+                    const list = getActiveList();
+                    if (list.length === 0) return null;
+
+                    return list.map((member: UserListMember) => {
+                      const isMe = member.name.toLowerCase() === currentUser?.toLowerCase();
+                      // Only S-MODS can see keys in any tab
+                      const showKey = (userRole === 'S-MODS' && !!member.key);
+
                       return (
                         <div
                           key={member.id}
                           style={{
                             display: 'grid',
-                            gridTemplateColumns: '24px 1fr 28px 60px 28px 120px',
-                            padding: '7px 18px', gap: 4,
+                            gridTemplateColumns: '24px 1fr 45px 50px 55px 100px',
+                            padding: '7px 18px', gap: 6,
                             borderBottom: '1px solid rgba(255,255,255,0.05)',
                             alignItems: 'center',
                             backgroundColor: isMe ? 'rgba(234,179,8,0.18)' : 'transparent',
@@ -657,7 +841,7 @@ export function UserModal({
                             </div>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, overflow: 'hidden' }}>
-                            {member.key ? (
+                            {showKey ? (
                               <button
                                 onClick={() => copyKey(member.key!)}
                                 title={`Copier: ${member.key}`}
@@ -681,22 +865,15 @@ export function UserModal({
                                 {copiedKey === member.key ? '✓ Copié' : `🔑 ${member.key}`}
                               </button>
                             ) : (
-                              <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11 }}>{member.level}</span>
+                              <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11 }}>
+                                {member.team ? `Éq. ${member.team}` : `NIV. ${member.level}`}
+                              </span>
                             )}
                           </div>
                         </div>
                       )
-                    })
-                  ) : (
-                    <div style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      height: '100%', padding: '48px 0',
-                      color: 'rgba(255,255,255,0.25)',
-                      fontFamily: "'Jersey 15', sans-serif", fontSize: 18, letterSpacing: '0.1em',
-                    }}>
-                      BIENTOT DISPONIBLE
-                    </div>
-                  )}
+                    });
+                  })()}
                 </div>
               </div>
 

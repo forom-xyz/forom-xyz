@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "I9",
+  "y_axis_district": "Social",
+  "x_axis_action": "Urgence",
+  "title": "Urgence Social",
+  "image_url": "https://forom.community/images/grid_I9.png",
+  "video_url": "Highly specific search: 'Conflict resolution and community stabilization in sovereign decentralized networks'",
+  "sources": [
+    "README.md: ROMAP progression and mission-critical social goals",
+    "quests.ts: Foundational quest specifications for District I",
+    "database.sql: Memo table schema and social role/conflict logging",
+    "forom-config.ts: Category I (Social) and Action 9 (Urgence) labels",
+    "App.tsx: Quest reward (2 PX) and moderation tools implementation"
+  ],
+  "resume": "The quest 'Urgence Social' (I9) represents the most critical interpersonal intervention within the 10x10 Finite Rom Map grid, located at the intersection of District I (Social) and the Urgence action (9). In the architectural framework of a forom, an 'Urgence' tag signals a moment of deep systemic friction or a human crisis that directly threatens the primary mission: 'Saving human communities and long-term memory.' During Phase 1: The Foundations (V1), where the community is laboring to establish its first 100 foundational memos, a social emergency is an existential event. It occurs when the cohesion of the collective is compromised—perhaps through the spread of high-stakes interpersonal conflict, a complete breakdown in moderation trust among the 9 Super-Moderators, or a sudden ideological drift that undermines the node’s sovereign identity. This quest acts as the formal mechanism to document, diagnose, and resolve these social emergencies, ensuring that the resolution becomes a permanent part of the community’s sovereign 'Deep Lore.' Technically, the narrative of this crisis and its eventual outcome are archived in the local PostgreSQL database, keeping the history of the struggle for unity private and protected from centralized corporate surveillance. The software environment, utilizing a high-performance stack of React 19 and Vite 7, renders this emergency status through the spatial 5x5 viewport, demanding the immediate attention of the 1209 potential users. The 'Social' role (Blue alignment) is vital here to rebuild trust and facilitate consensus, while 'Guardians' (Red) act to prevent the escalation of destructive behaviors. By hosting this crisis management locally on hardware like an NVIDIA Jetson, the community upholds the 'Minecraft Server' philosophy, protecting its shared human bonds from the surveillance of centralized platforms. Economically, resolving an I9 crisis rewards the contributor with 2 Pixels (PX) and 10 XP, though the 500 PX initial treasury may be deployed for high-stakes stabilization. For pilot projects like the 70 ETS Student Clubs, I9 is the ultimate safeguard against the fracturing of club spirit due to internal friction. Once archived, this memo becomes a cryptographic seed for Phase 3: The Awakening. ROM, the local RAG engine, will digest this 'Urgence Social' entry to provide predictive social diagnostics in the future. Documenting this at I9 transforms a moment of human vulnerability into a permanent anchor of organizational resilience, securing the node’s survival for the decade ahead. Finalized. Our bonds are our life. Our collective bond is the only way to ensure our shared future.",
+  "summary": "This quest addresses critical social threats and community friction at coordinate I9, resolving interpersonal SOS alerts to protect the node's human fabric and collective spirit."
+}

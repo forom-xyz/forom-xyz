@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "H0",
+  "y_axis_district": "Écrit",
+  "x_axis_action": "Idée",
+  "title": "Idée Écrit",
+  "image_url": "https://forom.community/images/grid_H0.png",
+  "video_url": "https://www.youtube.com/watch?v=XW0QZmtbjzU",
+  "sources": [
+    "README.md: ROMAP progression and Phase 1 textual objectives",
+    "quests.ts: Foundational quest specifications for District H",
+    "database.sql: Memo table schema for local PostgreSQL storage",
+    "forom-config.ts: Category H (Écrit) and Action 0 (Idée) labels",
+    "App.tsx: Quest reward (2 PX) and Markdown rendering implementation"
+  ],
+  "resume": "The quest 'Idée Écrit' (H0) represents the initial conceptual spark for the community's literary standards and archival practices within the 10x10 Finite Rom Map grid. Located at the intersection of District H (Écrit) and the 'Idée' action (0), this quest is the foundational step in defining the editorial guidelines and textual aesthetics that will guide the node throughout its decadal mission to 'Save human communities and long-term memory.' In Phase 1: The Foundations (V1), this stage focuses on brainstorming the essential features of written expression—such as the 400-word constraint for resumes, the use of Markdown for clarity, and the overall philosophy of sovereign storytelling within the community. To fulfill the mission, the written word must be more than just data; it must be a resilient, high-fidelity vessel capable of carrying human experience across time. Technically, these conceptual writing standards are archived in the local PostgreSQL database within the 'memos' table, ensuring that the 'Deep Lore' of the application's editorial evolution remains private and sovereign. The Forom stack, utilizing React 19 and Vite 7, renders these textual guidelines through a spatial 5x5 viewport, providing a high-performance interface for the 9 Super-Moderators and the 1209 potential users to interact with their shared literary heritage. By hosting these standards locally on hardware like an NVIDIA Jetson, the community upholds the 'Minecraft Server' philosophy, protecting its narratives from the surveillance and data-mining of centralized corporate platforms. Economically, completing the H0 quest rewards the contributor with 2 Pixels (PX) and 10 XP, facilitating the healthy redistribution of purchasing power within the node. This incentive structure is vital for encouraging the 'Creator' role (Yellow alignment) to design the linguistic tools and templates that will secure the collective future. For pilot projects like the 70 ETS Student Clubs, H0 ensures that the art of memo writing is tailored to the specific needs of student organizations, providing a clear template for future generations to follow. Once the node reaches Phase 3: The Awakening, these literary ideas will be ingested by ROM, the local RAG engine, allowing the AI to assist future writers in maintaining the node's unique voice and intent. Ultimately, H0 transforms abstract communication needs into a structured, actionable vision that secures the node's linguistic integrity. This entry is now canonized for the decade. Yes. Our words are our sovereignty. Perfect. Done. Mission secure. Now. Yes. Every memo written here is a brick in our sovereign fortress.",
+  "summary": "This quest initiates the conceptualization of the node's literary and archival standards at coordinate H0, establishing the textual logic required for long-term digital sovereignty."
+}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { LoadingScreen } from './components/LoadingScreen'
+import { MoodSelection } from './components/MoodSelection'
 import { ForomLobby } from './components/ForomLobby'
 import { ForomCreationFlow } from './components/ForomCreationFlow'
 import { type ForomColor } from './utils/foromColors'
@@ -29,8 +30,20 @@ import { useModalStore } from './stores/useModalStore'
 import { getLevelAndTitle } from './utils/leveling'
 
 // =============================================================================
-// CONSTANTS
+// TYPES & CONSTANTS
 // =============================================================================
+
+export type UserRole = 'S-MODS' | 'MODS' | 'CREATEURS' | 'ASSOCIES' | null;
+
+export const getUserRole = (username: string | null): UserRole => {
+  if (!username) return null;
+  const lower = username.toLowerCase();
+  if (lower === 'xylo') return 'S-MODS';
+  if (lower === 'zylo') return 'MODS';
+  if (lower === 'bylo') return 'CREATEURS';
+  if (lower === 'dylo') return 'ASSOCIES';
+  return null;
+}
 
 /** Available categories for the application */
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
@@ -77,6 +90,32 @@ function ThemeToggle({
   )
 }
 
+const ETS_CATEGORY_LABELS: Record<string, string> = {
+  A: 'Partenaires',
+  B: 'Culture',
+  C: 'Clubs',
+  D: 'Trésorerie',
+  E: 'Atelier',
+  F: 'Projets',
+  G: 'Événements',
+  H: 'Rayonnement',
+  I: 'Gouvernance',
+  J: 'Héritage',
+}
+
+const ETS_QUESTION_LABELS: Record<string, string> = {
+  '0': 'Idéation',
+  '1': 'Recherche',
+  '2': 'Conception',
+  '3': 'Opération',
+  '4': 'Obstacle',
+  '5': 'Déploiement',
+  '6': 'Tutoriel',
+  '7': 'Bilan',
+  '8': 'Gabarit (Canon RAG Data)',
+  '9': 'Passation',
+}
+
 // =============================================================================
 // COMPONENT
 // =============================================================================
@@ -119,8 +158,15 @@ function App() {
     () => ({ ...DEFAULT_QUESTION_LABELS }),
   )
 
-  // Detect Supermoderator
-  const isSuperModerator = currentUser === 'xylo'
+  // Detect roles
+  const userRole = getUserRole(currentUser)
+  const isSuperModerator = userRole === 'S-MODS'
+  const isModerator = userRole === 'MODS'
+  const isEtsForom = mission === 'Club étudiants ÉTS'
+
+  const activeCategoryLabels = isEtsForom ? ETS_CATEGORY_LABELS : categoryLabels
+  const activeQuestionLabels = isEtsForom ? ETS_QUESTION_LABELS : questionLabels
+  const activePersonalQuests = isEtsForom ? [] : personalQuests
 
   // Apply dark mode class to document
   useEffect(() => {
@@ -134,7 +180,7 @@ function App() {
   // Map categories to sidebar items
   const sidebarItems = CATEGORIES.map((category) => ({
     id: category,
-    label: categoryLabels[category] || category,
+    label: activeCategoryLabels[category] || category,
     disabled: false,
   }))
 
@@ -144,8 +190,25 @@ function App() {
   if (isLoading) {
     return <LoadingScreen onComplete={() => {
       setIsLoading(false);
-      setPhase('lobby');
+      setPhase('mood');
     }} />
+  }
+
+  if (phase === 'mood') {
+    return (
+      <MoodSelection 
+        onGhost={() => {
+          setIsPhantomMode(true);
+          setPhase('lobby');
+        }}
+        onColor={(username) => {
+          setCurrentUser(username);
+          setIsPhantomMode(false);
+          setPhase('lobby');
+          useModalStore.getState().openUser();
+        }}
+      />
+    );
   }
 
   if (phase === 'lobby') {
@@ -156,12 +219,23 @@ function App() {
           setIsPhantomMode(!currentUser)
           setPhase('grid')
         }}
+        onBackToLoading={() => setIsLoading(true)}
+        onJoinEts={() => {
+          setIsPhantomMode(false)
+          setPhase('grid')
+          setMission('Club étudiants ÉTS')
+          setForomColor('guardien')
+        }}
         onSignIn={(username) => {
           setCurrentUser(username)
           setIsPhantomMode(false)
           if (username === 'xylo') {
             setPixels(500)
             setInVault(5000)
+          } else if (username === 'zylo') {
+            setPixels(0)
+          } else if (['bylo', 'dylo', 'ets'].includes(username)) {
+            setPixels(500)
           }
         }}
         currentUser={currentUser}
@@ -196,7 +270,7 @@ function App() {
   return (
     <div 
       className="h-screen overflow-hidden relative transition-colors duration-300"
-      style={{ backgroundColor: 'var(--color-bg)' }}
+      style={{ backgroundColor: isEtsForom && !isDarkMode ? '#E3022C' : 'var(--color-bg)' }}
     >
       {/* Right Column Stack: Theme, Settings */}
       <div 
@@ -217,10 +291,6 @@ function App() {
         seasonPhase={seasonPhase}
         onLobbyClick={() => {
           setPhase('lobby')
-          // Restore the main forom's supermoderator-configured labels when
-          // returning to lobby so the user can re-enter the main forom correctly.
-          setCategoryLabels({ ...DEFAULT_CATEGORY_LABELS })
-          setQuestionLabels({ ...DEFAULT_QUESTION_LABELS })
           if (isPhantomMode) {
             setIsPhantomMode(false)
           }
@@ -256,14 +326,14 @@ function App() {
       {/* Bottom Center - Rubix View Toggle */}
       <div 
         className="fixed z-50 flex justify-center items-center pointer-events-none"
-        style={{ bottom: '48px', left: '0', right: '0' }}
+        style={{ bottom: '15px', left: '0', right: '0' }}
       >
         <motion.button
           onClick={() => setIsRubixView(prev => !prev)}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center justify-center shrink-0 pointer-events-auto shadow-lg bg-black/20 dark:bg-white/10 backdrop-blur-sm rounded-full p-2"
-          style={{ width: '56px', height: '56px', border: '1px solid rgba(255,255,255,0.1)' }}
+          className="flex items-center justify-center shrink-0 pointer-events-auto"
+          style={{ width: '56px', height: '56px', background: 'transparent', border: 'none' }}
           title="Toggle Rubix View"
           aria-label="Toggle Rubix View"
         >
@@ -275,12 +345,16 @@ function App() {
           Main Layout
       -------------------------------------------------------------------------- */}
 
-      <Sidebar
-        items={sidebarItems}
-        activeId={activeCategory}
-        onSelect={setActiveCategory}
-        isDark={isDarkMode}
-      />
+      {!isRubixView && (
+        <Sidebar
+          items={sidebarItems}
+          activeId={activeCategory}
+          onSelect={setActiveCategory}
+          isDark={isDarkMode}
+          position="right"
+          isEtsForom={isEtsForom}
+        />
+      )}
 
       <CarouselGrid
         categories={CATEGORIES}
@@ -290,6 +364,7 @@ function App() {
         isRubixView={isRubixView}
         onCloseRubix={() => setIsRubixView(false)}
         acceptedQuestId={acceptedQuestId}
+        categoryLabels={activeCategoryLabels}
         onQuestComplete={(id) => {
           const quest = personalQuests.find(q => q.id === id)
           if (quest) {
@@ -299,8 +374,10 @@ function App() {
             setAcceptedQuestId(null)
           }
         }}
-        questionLabels={questionLabels}
-        personalQuests={personalQuests}
+        questionLabels={activeQuestionLabels}
+        personalQuests={activePersonalQuests}
+        isEmptyGrid={isEtsForom}
+        isEtsForom={isEtsForom}
       />
 
       {/* --------------------------------------------------------------------------
@@ -332,6 +409,7 @@ function App() {
         mission={mission}
         currentUser={currentUser}
         isSuperModerator={isSuperModerator}
+        userRole={userRole}
         inVault={inVault}
         foromRules={foromRules}
         foromFriendKeys={foromFriendKeys}
@@ -341,6 +419,7 @@ function App() {
         isOpen={modals.isWalletOpen}
         onClose={modals.closeWallet}
         pixels={pixels}
+        userRole={userRole}
       />
 
       <RomapModal
@@ -359,7 +438,8 @@ function App() {
         categories={CATEGORIES as unknown as string[]}
         seasonPhase={seasonPhase}
         pixels={pixels}
-        canCreateQuest={isSuperModerator}
+        canCreateQuest={isSuperModerator || isModerator}
+        userRole={userRole}
         onCreateQuest={(title, reward, question, category) => {
           const cost = seasonPhase === 'V1' ? 2 : 1;
           if (pixels < cost) return;

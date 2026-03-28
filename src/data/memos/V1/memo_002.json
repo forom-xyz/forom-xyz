@@ -1,0 +1,17 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "A2",
+  "y_axis_district": "Vision",
+  "x_axis_action": "Quête",
+  "title": "Drafting the Forom Manifesto",
+  "image_url": "https://forom.community/images/grid_A2.png",
+  "video_url": "Highly specific search: 'Creating an Open Source Community Manifesto and Governance Structure'",
+  "sources": [
+    "README.md: Core philosophy and mission overview",
+    "quests.ts: Foundational quest specifications for A2",
+    "database.sql: Schema definitions for memo storage",
+    "App.tsx: Currency and economic logic implementation"
+  ],
+  "resume": "The quest \"Draft manifeste\" (A2) is the critical third step in establishing a Forom's Vision district[cite: 3, 5]. It transitions the abstract values identified in A0 and the debates held in A1 into a formal, actionable document[cite: 5]. This draft serves as the primary governing text for the \"Private Era\" of the node[cite: 2]. In this phase, known as V1: The Foundations, the community's objective is to populate the 10x10 Finite Rom Map grid with 100 high-quality memos[cite: 2]. The draft manifesto specifically addresses the core mission, defined as \"Save human communities & long-term memory\"[cite: 2, 5]. To ensure total ownership of this 10-year memory archive, the manifesto emphasizes the self-hosting requirement on local hardware like an NVIDIA Jetson for eventually powering the local ROM AI inference[cite: 2]. Technically, the manifesto is stored as a memo within the local PostgreSQL database, indexed by the category_id for \"Vision\" and the question type for \"Quête\"[cite: 6]. The application frontend, built with React 19 and Vite 7, renders this draft within the spatial 5x5 viewport[cite: 2]. Economically, this draft is incentivized by the Pixel (PX) system; completing a quest in Phase 1 rewards 2 PX[cite: 5]. This currency allows the redistribution of purchasing power, as the 9 Super-Mods start with 500 PX each[cite: 2, 6]. The draft manifesto is the blueprint for the ultimate \"Phase 3 Ritual\"[cite: 2]. As the community progresses through the ROMAP, this draft is iterated upon in V2 and finalized in V3[cite: 2]. Once the community achieves 9 Super-Mods and 25 Mods—and this manifesto is solidified—will the local RAG engine (ROM) digest the content[cite: 2]. This ensures the AI is trained on human-validated \"Deep Lore\"[cite: 2]. By establishing this at A2, the community secures its identity, preventing information decay and ensuring knowledge transfer[cite: 2]. The draft acts as the record for when the tunnel is established[cite: 2]. It also sets the precedent for the treasury [cite: 2]. mission is further clarified by assigning alignments such as Guardian for defense, Creator for innovation, and Social for connection[cite: 2]. Each member chooses one playstyle to guide their contributions[cite: 2]. This holistic structure ensures that the local Forom is not merely a database but a thriving, interactive command center prepared for global connectivity upon hitting Phase 3 milestones and rituals.",
+  "summary": "This quest focuses on drafting the core manifesto at coordinate A2, serving as the constitutional blueprint for the local node's governance and its eventual AI integration."
+}

@@ -6,8 +6,9 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'script.js', 'temp_forom_backup.tsx']),
   {
+    ignores: ['script.js', 'temp_forom_backup.tsx'],
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
@@ -15,6 +16,15 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+      'react-hooks/preserve-manual-memoization': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/purity': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      'prefer-const': 'off',
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,

@@ -1,0 +1,18 @@
+{
+  "phase": "V1",
+  "grid_coordinate": "E8",
+  "y_axis_district": "Piliers",
+  "x_axis_action": "Savoir",
+  "title": "Savoir Piliers",
+  "image_url": "https://forom.community/images/grid_E8.png",
+  "video_url": "https://www.youtube.com/watch?v=9S_f9S3tEos",
+  "sources": [
+    "README.md: ROM Awakening and RAG infrastructure requirements",
+    "quests.ts: Foundational quest specifications for District E",
+    "database.sql: Memo and user table schemas for local storage",
+    "forom-config.ts: Category E (Piliers) and Action 8 (Savoir) labels",
+    "App.tsx: Tech stack and quest reward implementation"
+  ],
+  "resume": "The quest 'Savoir Piliers' (E8) represents the thematic apex of District E, positioned at the intersection of Piliers and the 'Savoir' action (8) on the 10x10 Finite Rom Map grid. In the architectural framework of a Forom node, the Savoir tag is reserved for 'Canon RAG Data'—the highest tier of archived knowledge designed for direct ingestion by the future local AI assistant, ROM. During Phase 1: The Foundations (V1), this quest moves beyond working drafts or debates to establish the definitive, immutable version of the community's core thematic pillars. To fulfill the mission of 'Saving human communities and long-term memory,' the node must possess a flawless, machine-readable record of the values that define its existence. Technically, the 'Savoir Piliers' memo is stored in the local PostgreSQL database, indexed under Category E and Question 8. This ensures that the 'Deep Lore' of the community's ideological foundations is hosted on sovereign hardware like an NVIDIA Jetson, rather than being exploited by centralized cloud platforms. The software environment, utilizing a high-performance stack of React 19 and Vite 7, renders this canonized data within a spatial 5x5 viewport, allowing the 9 Super-Moderators and the growing user base to access the node's 'Moral North Star' with absolute clarity. Economically, successfully contributing to the E8 quest rewards the participant with 2 Pixels (PX) and 10 XP in V1, facilitating the redistribution of purchasing power within the node. This internal economy, kickstarted by the 500 PX initial treasury of the Super-Mods, incentivizes the 'Creator' role (Yellow alignment) to produce the high-quality documentation necessary for Phase 3. This archived record is particularly vital for pilot projects like the 70 ETS Student Clubs; it ensures that the thematic 'DNA' of the club survives even after the founding members graduate. Once the community triggers the Awakening ritual in Phase 3, ROM will ingest this E8 memo to provide intelligent, context-aware support that is perfectly aligned with the community's core values. By establishing the thematic canon at coordinate E8, the community transforms abstract principles into a permanent, searchable, and AI-ready asset. This entry secures the cultural integrity of the forom for the decade ahead. It is the definitive archive of our shared values. Every pillar is now eternal memory. Finalized. This systematic documentation of our spirit ensures that the node remains a beacon of sovereign truth within the chaotic digital matrix for the next ten years. Yes. Now we are ready.",
+  "summary": "This quest establishes the canonized thematic foundations at coordinate E8, providing the 'Canon RAG Data' required for the community's future AI assistant to align with its core values."
+}
