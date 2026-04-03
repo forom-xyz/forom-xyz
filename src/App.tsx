@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { LoadingScreen } from './components/LoadingScreen'
 import { MoodSelection } from './components/MoodSelection'
+import { AccountCreationFlow } from './components/AccountCreationFlow'
 import { ForomLobby } from './components/ForomLobby'
 import { ForomCreationFlow } from './components/ForomCreationFlow'
 import { type ForomColor } from './utils/foromColors'
@@ -11,6 +12,7 @@ import { CarouselGrid } from './components/CarouselGrid'
 import { WalletModal } from './components/WalletModal'
 import { QuestModal } from './components/QuestModal'
 import { UserModal } from './components/UserModal'
+import { LobbyUserModal } from './components/LobbyUserModal'
 import type { Quest } from './components/QuestModal'
 import { HeartFAB } from './components/HeartFAB'
 import { RomapModal } from './components/RomapModal'
@@ -136,6 +138,30 @@ function App() {
   const [activeCategory, setActiveCategory] = useState('E')
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [isRubixView, setIsRubixView] = useState(false)
+  const [usernameFromOIDC, setUsernameFromOIDC] = useState<string>("Sans nom")
+
+  // OIDC Redirect Callback Logic
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+    
+    if (code) {
+      // 1. Clean the URL so the authorization code isn't left hanging.
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // 2. MOCK: Since we don't have a backend exchanging the OAuth token yet,
+      // we use the 'state' flag we passed to Authentik to know if it's a new or returning user!
+      if (state === 'register') {
+        setUsernameFromOIDC("rom"); // Example of OIDC username extraction
+        setPhase('profile-setup');
+      } else {
+        // Returning user logic - bypass setup and go straight back to the lobby
+        setCurrentUser("rom"); // We'd get this from the backend token normally
+        setPhase('lobby');
+      }
+    }
+  }, [setPhase]);
 
   // Economy & Leveling State
   const [pixels, setPixels] = useState(0)
@@ -201,45 +227,89 @@ function App() {
           setIsPhantomMode(true);
           setPhase('lobby');
         }}
-        onColor={(username) => {
+        onColor={(action) => {
+          const clientId = "forom-web-app";
+          const redirectUri = encodeURIComponent("https://forom.xyz/callback");
+          const scope = encodeURIComponent("openid profile email forom_data");
+          let authUrl = `https://auth.forom.xyz/application/o/authorize/?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}`;
+          
+          if (action === 'register') {
+            // Include state=register to trigger the setup phase on our frontend when returning
+            authUrl += '&state=register';
+          }
+          
+          window.location.href = authUrl;
+        }}
+        onLoginDirect={(username) => {
           setCurrentUser(username);
-          setIsPhantomMode(false);
           setPhase('lobby');
-          useModalStore.getState().openUser();
         }}
       />
     );
   }
 
+  if (phase === 'profile-setup') {
+    return (
+      <AccountCreationFlow
+        username={usernameFromOIDC}
+        onSubmit={(username, _color, _town) => {
+          // Here you could send the color and town back to your backend
+          setCurrentUser(username);
+          setPhase('lobby');
+          useModalStore.getState().openUser();
+        }}
+        onClose={() => setPhase('mood')}
+      />
+    )
+  }
+
   if (phase === 'lobby') {
     return (
-      <ForomLobby 
-        onConfirm={() => setPhase('creation-flow')} 
-        onSkip={() => {
-          setIsPhantomMode(!currentUser)
-          setPhase('grid')
-        }}
-        onBackToLoading={() => setIsLoading(true)}
-        onJoinEts={() => {
-          setIsPhantomMode(false)
-          setPhase('grid')
-          setMission('Club étudiants ÉTS')
-          setForomColor('guardien')
-        }}
-        onSignIn={(username) => {
-          setCurrentUser(username)
-          setIsPhantomMode(false)
-          if (username === 'xylo') {
-            setPixels(500)
-            setInVault(5000)
-          } else if (username === 'zylo') {
-            setPixels(0)
-          } else if (['bylo', 'dylo', 'ets'].includes(username)) {
-            setPixels(500)
-          }
-        }}
-        currentUser={currentUser}
-      />
+      <>
+        <ForomLobby 
+          onConfirm={() => setPhase('creation-flow')} 
+          onSkip={() => {
+            setIsPhantomMode(!currentUser)
+            setPhase('grid')
+          }}
+          onBackToLoading={() => setIsLoading(true)}
+          onJoinEts={() => {
+            setIsPhantomMode(false)
+            setPhase('grid')
+            setMission('Club étudiants ÉTS')
+            setForomColor('guardien')
+          }}
+          onSignIn={(username) => {
+            setCurrentUser(username)
+            setIsPhantomMode(false)
+            if (username === 'xylo') {
+              setPixels(500)
+              setInVault(5000)
+            } else if (username === 'zylo') {
+              setPixels(0)
+            } else if (['bylo', 'dylo', 'ets'].includes(username)) {
+              setPixels(500)
+            }
+          }}
+          currentUser={currentUser}
+        />
+        <LobbyUserModal
+          isOpen={modals.isUserOpen}
+          onClose={modals.closeUser}
+          pixels={pixels}
+          level={level}
+          xp={xp}
+          isDarkMode={isDarkMode}
+          foromColor={foromColor}
+          mission={mission}
+          currentUser={currentUser}
+          isSuperModerator={isSuperModerator}
+          userRole={userRole}
+          inVault={inVault}
+          foromRules={foromRules}
+          foromFriendKeys={foromFriendKeys}
+        />
+      </>
     )
   }
 

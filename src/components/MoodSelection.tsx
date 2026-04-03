@@ -100,17 +100,22 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 
 interface MoodSelectionProps {
   onGhost: () => void
-  onColor: (username: string) => void
+  onColor: (action: 'login' | 'register') => void
   onBack?: () => void
+  onLoginDirect?: (username: string) => void
 }
 
-export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) {
+
+
+export function MoodSelection({ onGhost, onColor, onBack, onLoginDirect }: MoodSelectionProps) {
   const { language } = useAppStore()
   const t = TRANSLATIONS[language] || TRANSLATIONS.en
   const [selected, setSelected] = useState<'couleur' | 'fantome' | null>(null)
   const [isSignInOpen, setIsSignInOpen] = useState(false)
-  const [signInInput, setSignInInput] = useState('')
-
+  const [showConnexionForm, setShowConnexionForm] = useState(false)
+  
+  const [loginUsername, setLoginUsername] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
 
   const [colorInfoOpen, setColorInfoOpen] = useState(false)
   const [ghostInfoOpen, setGhostInfoOpen] = useState(false)
@@ -129,14 +134,14 @@ export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) 
   }, [])
 
   const handleConfirm = () => {
-    if (!selected) return
-    // Stop the sound
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.currentTime = 0
+    if (selected === 'couleur') {
+      setIsSignInOpen(true);
+      setShowConnexionForm(false);
+      setLoginUsername('');
+      setLoginPassword('');
+    } else if (selected === 'fantome') {
+      onGhost();
     }
-    if (selected === 'fantome') onGhost()
-    else setIsSignInOpen(true)
   }
 
   return (
@@ -412,28 +417,29 @@ export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) 
         </div>
       </div>
 
-      {/* Confirm Button */}
-      <motion.button
-        onClick={handleConfirm}
-        whileHover={selected ? { scale: 1.05 } : {}}
-        whileTap={selected ? { scale: 0.95 } : {}}
-        style={{
-          marginTop: 'clamp(30px, 5vh, 60px)',
-          padding: 'clamp(12px, 1.8vh, 20px) clamp(50px, 8vw, 100px)',
-          borderRadius: '999px',
-          fontWeight: 700,
-          fontSize: 'clamp(16px, min(2vw, 2.5vh), 24px)',
-          letterSpacing: '0.05em',
-          border: 'none',
-          cursor: selected ? 'pointer' : 'not-allowed',
-          backgroundColor: selected ? '#5B9F65' : 'rgba(91,159,101,0.35)',
-          color: selected ? '#ffffff' : 'rgba(255,255,255,0.4)',
-          transition: 'background-color 0.3s, color 0.3s',
-          fontFamily: "'Montserrat', sans-serif",
-        }}
-      >
-        {t.confirmer}
-      </motion.button>
+      {/* Action Buttons */}
+      <div style={{ display: 'flex', gap: '20px', marginTop: 'clamp(30px, 5vh, 60px)' }}>
+          <motion.button
+            onClick={handleConfirm}
+            whileHover={selected ? { scale: 1.05 } : {}}
+            whileTap={selected ? { scale: 0.95 } : {}}
+            style={{
+              padding: 'clamp(12px, 1.8vh, 20px) clamp(50px, 8vw, 100px)',
+              borderRadius: '999px',
+              fontWeight: 700,
+              fontSize: 'clamp(16px, min(2vw, 2.5vh), 24px)',
+              letterSpacing: '0.05em',
+              border: 'none',
+              cursor: selected ? 'pointer' : 'not-allowed',
+              backgroundColor: selected ? '#5B9F65' : 'rgba(91,159,101,0.35)',
+              color: selected ? '#ffffff' : 'rgba(255,255,255,0.4)',
+              transition: 'background-color 0.3s, color 0.3s',
+              fontFamily: "'Montserrat', sans-serif",
+            }}
+          >
+            {t.confirmer}
+          </motion.button>
+      </div>
 
       {/* Sign-In Modal */}
       <AnimatePresence>
@@ -442,33 +448,51 @@ export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={() => setIsSignInOpen(false)}
             style={{
               position: 'fixed',
               inset: 0,
               backgroundColor: 'rgba(0,0,0,0.8)',
-              backdropFilter: 'blur(10px)',
               zIndex: 10000,
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
+              gap: '24px',
             }}
           >
+            <motion.h2
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              style={{
+                fontFamily: "'Jersey 15', sans-serif",
+                fontSize: 'clamp(28px, 5vw, 42px)',
+                color: 'white',
+                margin: 0,
+                letterSpacing: '0.1em',
+              }}
+            >
+              Nouveau?
+            </motion.h2>
+
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
               style={{
-                backgroundColor: '#1a1a1a',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '16px',
-                padding: '32px',
+                backgroundColor: '#121212',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '24px',
+                padding: '32px 24px',
                 width: '90%',
-                maxWidth: '400px',
+                maxWidth: '360px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '24px',
-                position: 'relative'
+                position: 'relative',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
               }}
             >
               <button
@@ -479,72 +503,144 @@ export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) 
                   right: '16px',
                   background: 'none',
                   border: 'none',
-                  color: 'white',
+                  color: 'rgba(255,255,255,0.4)',
                   cursor: 'pointer',
-                  fontSize: '20px',
-                  fontWeight: 'bold'
+                  fontSize: '18px',
+                  fontWeight: 'bold',
                 }}
               >
                 ✕
               </button>
-              
-              <h2 style={{
-                fontFamily: "'Jersey 15', sans-serif",
-                fontSize: '32px',
-                color: '#FFD700',
-                margin: 0,
-                letterSpacing: '0.1em'
-              }}>CONNEXION</h2>
-              
-              <input
-                type="text"
-                autoFocus
-                placeholder="TON PSEUDO"
-                value={signInInput}
-                onChange={e => setSignInInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && signInInput.trim()) {
-                    onColor(signInInput.trim());
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: '16px',
-                  outline: 'none',
-                  textAlign: 'center'
-                }}
-              />
-              
-              <button
-                onClick={() => {
-                  if (signInInput.trim()) {
-                    onColor(signInInput.trim());
-                  }
-                }}
-                style={{
-                  background: '#5B9F65',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 32px',
-                  borderRadius: '24px',
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontWeight: 'bold',
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s',
-                  width: '100%'
-                }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-              >
-                ENTRER DANS LE FOROM
-              </button>
+
+              {!showConnexionForm ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', alignItems: 'center', marginTop: '10px' }}>
+                  <motion.button
+                    onClick={() => setShowConnexionForm(true)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '999px',
+                      backgroundColor: '#FFFFFF',
+                      color: '#6B21A8', // Purple
+                      border: 'none',
+                      fontFamily: "'Montserrat', sans-serif",
+                      fontWeight: 800,
+                      fontSize: '15px',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                    }}
+                  >
+                    Connexion
+                  </motion.button>
+                  <motion.button
+                    onClick={() => onColor('register')}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '999px',
+                      backgroundColor: '#FFFFFF',
+                      color: '#F97316', // Orange
+                      border: 'none',
+                      fontFamily: "'Montserrat', sans-serif",
+                      fontWeight: 800,
+                      fontSize: '15px',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                    }}
+                  >
+                    Créer un compte
+                  </motion.button>
+                </div>
+              ) : (
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (loginUsername.trim() && onLoginDirect) {
+                      onLoginDirect(loginUsername.trim());
+                    }
+                  }}
+                  style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
+                >
+                  <h3
+                    style={{
+                      fontFamily: "'Jersey 15', monospace",
+                      fontSize: '32px',
+                      fontWeight: 400,
+                      color: '#FFD700',
+                      margin: '0 0 24px 0',
+                      letterSpacing: '0.1em',
+                      textAlign: 'center'
+                    }}
+                  >
+                    CONNEXION
+                  </h3>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
+                    <input 
+                      type="text" 
+                      placeholder="TON PSEUDO / COURRIEL"
+                      value={loginUsername}
+                      onChange={(e) => setLoginUsername(e.target.value)}
+                      style={{
+                        padding: '14px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        backgroundColor: '#1E1E1E',
+                        color: 'white',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: '14px',
+                        outline: 'none',
+                        textAlign: 'center',
+                        textTransform: 'uppercase'
+                      }}
+                    />
+                    
+                    <input 
+                      type="password" 
+                      placeholder="MOT DE PASSE"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      style={{
+                        padding: '14px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        backgroundColor: '#1E1E1E',
+                        color: 'white',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: '14px',
+                        outline: 'none',
+                        textAlign: 'center',
+                        textTransform: 'uppercase'
+                      }}
+                    />
+
+                    <motion.button
+                      type="submit"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      style={{
+                        width: '100%',
+                        padding: '14px',
+                        borderRadius: '999px',
+                        backgroundColor: '#5B9F65',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        fontFamily: "'Montserrat', sans-serif",
+                        fontWeight: 800,
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        marginTop: '10px'
+                      }}
+                    >
+                      ENTRER DANS LE FOROM
+                    </motion.button>
+                  </div>
+                </form>
+              )}
             </motion.div>
           </motion.div>
         )}

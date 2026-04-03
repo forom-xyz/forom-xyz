@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '../stores/useAppStore'
+import { useModalStore } from '../stores/useModalStore'
+import { ParameterIcon } from './LobbyUserModal'
 import tutoIcon from '../assets/icons/TUTO.svg'
 import etsIcon from '../assets/icons/ets.jpg'
 import githubIcon from '../assets/icons/github.png'
 import chromaNotesIcon from '../assets/icons/chroma_portal.svg'
 import ghostWhtIcon from '../assets/icons/ghost_wht.svg'
-import ghostBlkIcon from '../assets/icons/ghost_blk.svg'
 import larucheIcon from '../assets/icons/laruche.svg'
 import { RomOnboarding } from './RomOnboarding'
 
@@ -165,6 +166,8 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
           onClick={() => {
             if (!currentUser) {
               onBackToLoading?.()
+            } else {
+              useModalStore.getState().openUser()
             }
           }}
           className="absolute flex items-center justify-center transition-transform"
@@ -177,11 +180,11 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
             background: 'none',
             border: 'none',
             padding: 0,
-            cursor: currentUser ? 'default' : 'pointer'
+            cursor: 'pointer'
           }}
-          title={currentUser ? "Logged In" : "Ghost"}
+          title={currentUser ? "Paramètres" : "Ghost"}
         >
-          <img src={currentUser ? ghostBlkIcon : ghostWhtIcon} alt="Ghost" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          {currentUser ? <ParameterIcon width="48" height="48" /> : <img src={ghostWhtIcon} alt="Ghost" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />}
         </button>
       )}
 

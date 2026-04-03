@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type AppPhase = 'loading' | 'mood' | 'lobby' | 'color-select' | 'creation-flow' | 'grid';
+export type AppPhase = 'loading' | 'mood' | 'lobby' | 'color-select' | 'creation-flow' | 'grid' | 'profile-setup';
 export type AppLanguage = 'fr' | 'en' | 'es';
 
 /**
