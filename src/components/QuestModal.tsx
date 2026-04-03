@@ -217,7 +217,7 @@ export function QuestModal({
   // Auto-switch to quest log and highlight the accepted quest
   useEffect(() => {
     if (acceptedQuestId) {
-      setBoardSelectedId(acceptedQuestId) // eslint-disable-line react-hooks/set-state-in-effect
+      setBoardSelectedId(acceptedQuestId)
       setActiveTab('community')
     }
   }, [acceptedQuestId])

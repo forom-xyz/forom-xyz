@@ -119,7 +119,7 @@ export function HeartFAB({ fixed = true }: HeartFABProps) {
   useEffect(() => {
     lastTickRef.current = Date.now()
     const { count, lastTs } = loadStorage()
-    setHeartCount(count) // eslint-disable-line react-hooks/set-state-in-effect
+    setHeartCount(count)
 
     // Resume partial progress from previous session
     if (lastTs > 0) {
