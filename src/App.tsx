@@ -252,7 +252,7 @@ function App() {
     return (
       <AccountCreationFlow
         username={usernameFromOIDC}
-        onSubmit={(username, _color, _town) => {
+        onSubmit={(username) => {
           // Here you could send the color and town back to your backend
           setCurrentUser(username);
           setPhase('lobby');
