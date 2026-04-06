@@ -323,7 +323,7 @@ export function CarouselGrid({
       const cat = categories[c] as CategoryType
       for (let i = 0; i < ITEMS_PER_ROW; i++) {
         const mem = getProcessedMemory(cat, i)
-        
+
         // Match if it has the right question
         if (mem && mem.question === questionStr) {
           // Calculate a simple distance metric (row distance heavily weighted to prefer current row, plus horizontal distance)
@@ -346,7 +346,7 @@ export function CarouselGrid({
       if (closestRow !== activeIndex) {
         onCategoryChange(categories[closestRow])
       }
-      
+
       // 2. Slide horizontally
       if (closestCol !== horizontalIndex) {
         setSlideDirection(closestCol > horizontalIndex ? 'right' : 'left')
@@ -403,7 +403,7 @@ export function CarouselGrid({
             if (memory) {
               const catColor = CATEGORY_COLORS[memory.category] || '#ffffff';
               const tagColor = memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888';
-              
+
               const isMemoryDone = memory.isFilled && memory.videoUrl && memory.description && memory.description.trim().length > 0 && Array.isArray(memory.sources) && memory.sources.length > 0;
 
               const matchedQuest = personalQuests.find(q => q.category === memory?.category && q.question === memory?.question);
@@ -475,14 +475,14 @@ export function CarouselGrid({
         <div className="flex flex-col items-center justify-center flex-1 w-full" style={{ gap: '0.6vw', minHeight: 0 }}>
           {categories.map((category, row) => (
             <div key={category} className="flex items-center justify-center relative" style={{ gap: '0.6vw' }}>
-              
+
               {/* Subtle Row Label (Category) positioned on the right */}
-              <div 
-                className="absolute left-full text-gray-400 font-bold uppercase flex items-center h-full whitespace-nowrap pointer-events-none" 
-                style={{ 
-                  fontFamily: "'Jersey 15', sans-serif", 
-                  fontSize: 'clamp(12px, 1.5vw, 20px)', 
-                  letterSpacing: '0.05em', 
+              <div
+                className="absolute left-full text-gray-400 font-bold uppercase flex items-center h-full whitespace-nowrap pointer-events-none"
+                style={{
+                  fontFamily: "'Jersey 15', sans-serif",
+                  fontSize: 'clamp(12px, 1.5vw, 20px)',
+                  letterSpacing: '0.05em',
                   opacity: 0.5,
                   marginLeft: '8%' // ~15% spacing as requested
                 }}
@@ -495,7 +495,7 @@ export function CarouselGrid({
                 let memory = getProcessedMemory(category as CategoryType, col)
                 const itemBorderColor = memory ? mixColors(CATEGORY_COLORS[memory.category] || '#ffffff', memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888') : '#e5e7eb';
                 let customBgColor: string | undefined = undefined;
-                
+
                 if (memory) {
                   const catColor = CATEGORY_COLORS[memory.category] || '#ffffff';
                   const tagColor = memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888';
@@ -554,39 +554,39 @@ export function CarouselGrid({
           ))}
         </div>
 
-      <div
-        className="flex w-full items-center justify-center pointer-events-none"
-        style={{ gap: '0.6vw', marginTop: '0.5vh' }}
-      >
-        {QUESTION_ORDER.map((q) => (
-          <div key={q} className="flex justify-center items-center relative shrink-0">
-            {/* 1) GHOST MEMORY BOX FOR FLAWLESS GEOMETRY MATCHING */}
-            <div style={{ opacity: 0, pointerEvents: 'none' }}>
-              <MemoryBox
-                memory={null}
-                borderColor="transparent"
-                displayNumber={0}
-                isCentered={false}
-                isSmall={true}
-                isExtraSmall={false}
-              />
+        <div
+          className="flex w-full items-center justify-center pointer-events-none"
+          style={{ gap: '0.6vw', marginTop: '0.5vh' }}
+        >
+          {QUESTION_ORDER.map((q) => (
+            <div key={q} className="flex justify-center items-center relative shrink-0">
+              {/* 1) GHOST MEMORY BOX FOR FLAWLESS GEOMETRY MATCHING */}
+              <div style={{ opacity: 0, pointerEvents: 'none' }}>
+                <MemoryBox
+                  memory={null}
+                  borderColor="transparent"
+                  displayNumber={0}
+                  isCentered={false}
+                  isSmall={true}
+                  isExtraSmall={false}
+                />
+              </div>
+
+              {/* 2) ABSOLUTE TEXT CENTERED OVER THE GHOST BOX */}
+              <div
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400 font-bold uppercase text-center whitespace-nowrap"
+                style={{
+                  fontFamily: "'Jersey 15', sans-serif",
+                  fontSize: 'clamp(10px, 1.2vw, 16px)',
+                  letterSpacing: '0.05em',
+                  opacity: 0.5,
+                }}
+              >
+                {questionLabels[q] || q}
+              </div>
             </div>
-            
-            {/* 2) ABSOLUTE TEXT CENTERED OVER THE GHOST BOX */}
-            <div
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400 font-bold uppercase text-center whitespace-nowrap"
-              style={{
-                fontFamily: "'Jersey 15', sans-serif",
-                fontSize: 'clamp(10px, 1.2vw, 16px)',
-                letterSpacing: '0.05em',
-                opacity: 0.5,
-              }}
-            >
-              {questionLabels[q] || q}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
       </div>
     )
@@ -597,7 +597,7 @@ export function CarouselGrid({
       className="absolute flex flex-col items-center justify-center z-10 pointer-events-none"
       style={{ top: 0, bottom: 0, left: 0, right: 0, paddingBottom: '30px' }}
     >
-      
+
       {/* Top Question Filters removed - replaced by bottom custom Wheel */}
 
       {/* Main Content - Grid centered, Vertical Navigation positioned separately */}

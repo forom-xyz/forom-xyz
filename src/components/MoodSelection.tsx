@@ -113,7 +113,7 @@ export function MoodSelection({ onGhost, onColor, onBack, onLoginDirect }: MoodS
   const [selected, setSelected] = useState<'couleur' | 'fantome' | null>(null)
   const [isSignInOpen, setIsSignInOpen] = useState(false)
   const [showConnexionForm, setShowConnexionForm] = useState(false)
-  
+
   const [loginUsername, setLoginUsername] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
 
@@ -419,26 +419,26 @@ export function MoodSelection({ onGhost, onColor, onBack, onLoginDirect }: MoodS
 
       {/* Action Buttons */}
       <div style={{ display: 'flex', gap: '20px', marginTop: 'clamp(30px, 5vh, 60px)' }}>
-          <motion.button
-            onClick={handleConfirm}
-            whileHover={selected ? { scale: 1.05 } : {}}
-            whileTap={selected ? { scale: 0.95 } : {}}
-            style={{
-              padding: 'clamp(12px, 1.8vh, 20px) clamp(50px, 8vw, 100px)',
-              borderRadius: '999px',
-              fontWeight: 700,
-              fontSize: 'clamp(16px, min(2vw, 2.5vh), 24px)',
-              letterSpacing: '0.05em',
-              border: 'none',
-              cursor: selected ? 'pointer' : 'not-allowed',
-              backgroundColor: selected ? '#5B9F65' : 'rgba(91,159,101,0.35)',
-              color: selected ? '#ffffff' : 'rgba(255,255,255,0.4)',
-              transition: 'background-color 0.3s, color 0.3s',
-              fontFamily: "'Montserrat', sans-serif",
-            }}
-          >
-            {t.confirmer}
-          </motion.button>
+        <motion.button
+          onClick={handleConfirm}
+          whileHover={selected ? { scale: 1.05 } : {}}
+          whileTap={selected ? { scale: 0.95 } : {}}
+          style={{
+            padding: 'clamp(12px, 1.8vh, 20px) clamp(50px, 8vw, 100px)',
+            borderRadius: '999px',
+            fontWeight: 700,
+            fontSize: 'clamp(16px, min(2vw, 2.5vh), 24px)',
+            letterSpacing: '0.05em',
+            border: 'none',
+            cursor: selected ? 'pointer' : 'not-allowed',
+            backgroundColor: selected ? '#5B9F65' : 'rgba(91,159,101,0.35)',
+            color: selected ? '#ffffff' : 'rgba(255,255,255,0.4)',
+            transition: 'background-color 0.3s, color 0.3s',
+            fontFamily: "'Montserrat', sans-serif",
+          }}
+        >
+          {t.confirmer}
+        </motion.button>
       </div>
 
       {/* Sign-In Modal */}
@@ -512,135 +512,89 @@ export function MoodSelection({ onGhost, onColor, onBack, onLoginDirect }: MoodS
                 ✕
               </button>
 
-              {!showConnexionForm ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', alignItems: 'center', marginTop: '10px' }}>
-                  <motion.button
-                    onClick={() => setShowConnexionForm(true)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{
-                      width: '100%',
-                      padding: '14px',
-                      borderRadius: '999px',
-                      backgroundColor: '#FFFFFF',
-                      color: '#6B21A8', // Purple
-                      border: 'none',
-                      fontFamily: "'Montserrat', sans-serif",
-                      fontWeight: 800,
-                      fontSize: '15px',
-                      cursor: 'pointer',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                    }}
-                  >
-                    Connexion
-                  </motion.button>
-                  <motion.button
-                    onClick={() => onColor('register')}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{
-                      width: '100%',
-                      padding: '14px',
-                      borderRadius: '999px',
-                      backgroundColor: '#FFFFFF',
-                      color: '#F97316', // Orange
-                      border: 'none',
-                      fontFamily: "'Montserrat', sans-serif",
-                      fontWeight: 800,
-                      fontSize: '15px',
-                      cursor: 'pointer',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                    }}
-                  >
-                    Créer un compte
-                  </motion.button>
-                </div>
-              ) : (
-                <form 
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (loginUsername.trim() && onLoginDirect) {
-                      onLoginDirect(loginUsername.trim());
-                    }
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', alignItems: 'center', marginTop: '10px' }}>
+
+                {/* Standard Login */}
+                <motion.button
+                  onClick={() => onColor('login')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    borderRadius: '999px',
+                    backgroundColor: '#FFFFFF',
+                    color: '#6B21A8', // Purple
+                    border: 'none',
+                    fontFamily: "'Montserrat', sans-serif",
+                    fontWeight: 800,
+                    fontSize: '15px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
                   }}
-                  style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
                 >
-                  <h3
-                    style={{
-                      fontFamily: "'Jersey 15', monospace",
-                      fontSize: '32px',
-                      fontWeight: 400,
-                      color: '#FFD700',
-                      margin: '0 0 24px 0',
-                      letterSpacing: '0.1em',
-                      textAlign: 'center'
-                    }}
-                  >
-                    CONNEXION
-                  </h3>
+                  Connexion
+                </motion.button>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
-                    <input 
-                      type="text" 
-                      placeholder="TON PSEUDO / COURRIEL"
-                      value={loginUsername}
-                      onChange={(e) => setLoginUsername(e.target.value)}
-                      style={{
-                        padding: '14px',
-                        borderRadius: '8px',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        backgroundColor: '#1E1E1E',
-                        color: 'white',
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: '14px',
-                        outline: 'none',
-                        textAlign: 'center',
-                        textTransform: 'uppercase'
-                      }}
-                    />
-                    
-                    <input 
-                      type="password" 
-                      placeholder="MOT DE PASSE"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      style={{
-                        padding: '14px',
-                        borderRadius: '8px',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        backgroundColor: '#1E1E1E',
-                        color: 'white',
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: '14px',
-                        outline: 'none',
-                        textAlign: 'center',
-                        textTransform: 'uppercase'
-                      }}
-                    />
+                {/* Create Account - Pointing to Enrollment Flow */}
+                <motion.button
+                  onClick={() => onColor('register')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    borderRadius: '999px',
+                    backgroundColor: '#FFFFFF',
+                    color: '#F97316', // Orange
+                    border: 'none',
+                    fontFamily: "'Montserrat', sans-serif",
+                    fontWeight: 800,
+                    fontSize: '15px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  Créer un compte
+                </motion.button>
 
-                    <motion.button
-                      type="submit"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{
-                        width: '100%',
-                        padding: '14px',
-                        borderRadius: '999px',
-                        backgroundColor: '#5B9F65',
-                        color: '#FFFFFF',
-                        border: 'none',
-                        fontFamily: "'Montserrat', sans-serif",
-                        fontWeight: 800,
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        marginTop: '10px'
-                      }}
-                    >
-                      ENTRER DANS LE FOROM
-                    </motion.button>
-                  </div>
-                </form>
-              )}
+                {/* Divider */}
+                <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', margin: '8px 0' }}>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontFamily: "'Montserrat', sans-serif" }}>OU</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                </div>
+
+                {/* Discord Fast Connect */}
+                <motion.button
+                  onClick={() => window.location.href = "https://auth.forom.xyz/source/oauth/login/discord/?next=%2Fapplication%2Fo%2Fauthorize%2F%3Fclient_id%3Dforom-web-app%26response_type%3Dcode%26redirect_uri%3Dhttps%3A%2F%2Fforom.xyz%2Fcallback%26scope%3Dopenid+profile+email+forom_data"}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    borderRadius: '999px',
+                    backgroundColor: '#5865F2', // Discord Blurple
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontFamily: "'Montserrat', sans-serif",
+                    fontWeight: 800,
+                    fontSize: '15px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 127.14 96.36" fill="currentColor">
+                    <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z" />
+                  </svg>
+                  Continuer avec Discord
+                </motion.button>
+              </div>
+
             </motion.div>
           </motion.div>
         )}
