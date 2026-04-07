@@ -229,10 +229,6 @@ function App() {
             window.location.href = authUrl;
           }
         }}
-        onLoginDirect={(username) => {
-          setCurrentUser(username);
-          setPhase('lobby');
-        }}
       />
     );
   }
@@ -270,12 +266,6 @@ function App() {
             setPhase('grid')
           }}
           onBackToLoading={() => setIsLoading(true)}
-          onJoinEts={() => {
-            setIsPhantomMode(false)
-            setPhase('grid')
-            setMission('Club étudiants ÉTS')
-            setForomColor('guardien')
-          }}
           onSignIn={(username) => {
             setCurrentUser(username)
             setIsPhantomMode(false)

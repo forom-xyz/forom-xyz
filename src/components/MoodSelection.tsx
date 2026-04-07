@@ -102,20 +102,15 @@ interface MoodSelectionProps {
   onGhost: () => void
   onColor: (action: 'login' | 'register') => void
   onBack?: () => void
-  onLoginDirect?: (username: string) => void
 }
 
 
 
-export function MoodSelection({ onGhost, onColor, onBack, onLoginDirect }: MoodSelectionProps) {
+export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) {
   const { language } = useAppStore()
   const t = TRANSLATIONS[language] || TRANSLATIONS.en
   const [selected, setSelected] = useState<'couleur' | 'fantome' | null>(null)
   const [isSignInOpen, setIsSignInOpen] = useState(false)
-  const [showConnexionForm, setShowConnexionForm] = useState(false)
-
-  const [loginUsername, setLoginUsername] = useState('')
-  const [loginPassword, setLoginPassword] = useState('')
 
   const [colorInfoOpen, setColorInfoOpen] = useState(false)
   const [ghostInfoOpen, setGhostInfoOpen] = useState(false)
@@ -136,9 +131,6 @@ export function MoodSelection({ onGhost, onColor, onBack, onLoginDirect }: MoodS
   const handleConfirm = () => {
     if (selected === 'couleur') {
       setIsSignInOpen(true);
-      setShowConnexionForm(false);
-      setLoginUsername('');
-      setLoginPassword('');
     } else if (selected === 'fantome') {
       onGhost();
     }
@@ -241,7 +233,7 @@ export function MoodSelection({ onGhost, onColor, onBack, onLoginDirect }: MoodS
                 </h3>
                 <p
                   style={{
-                    fontFamily: "'JetBrains Mono', monospace",
+                    fontFamily: "'BitcountGridSingle-Light', monospace",
                     fontSize: 'clamp(10px, min(1.1vw, 1.4vh), 14px)',
                     color: '#FFD700',
                     lineHeight: 1.6,
@@ -400,7 +392,7 @@ export function MoodSelection({ onGhost, onColor, onBack, onLoginDirect }: MoodS
                 </h3>
                 <p
                   style={{
-                    fontFamily: "'JetBrains Mono', monospace",
+                    fontFamily: "'BitcountGridSingle-Light', monospace",
                     fontSize: 'clamp(10px, min(1.1vw, 1.4vh), 14px)',
                     color: '#FFD700',
                     lineHeight: 1.6,

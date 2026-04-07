@@ -42,10 +42,10 @@ const DelayedTypewriterText = ({ text, delayMs = 200 }: { text: string, delayMs?
 
 // Redundant LanguageCarousel block migrated to LoadingScreen.tsx
 
-export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToLoading, onJoinEts }: { onConfirm: () => void; onSkip?: () => void; onSignIn?: (username: string) => void; currentUser?: string | null; onBackToLoading?: () => void; onJoinEts?: () => void }) {
+export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToLoading }: { onConfirm: () => void; onSkip?: () => void; onSignIn?: (username: string) => void; currentUser?: string | null; onBackToLoading?: () => void }) {
   const [isPlayOpen, setIsPlayOpen] = useState(false)
   const [isDeployOpen, setIsDeployOpen] = useState(false)
-  const [isCreateSelected, setIsCreateSelected] = useState(false)
+  const isCreateSelected = false
   const [isSignInOpen, setIsSignInOpen] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -58,7 +58,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
 
   const [romPhase, setRomPhase] = useState<string | number>('idle')
   const ghostPanelWidth = 'min(30vw, 440px)'
-  const useGhostLayoutForColorMood = true
+
 
   const { language: activeLang } = useAppStore()
   const TRANSLATIONS: Record<string, Record<string, string>> = {
@@ -68,21 +68,11 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
   }
   const t = TRANSLATIONS[activeLang] || TRANSLATIONS.en
 
-  const handleSignIn = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (['xylo', 'zylo', 'bylo', 'dylo', 'ets'].includes(username) && password === 'colors') {
-      onSignIn?.(username)
-      setIsSignInOpen(false)
-    } else {
-      alert('Invalid credentials')
-    }
-  }
-
   const getRomTranslation = (p: string | number) => {
     switch (p) {
       case 0: return ""
       case 1:
-        if (activeLang === 'fr') return "Voici ROM. S'il n'est pas intelligent au départ, il grandira grâce à vous et votre communauté. Sa force ? Il fonctionne en local, comme un serveur Minecraft. Vous restez ainsi propriétaires de votre savoir collectif, libres de le conserver ou de le vendre."
+        if (activeLang === 'fr') return "Voici ROM. S'il n'est pas intelligent au départ, il grandira grâce à vous et votre communauté. Sa force ?\n\nIl fonctionne en local, comme un serveur Minecraft. Vous restez ainsi propriétaires de votre savoir collectif, libres de le conserver ou de le vendre."
         if (activeLang === 'es') return "Te presento a ROM. Aunque no es inteligente por defecto, cobrará vida gracias a tu comunidad. Su gran ventaja es que funciona de forma local, como un servidor de Minecraft. Así, ustedes son los únicos dueños de su conocimiento colectivo, con total libertad para conservarlo o venderlo."
         return "Meet ROM. He isn’t smart on his own, but he evolves with your community’s help. Like a Minecraft server, ROM runs locally, ensuring you own your collective knowledge. It's yours to keep or monetize as you see fit."
       case 2:
@@ -108,6 +98,18 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
       default: return ""
     }
   }
+
+  const handleSignIn = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (['xylo', 'zylo', 'bylo', 'dylo', 'ets'].includes(username) && password === 'colors') {
+      onSignIn?.(username)
+      setIsSignInOpen(false)
+    } else {
+      alert('Invalid credentials')
+    }
+  }
+
+
 
   return (
     <motion.div
@@ -377,9 +379,8 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-        {(!currentUser || useGhostLayoutForColorMood) ? (
-          <>
-            {/* GHOST VIEW LEFT */}
+        <>
+          {/* GHOST VIEW LEFT */}
             <div style={{ flex: '0 0 clamp(180px, 20vw, 300px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: romPhase === "public_tour" ? 45 : 1, minHeight: 'clamp(520px, 74vh, 860px)' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: ghostPanelWidth, alignSelf: 'flex-end' }}>
                 <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>JOUER</div>
@@ -451,10 +452,26 @@ Le moteur de ce savoir, ce sont les Pixels (PX). Pour remplir leur mission, les 
               </div>
             </div>
 
-            {/* GHOST VIEW CENTER */}
+            {/* VIEW CENTER */}
             <div style={{ flex: '0 1 clamp(380px, 42vw, 660px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ width: '100%', position: 'relative', zIndex: 45, display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-                <RomOnboarding currentUser={currentUser || null} isCreateSelected={false} onPhaseChange={setRomPhase} />
+              <div style={{ width: '100%', position: 'relative', zIndex: 45, display: 'flex', justifyContent: 'center', height: '280px', marginBottom: '20px' }}>
+                
+                {/* ROM Container - Positioned absolutely left of center */}
+                <div style={{ position: 'absolute', bottom: '0', right: 'calc(50% + 20px)', width: '320px', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+                  <RomOnboarding currentUser={currentUser || null} isCreateSelected={false} onPhaseChange={setRomPhase} />
+                </div>
+                
+                {/* Traduction Container - Positioned absolutely right of center */}
+                <div style={{ position: 'absolute', top: '10px', left: 'calc(50% + 20px)', width: 'clamp(280px, 20vw, 400px)', display: 'flex', flexDirection: 'column', opacity: (romPhase === 'idle' || romPhase === 0) ? 0 : 0.8, transition: 'opacity 0.4s', pointerEvents: 'none' }}>
+                  <div style={{ color: '#ffffff', fontWeight: 900, fontSize: 'clamp(14px, 1.5vw, 18px)', fontFamily: "'Jersey 15', sans-serif", letterSpacing: '0.1em', marginBottom: '16px', textTransform: 'uppercase', textAlign: 'left' }}>
+                    TRADUCTION
+                  </div>
+                  <span style={{ color: '#FFD700', fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, 1vw, 13px)', textAlign: 'left', lineHeight: 1.6, whiteSpace: 'pre-wrap', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+                    {romPhase !== 0 && romPhase !== 'idle' && (
+                      <DelayedTypewriterText key={`${activeLang}-${romPhase}`} text={getRomTranslation(romPhase)} delayMs={200} />
+                    )}
+                  </span>
+                </div>
               </div>
               
               <div style={{ color: '#FFD700', fontWeight: 900, fontSize: 'clamp(14px, 1.8vw, 28px)', letterSpacing: '0.3em', marginBottom: 'clamp(16px, 2vh, 32px)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>DÉCOUVRIR</div>
@@ -462,44 +479,43 @@ Le moteur de ce savoir, ce sont les Pixels (PX). Pour remplir leur mission, les 
               <div style={{
                 backgroundColor: '#1A1A1A',
                 borderRadius: 'clamp(12px, 1.5vw, 24px)',
-                padding: 'clamp(10px, 1.8vw, 28px)',
-                width: '100%',
+                padding: 'clamp(16px, 1.8vw, 32px)',
+                width: 'min(100%, 360px)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'clamp(6px, 1vh, 14px)',
+                gap: 'clamp(12px, 1.5vh, 20px)',
                 boxSizing: 'border-box',
-                zIndex: romPhase === 'public_tour' ? 45 : 1
+                zIndex: romPhase === 'public_tour' ? 45 : 1,
+                alignItems: 'center'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.public}</span>
-                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                <div style={{ color: '#2563EB', fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(14px, 1.8vw, 28px)', letterSpacing: '0.3em', textTransform: 'uppercase', textAlign: 'center' }}>
+                  {t.public}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
-                  <div onClick={() => onSkip?.()} title="Tuto" style={{ backgroundColor: '#000000', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.25)', transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden' }} onMouseEnter={e => { e.currentTarget.style.borderColor = '#FFD700'; e.currentTarget.style.transform = 'scale(1.06)' }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }}>
-                    <img src={tutoIcon} alt="Tuto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(8px, 1.2vw, 16px)', width: '100%' }}>
+                  <svg style={{ cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.2s', width: 'clamp(16px, 2vw, 24px)', height: 'clamp(16px, 2vw, 24px)' }} onMouseEnter={e => e.currentTarget.style.opacity = '1'} onMouseLeave={e => e.currentTarget.style.opacity = '0.8'} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  <div style={{ backgroundColor: '#D9D9D9', borderRadius: '8px', width: 'clamp(38px, 4.5vw, 56px)', height: 'clamp(38px, 4.5vw, 56px)', flexShrink: 0 }} />
+                  <div onClick={() => onSkip?.()} title="Tuto" style={{ backgroundColor: '#ffffff', borderRadius: '8px', width: 'clamp(50px, 6vw, 76px)', height: 'clamp(50px, 6vw, 76px)', flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '2px solid transparent', transition: 'transform 0.15s, border-color 0.15s' }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.borderColor = '#2563EB' }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.borderColor = 'transparent' }}>
+                    <img src={tutoIcon} alt="Tuto" style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
                   </div>
-                  {Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i + 1} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
-                    </div>
-                  ))}
+                  <div style={{ backgroundColor: '#D9D9D9', borderRadius: '8px', width: 'clamp(38px, 4.5vw, 56px)', height: 'clamp(38px, 4.5vw, 56px)', flexShrink: 0 }} />
+                  <svg style={{ cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.2s', width: 'clamp(16px, 2vw, 24px)', height: 'clamp(16px, 2vw, 24px)' }} onMouseEnter={e => e.currentTarget.style.opacity = '1'} onMouseLeave={e => e.currentTarget.style.opacity = '0.8'} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
-                <div style={{ margin: 'clamp(2px, 0.5vh, 8px) 0' }}>
-                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.18)' }} />
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.prive}</span>
-                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
-                  <div style={{ backgroundColor: '#E3022C', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.5, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                     <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
+
+                <div style={{ width: '70%', height: '1px', backgroundColor: 'rgba(255,255,255,0.7)', margin: '4px auto' }} />
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(8px, 1.2vw, 16px)', width: '100%' }}>
+                  <svg style={{ cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.2s', width: 'clamp(16px, 2vw, 24px)', height: 'clamp(16px, 2vw, 24px)' }} onMouseEnter={e => e.currentTarget.style.opacity = '1'} onMouseLeave={e => e.currentTarget.style.opacity = '0.8'} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  <div style={{ backgroundColor: '#D9D9D9', borderRadius: '8px', width: 'clamp(38px, 4.5vw, 56px)', height: 'clamp(38px, 4.5vw, 56px)', flexShrink: 0 }} />
+                  <div onClick={() => window.open('https://forom.etsmtl.ca', '_blank')} title="ÉTS" style={{ backgroundColor: '#E3022C', borderRadius: '8px', width: 'clamp(50px, 6vw, 76px)', height: 'clamp(50px, 6vw, 76px)', flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '2px solid transparent', transition: 'transform 0.15s, border-color 0.15s' }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.borderColor = '#ffffff' }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.borderColor = 'transparent' }}>
+                    <img src={etsIcon} alt="ÉTS" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
-                  {Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
-                    </div>
-                  ))}
+                  <div style={{ backgroundColor: '#D9D9D9', borderRadius: '8px', width: 'clamp(38px, 4.5vw, 56px)', height: 'clamp(38px, 4.5vw, 56px)', flexShrink: 0 }} />
+                  <svg style={{ cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.2s', width: 'clamp(16px, 2vw, 24px)', height: 'clamp(16px, 2vw, 24px)' }} onMouseEnter={e => e.currentTarget.style.opacity = '1'} onMouseLeave={e => e.currentTarget.style.opacity = '0.8'} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+
+                <div style={{ color: '#E85C5C', fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(14px, 1.8vw, 28px)', letterSpacing: '0.3em', textTransform: 'uppercase', textAlign: 'center' }}>
+                  {t.prive}
                 </div>
               </div>
             </div>
@@ -574,75 +590,6 @@ Invite tes amis à rejoindre les rangs des Membres ou des Modérateurs. Ensemble
               </div>
             </div>
           </>
-        ) : (
-          <>
-            {/* LOGGED IN VIEW LEFT: REJOINDRE */}
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: romPhase === 'public_tour' ? 45 : 1 }}>
-              <div style={{ color: '#E85C5C', fontWeight: 900, fontSize: 'clamp(13px, 1.6vw, 26px)', letterSpacing: '0.25em', marginBottom: 'clamp(10px, 2vh, 24px)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{t.rejoindre}</div>
-              <div style={{ backgroundColor: '#1A1A1A', borderRadius: 'clamp(12px, 1.5vw, 24px)', padding: 'clamp(10px, 1.8vw, 28px)', width: '100%', display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vh, 14px)', boxSizing: 'border-box' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.public}</span>
-                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
-                  <div onClick={() => onSkip?.()} title="Tuto" style={{ backgroundColor: '#000000', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.25)', transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden' }} onMouseEnter={e => { e.currentTarget.style.borderColor = '#FFD700'; e.currentTarget.style.transform = 'scale(1.06)' }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }}>
-                    <img src={tutoIcon} alt="Tuto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                  {Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i + 1} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ margin: 'clamp(2px, 0.5vh, 8px) 0' }}>
-                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.18)' }} />
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: 'clamp(8px, 0.8vw, 11px)', fontWeight: 700, fontFamily: 'Montserrat, sans-serif', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap' }}>{t.prive}</span>
-                  <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'clamp(5px, 0.8vw, 12px)' }}>
-                  <div onClick={() => { if (currentUser === 'xylo' || currentUser === 'ets') onJoinEts?.() }} title="Club étudiants ÉTS" style={{ backgroundColor: '#E3022C', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', cursor: (currentUser === 'xylo' || currentUser === 'ets') ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.25)', transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden', position: 'relative', opacity: (currentUser === 'xylo' || currentUser === 'ets') ? 1 : 0.5 }} onMouseEnter={(currentUser === 'xylo' || currentUser === 'ets') ? (e => { e.currentTarget.style.borderColor = '#ffffff'; e.currentTarget.style.transform = 'scale(1.06)' }) : undefined} onMouseLeave={(currentUser === 'xylo' || currentUser === 'ets') ? (e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'scale(1)' }) : undefined}>
-                    {(currentUser === 'xylo' || currentUser === 'ets') ? (
-                      <img src={etsIcon} alt="ÉTS" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
-                    )}
-                  </div>
-                  {Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i} style={{ backgroundColor: '#3A3A3A', borderRadius: 'clamp(6px, 0.7vw, 12px)', aspectRatio: '1 / 1', opacity: 0.7, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: 'clamp(10px, 1.1vw, 18px)', opacity: 0.5, userSelect: 'none' }}>🔒</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <a href="https://github.com/Forom-ets/forom" target="_blank" rel="noopener noreferrer" style={{ marginTop: '10%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <img src={githubIcon} alt="GitHub" style={{ width: 'clamp(28px, 3.5vw, 52px)', height: 'clamp(28px, 3.5vw, 52px)', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.8, transition: 'opacity 0.2s' }} onMouseEnter={e => (e.currentTarget.style.opacity = '1')} onMouseLeave={e => (e.currentTarget.style.opacity = '0.8')} />
-              </a>
-            </div>
-
-            {/* LOGGED IN VIEW CENTER */}
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ width: '100%', position: 'relative', zIndex: 45, display: 'flex', justifyContent: 'center' }}>
-                <RomOnboarding currentUser={currentUser || null} isCreateSelected={isCreateSelected} onPhaseChange={setRomPhase} />
-              </div>
-              <div style={{ position: 'relative', zIndex: 45, marginTop: '24px', minHeight: '60px', display: 'flex', justifyContent: 'center', width: '100%', padding: '0 20px', boxSizing: 'border-box', pointerEvents: 'none' }}>
-                <span style={{ color: '#FFD700', fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(12px, 1.2vw, 16px)', textAlign: 'center', lineHeight: 1.6, opacity: (romPhase === 'idle' || romPhase === 0) ? 0 : 0.8, transition: 'opacity 0.4s', whiteSpace: 'pre-wrap', maxWidth: '500px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-                  <DelayedTypewriterText key={`${activeLang}-${romPhase}`} text={getRomTranslation(romPhase)} delayMs={200} />
-                </span>
-              </div>
-            </div>
-
-            {/* LOGGED IN VIEW RIGHT: CRÉER */}
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ color: '#2563EB', fontWeight: 900, fontSize: 'clamp(13px, 1.6vw, 26px)', letterSpacing: '0.25em', marginBottom: 'clamp(10px, 2vh, 24px)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{t.creer}</div>
-              <div onClick={() => setIsCreateSelected(true)} style={{ backgroundColor: isCreateSelected ? '#0d2b5e' : '#1A1A1A', borderRadius: 'clamp(12px, 1.5vw, 24px)', width: '100%', aspectRatio: '1 / 1', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: `3px solid ${isCreateSelected ? '#2563EB' : 'transparent'}`, boxSizing: 'border-box', transition: 'border-color 0.25s, background-color 0.25s' }}>
-                <span style={{ color: 'white', fontSize: 'clamp(28px, 4vw, 64px)', fontWeight: 300, lineHeight: 1 }}>+</span>
-              </div>
-            </div>
-          </>
-        )}
       </div>
 
       {/* FOOTER AREA (Connect key and Confirmer) */}

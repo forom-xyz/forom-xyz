@@ -363,7 +363,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                     <h3 style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(12px, min(1.5vw, 2vh), 22px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'left', margin: 0, marginBottom: '8px', color: '#FFD700' }}>
                       <TypewriterText text={t.topLeftTitle + ' ▲'} />
                     </h3>
-                    <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                    <p style={{ fontFamily: "'BitcountGridSingle-Light', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
                       <TypewriterText text={t.topLeftText} />
                     </p>
                   </motion.div>
@@ -386,7 +386,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                     transition={{ duration: 0.4, delay: 0.2 }}
                     style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}
                   >
-                    <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                    <p style={{ fontFamily: "'BitcountGridSingle-Light', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
                       <TypewriterText text={t.bottomLeftText} startDelay={2000} />
                     </p>
                     <h3 style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(12px, min(1.5vw, 2vh), 22px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'center', margin: 0, marginTop: '8px', color: '#FFD700' }}>
@@ -412,7 +412,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                     <h3 style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(12px, min(1.5vw, 2vh), 22px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'right', margin: 0, marginBottom: '8px', color: '#FFD700' }}>
                       <TypewriterText text={t.topRightTitle + ' ▲'} />
                     </h3>
-                    <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                    <p style={{ fontFamily: "'BitcountGridSingle-Light', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
                       <TypewriterText text={t.topRightText} />
                     </p>
                   </motion.div>
@@ -435,7 +435,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                     transition={{ duration: 0.4, delay: 0.2 }}
                     style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}
                   >
-                    <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
+                    <p style={{ fontFamily: "'BitcountGridSingle-Light', monospace", fontSize: 'clamp(10px, min(1.2vw, 1.6vh), 16px)', color: '#FFD700', lineHeight: 1.5, opacity: 0.9, textAlign: 'justify', margin: 0 }}>
                       <TypewriterText text={t.bottomRightText} startDelay={2000} />
                     </p>
                     <h3 style={{ fontFamily: "'Jersey 15', sans-serif", fontSize: 'clamp(12px, min(1.5vw, 2vh), 22px)', fontWeight: 400, letterSpacing: '0.05em', textAlign: 'center', margin: 0, marginTop: '8px', color: '#FFD700' }}>

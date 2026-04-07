@@ -28,6 +28,24 @@
   font-display: swap;
 }
 
+/* Custom Font: Bytesize */
+@font-face {
+  font-family: 'Bytesize';
+  src: url('./assets/fonts/Bytesized-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Custom Font: BitcountGridSingle Light */
+@font-face {
+  font-family: 'BitcountGridSingle-Light';
+  src: url('./assets/fonts/BitcountGridSingle-Light.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Tailwind CSS */
 @tailwind base;
 @tailwind components;
