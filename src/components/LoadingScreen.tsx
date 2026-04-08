@@ -3,9 +3,7 @@ import { useAppStore, type AppLanguage } from '../stores/useAppStore'
 import { motion, AnimatePresence } from 'framer-motion'
 import foromLogoBlk from '../assets/icons/forom_logo_blk.png'
 import foromLogoWht from '../assets/icons/forom_logo_wht.png'
-import macLauncherIcon from '../assets/icons/mac_launcher.svg'
-import linuxLauncherIcon from '../assets/icons/linux_launcher.svg'
-import winLauncherIcon from '../assets/icons/win_launcher.svg'
+import wipIcon from '../assets/icons/WIP_icon.svg'
 import bonjourHiSnd from '../assets/sons/bonjourhi.mp3'
 import mantisseSnd from '../assets/sons/explore.mp3'
 
@@ -217,7 +215,7 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     comment: "COMMENT?",
     lockIn: "LOCK IN, CUT NOISE",
     exploreHint: "'' Gardez vos cookies, restez local ''",
-    explore: "EXPLORER",
+    explore: "APPUYEZ SUR ESPACE",
     catchphrase: "Changer le monde un pixel à la fois.",
   },
   en: {
@@ -233,7 +231,7 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     comment: "HOW?",
     lockIn: "LOCK IN, CUT NOISE",
     exploreHint: "'' Keep your cookies, stay local ''",
-    explore: "EXPLORE",
+    explore: "PRESS SPACE",
     catchphrase: "Change the world one pixel at the time.",
   },
   es: {
@@ -249,7 +247,7 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     comment: "¿CÓMO?",
     lockIn: "LOCK IN, CUT NOISE",
     exploreHint: "'' Guarda tus cookies, mantente local ''",
-    explore: "EXPLORAR",
+    explore: "PRESIONA ESPACIO",
     catchphrase: "Cambiar el mundo un píxel a la vez.",
   }
 }
@@ -262,6 +260,18 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [leftInfoOpen, setLeftInfoOpen] = useState(false)
   const [rightInfoOpen, setRightInfoOpen] = useState(false)
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
+
+  // Handle spacebar press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && phase === 'init') {
+        e.preventDefault()
+        handleInit()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [phase])
 
   useEffect(() => {
     if (!hoverAudioRef.current) {
@@ -446,100 +456,10 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
               </AnimatePresence>
             </div>
 
-            {/* EXPLORE Text Button */}
-            <motion.button
-              onClick={handleInit}
-              onHoverStart={() => setIsHovering(true)}
-              onHoverEnd={() => setIsHovering(false)}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                position: 'absolute', top: '50%', left: '50%', x: '-50%', y: '-50%',
-                background: 'transparent', border: 'none', cursor: 'pointer', padding: '0', zIndex: 10,
-                filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.8))'
-              }}
-            >
-              <div style={{ position: 'relative' }}>
-                {/* White Text (Default) */}
-                <motion.span
-                  animate={{ opacity: isHovering ? 0 : 1, scale: isHovering ? 1.05 : 1 }}
-                  transition={{ duration: 0.2 }}
-                  style={{
-                    display: 'block',
-                    fontSize: 'clamp(24px, min(7vw, 11vh), 150px)',
-                    color: '#ffffff',
-                    fontFamily: "'Jersey 15', sans-serif",
-                    letterSpacing: '0.15em',
-                    lineHeight: 1
-                  }}
-                >
-                  {t.explore}
-                </motion.span>
-
-                {/* Rainbow Text (Hovered) */}
-                <motion.span
-                  animate={{
-                    opacity: isHovering ? 1 : 0,
-                    scale: isHovering ? 1.05 : 1,
-                    backgroundPosition: isHovering ? ["0% 50%", "200% 50%"] : "0% 50%",
-                  }}
-                  transition={{
-                    opacity: { duration: 0.2 },
-                    scale: { duration: 0.2 },
-                    backgroundPosition: { duration: 1.5, repeat: Infinity, ease: 'linear' }
-                  }}
-                  style={{
-                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                    fontSize: 'clamp(24px, min(7vw, 11vh), 150px)',
-                    fontFamily: "'Jersey 15', sans-serif",
-                    letterSpacing: '0.15em',
-                    lineHeight: 1,
-                    backgroundImage: 'linear-gradient(90deg, #ff0000, #ff9900, #ffff00, #33ff00, #0099ff, #6633ff, #ff0000)',
-                    backgroundSize: '200% auto',
-                    WebkitBackgroundClip: 'text',
-                    backgroundClip: 'text',
-                    color: 'transparent',
-                    display: 'flex', justifyContent: 'center'
-                  }}
-                >
-                  {t.explore.split('').map((char, i) => (
-                    <motion.span
-                      key={i}
-                      initial={{ y: 0 }}
-                      animate={isHovering ? { y: [0, -16, 0] } : { y: 0 }}
-                      transition={isHovering ? { duration: 0.6, repeat: Infinity, delay: i * 0.08, ease: 'easeInOut' } : { duration: 0 }}
-                      style={{ display: 'inline-block', whiteSpace: 'pre' }}
-                    >
-                      {char}
-                    </motion.span>
-                  ))}
-                </motion.span>
-              </div>
-            </motion.button>
-
-            {/* Catchphrase below EXPLORE */}
+            {/* ── Download Launcher Buttons / WIP Badge ── */}
             <div style={{
               position: 'absolute',
-              top: 'calc(50% + clamp(30px, min(5vw, 7vh), 90px))',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 10,
-              whiteSpace: 'nowrap',
-            }}>
-              <span style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 'clamp(10px, min(1.3vw, 1.8vh), 16px)',
-                color: '#FFD700',
-                letterSpacing: '0.08em',
-                fontWeight: 600,
-              }}>
-                {t.catchphrase}
-              </span>
-            </div>
-
-            {/* ── Download Launcher Buttons ── */}
-            <div style={{
-              position: 'absolute',
-              top: '32%',
+              top: '25%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
               zIndex: 10,
@@ -559,60 +479,95 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                 TÉLÉCHARGER
               </span>
 
-              {/* Icons row */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(24px, 4vw, 60px)' }}>
-                {([
-                  { label: 'MAC', href: '/downloads/ForomInstaller.dmg', filename: 'ForomInstaller.dmg', color: '#EF4444', icon: macLauncherIcon },
-                  { label: 'LINUX', href: '/downloads/ForomInstaller.AppImage', filename: 'ForomInstaller.AppImage', color: '#22C55E', icon: linuxLauncherIcon },
-                  { label: 'WIN', href: '/downloads/ForomInstaller.exe', filename: 'ForomInstaller.exe', color: '#3B82F6', icon: winLauncherIcon },
-                ] as const).map(({ label, href, filename, color, icon }) => (
-                  <motion.a
-                    key={label}
-                    href={href}
-                    download={filename}
-                    whileHover={{ scale: 1.15, y: -4 }}
-                    whileTap={{ scale: 0.92 }}
-                    title={`Download for ${label}`}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 'clamp(4px, 0.7vh, 8px)',
-                      cursor: 'pointer',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    {/* OS-specific launcher icon */}
-                    <img
-                      src={icon}
-                      alt={`${label} launcher`}
-                      style={{
-                        width: 'clamp(28px, min(4vw, 5vh), 52px)',
-                        height: 'clamp(28px, min(4vw, 5vh), 52px)',
-                        objectFit: 'contain',
-                      }}
-                    />
-                    {/* OS label */}
-                    <span style={{
-                      fontFamily: "'Jersey 15', sans-serif",
-                      fontSize: 'clamp(11px, min(1.4vw, 2vh), 18px)',
-                      letterSpacing: '0.12em',
-                      color,
-                      fontWeight: 600,
-                    }}>
-                      {label}
-                    </span>
-                  </motion.a>
-                ))}
-              </div>
+              <img
+                src={wipIcon}
+                alt="Work in progress"
+                style={{
+                  height: 'clamp(64px, min(10vw, 14vh), 128px)',
+                  objectFit: 'contain',
+                }}
+              />
             </div>
 
-            {/* Logo near LOCK IN */}
+            {/* Logo in Center */}
             <motion.img
               src={foromLogoWht}
               alt="Forom"
-              style={{ position: 'absolute', bottom: '15vh', left: '50%', transform: 'translateX(-50%)', height: 'clamp(50px, min(30vw, 25vh), 340px)', zIndex: 10, pointerEvents: 'none' }}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 'clamp(240px, 35vw, 420px)',
+                height: 'clamp(240px, 35vw, 420px)',
+                zIndex: 10,
+                pointerEvents: 'none',
+              }}
             />
+
+            {/* Catchphrase below Logo */}
+            <div style={{
+              position: 'absolute',
+              top: 'calc(50% + clamp(80px, min(12vw, 16vh), 180px))',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 10,
+              whiteSpace: 'nowrap',
+            }}>
+              <span style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 'clamp(10px, min(1.3vw, 1.8vh), 16px)',
+                color: '#FFD700',
+                letterSpacing: '0.08em',
+                fontWeight: 600,
+              }}>
+                {t.catchphrase}
+              </span>
+            </div>
+
+            {/* PRESS SPACE Button */}
+            <motion.button
+              onClick={handleInit}
+              onHoverStart={() => setIsHovering(true)}
+              onHoverEnd={() => setIsHovering(false)}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                position: 'absolute',
+                bottom: '18vh',
+                left: '50%',
+                x: '-50%',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '0',
+                zIndex: 10,
+                filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.8))',
+              }}
+            >
+              <div style={{ position: 'relative' }}>
+                {/* Continuously color-shifting Text */}
+                <motion.span
+                  animate={{
+                    color: ['#051AFF', '#8E579C', '#FF0505', '#ED6606', '#FFE100', '#25913C', '#051AFF'],
+                    scale: isHovering ? 1.05 : 1
+                  }}
+                  transition={{
+                    color: { duration: 0.6, repeat: Infinity, ease: 'linear' },
+                    scale: { duration: 0.2 }
+                  }}
+                  style={{
+                    display: 'block',
+                    fontSize: 'clamp(16px, min(3vw, 4.5vh), 60px)',
+                    fontFamily: "'Jersey 15', sans-serif",
+                    letterSpacing: '0.15em',
+                    lineHeight: 1,
+                    textShadow: '0 0 10px currentColor'
+                  }}
+                >
+                  {t.explore}
+                </motion.span>
+              </div>
+            </motion.button>
 
             {/* Lock in text at 8% from bottom edge */}
             <div style={{ position: 'absolute', bottom: '8vh', left: '50%', transform: 'translateX(-50%)', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>

@@ -57,7 +57,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
   const [joinRule, setJoinRule] = useState('')
 
   const [romPhase, setRomPhase] = useState<string | number>('idle')
-  const ghostPanelWidth = 'min(30vw, 440px)'
+  const ghostPanelWidth = 'min(26vw, 360px)'
 
 
   const { language: activeLang } = useAppStore()
@@ -382,7 +382,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
         <>
           {/* GHOST VIEW LEFT */}
             <div style={{ flex: '0 0 clamp(180px, 20vw, 300px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: romPhase === "public_tour" ? 45 : 1, minHeight: 'clamp(520px, 74vh, 860px)' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: ghostPanelWidth, alignSelf: 'flex-end' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: ghostPanelWidth, alignSelf: 'flex-end', zIndex: 10 }}>
                 <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>JOUER</div>
                 <button onClick={() => setIsPlayOpen(!isPlayOpen)} style={{ background: "#000", border: '2px solid rgba(255,255,255,0.2)', cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s, border-color 0.2s", width: "clamp(40px, 5vw, 60px)", height: "clamp(40px, 5vw, 60px)", borderRadius: "50%" }} onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.1)"; e.currentTarget.style.borderColor = '#22C55E'; }} onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
                   <span style={{ color: "#22C55E", fontSize: "clamp(18px, 2vw, 24px)", fontWeight: "bold" }}>$</span>
@@ -429,11 +429,16 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
                         margin: 0,
                         color: '#FFD700',
                         fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 'clamp(11px, 1.2vw, 17px)',
+                        fontSize: 'clamp(10px, 1.1vw, 14px)',
                         lineHeight: 1.45,
                         textAlign: 'justify',
                         whiteSpace: 'pre-wrap',
-                        letterSpacing: '0.06em'
+                        letterSpacing: '0.06em',
+                        backgroundColor: 'rgba(0,0,0,0.85)',
+                        padding: '16px',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                        border: '1px solid rgba(255,255,255,0.05)'
                       }}>
 Pour enrichir un forom public, l’organisation s'appuie sur quatre rôles clés : Super Admins (9), Admins (50), Moderators (100) et Membres (1 000). Chaque contributeur accumule de l’XP pour atteindre le niveau 100, validant ainsi sa maîtrise de l'archivage.
 
@@ -457,12 +462,22 @@ Le moteur de ce savoir, ce sont les Pixels (PX). Pour remplir leur mission, les 
               <div style={{ width: '100%', position: 'relative', zIndex: 45, display: 'flex', justifyContent: 'center', height: '280px', marginBottom: '20px' }}>
                 
                 {/* ROM Container - Positioned absolutely left of center */}
-                <div style={{ position: 'absolute', bottom: '0', right: 'calc(50% + 20px)', width: '320px', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+                <div style={{
+                  position: 'absolute',
+                  bottom: '0',
+                  right: (romPhase === 'idle' || romPhase === 0) ? '50%' : 'calc(50% + 20px)',
+                  transform: (romPhase === 'idle' || romPhase === 0) ? 'translateX(50%)' : 'none',
+                  transition: 'right 0.4s ease, transform 0.4s ease',
+                  width: '320px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                }}>
                   <RomOnboarding currentUser={currentUser || null} isCreateSelected={false} onPhaseChange={setRomPhase} />
                 </div>
                 
                 {/* Traduction Container - Positioned absolutely right of center */}
-                <div style={{ position: 'absolute', top: '10px', left: 'calc(50% + 20px)', width: 'clamp(280px, 20vw, 400px)', display: 'flex', flexDirection: 'column', opacity: (romPhase === 'idle' || romPhase === 0) ? 0 : 0.8, transition: 'opacity 0.4s', pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', top: '10px', left: 'calc(50% + 20px)', width: 'clamp(200px, 16vw, 320px)', display: 'flex', flexDirection: 'column', opacity: (romPhase === 'idle' || romPhase === 0) ? 0 : 0.8, transition: 'opacity 0.4s', pointerEvents: 'none' }}>
                   <div style={{ color: '#ffffff', fontWeight: 900, fontSize: 'clamp(14px, 1.5vw, 18px)', fontFamily: "'Jersey 15', sans-serif", letterSpacing: '0.1em', marginBottom: '16px', textTransform: 'uppercase', textAlign: 'left' }}>
                     TRADUCTION
                   </div>
@@ -521,8 +536,8 @@ Le moteur de ce savoir, ce sont les Pixels (PX). Pour remplir leur mission, les 
             </div>
 
             {/* GHOST VIEW RIGHT */}
-            <div style={{ flex: '0 0 clamp(180px, 20vw, 300px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", position: 'relative', minHeight: 'clamp(520px, 74vh, 860px)' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: ghostPanelWidth, alignSelf: 'flex-start' }}>
+            <div style={{ flex: '0 0 clamp(180px, 20vw, 300px)', minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", position: 'relative', minHeight: 'clamp(520px, 74vh, 860px)', zIndex: 10 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: ghostPanelWidth, alignSelf: 'flex-start', zIndex: 10 }}>
                 <div style={{ color: "#ffffff", fontWeight: 900, fontSize: "clamp(10px, 1.2vw, 20px)", letterSpacing: "0.15em", marginBottom: "16px", textTransform: "uppercase", whiteSpace: "nowrap" }}>CRÉER</div>
                 <button onClick={() => setIsDeployOpen(!isDeployOpen)} style={{ background: "#000", border: '2px solid rgba(255,255,255,0.2)', cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s, border-color 0.2s", width: "clamp(40px, 5vw, 60px)", height: "clamp(40px, 5vw, 60px)", borderRadius: "50%" }} onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.1)"; e.currentTarget.style.borderColor = '#F97316'; }} onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
                   <span style={{ color: "#F97316", fontSize: "clamp(18px, 2vw, 24px)", fontWeight: "bold" }}>!</span>
@@ -538,7 +553,8 @@ Le moteur de ce savoir, ce sont les Pixels (PX). Pour remplir leur mission, les 
                       style={{
                         position: 'absolute',
                         top: 'calc(100% + 24px)',
-                        left: 0,
+                        right: 0,
+                        left: 'auto',
                         transform: 'none',
                         width: ghostPanelWidth,
                         display: 'flex',
@@ -567,11 +583,16 @@ Le moteur de ce savoir, ce sont les Pixels (PX). Pour remplir leur mission, les 
                         margin: 0,
                         color: '#FFD700',
                         fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 'clamp(11px, 1.2vw, 17px)',
+                        fontSize: 'clamp(10px, 1.1vw, 14px)',
                         lineHeight: 1.45,
                         textAlign: 'justify',
                         whiteSpace: 'pre-wrap',
-                        letterSpacing: '0.06em'
+                        letterSpacing: '0.06em',
+                        backgroundColor: 'rgba(0,0,0,0.85)',
+                        padding: '16px',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                        border: '1px solid rgba(255,255,255,0.05)'
                       }}>
 Envie de bâtir ton propre bastion d'intelligence ? Créer un serveur forom en local est aussi simple que de lancer un monde Minecraft. En hébergeant ton instance, tu deviens le gardien d'un moteur RAG souverain directement sur ta machine.
 

@@ -92,31 +92,7 @@ function ThemeToggle({
   )
 }
 
-const ETS_CATEGORY_LABELS: Record<string, string> = {
-  A: 'Partenaires',
-  B: 'Culture',
-  C: 'Clubs',
-  D: 'Trésorerie',
-  E: 'Atelier',
-  F: 'Projets',
-  G: 'Événements',
-  H: 'Rayonnement',
-  I: 'Gouvernance',
-  J: 'Héritage',
-}
 
-const ETS_QUESTION_LABELS: Record<string, string> = {
-  '0': 'Idéation',
-  '1': 'Recherche',
-  '2': 'Conception',
-  '3': 'Opération',
-  '4': 'Obstacle',
-  '5': 'Déploiement',
-  '6': 'Tutoriel',
-  '7': 'Bilan',
-  '8': 'Gabarit (Canon RAG Data)',
-  '9': 'Passation',
-}
 
 // =============================================================================
 // COMPONENT
@@ -179,11 +155,7 @@ function App() {
   const userRole = getUserRole(currentUser)
   const isSuperModerator = userRole === 'S-MODS'
   const isModerator = userRole === 'MODS'
-  const isEtsForom = mission === 'Club étudiants ÉTS'
 
-  const activeCategoryLabels = isEtsForom ? ETS_CATEGORY_LABELS : categoryLabels
-  const activeQuestionLabels = isEtsForom ? ETS_QUESTION_LABELS : questionLabels
-  const activePersonalQuests = isEtsForom ? [] : personalQuests
 
   // Apply dark mode class to document
   useEffect(() => {
@@ -197,7 +169,7 @@ function App() {
   // Map categories to sidebar items
   const sidebarItems = CATEGORIES.map((category) => ({
     id: category,
-    label: activeCategoryLabels[category] || category,
+    label: categoryLabels[category] || category,
     disabled: false,
   }))
 
@@ -327,7 +299,7 @@ function App() {
   return (
     <div 
       className="h-screen overflow-hidden relative transition-colors duration-300"
-      style={{ backgroundColor: isEtsForom && !isDarkMode ? '#E3022C' : 'var(--color-bg)' }}
+      style={{ backgroundColor: 'var(--color-bg)' }}
     >
       {/* Right Column Stack: Theme, Settings */}
       <div 
@@ -409,7 +381,6 @@ function App() {
           onSelect={setActiveCategory}
           isDark={isDarkMode}
           position="right"
-          isEtsForom={isEtsForom}
         />
       )}
 
@@ -421,7 +392,7 @@ function App() {
         isRubixView={isRubixView}
         onCloseRubix={() => setIsRubixView(false)}
         acceptedQuestId={acceptedQuestId}
-        categoryLabels={activeCategoryLabels}
+        categoryLabels={categoryLabels}
         onQuestComplete={(id) => {
           const quest = personalQuests.find(q => q.id === id)
           if (quest) {
@@ -431,10 +402,9 @@ function App() {
             setAcceptedQuestId(null)
           }
         }}
-        questionLabels={activeQuestionLabels}
-        personalQuests={activePersonalQuests}
-        isEmptyGrid={isEtsForom}
-        isEtsForom={isEtsForom}
+        questionLabels={questionLabels}
+        personalQuests={personalQuests}
+        isEmptyGrid={false}
       />
 
       {/* --------------------------------------------------------------------------

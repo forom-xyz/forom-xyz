@@ -492,14 +492,15 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
             onClick={onLobbyClick}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center justify-center cursor-pointer rounded-full overflow-hidden border-2 border-transparent hover:border-gray-500 transition-colors bg-gray-200 dark:bg-gray-800"
+            className="flex items-center justify-center cursor-pointer transition-transform"
             style={{ width: '36px', height: '36px' }}
             title="Return to Sign In"
           >
             <img 
               src={ghostWhtIcon} 
               alt="Phantom Mode" 
-              style={{ width: '20px', height: '20px', filter: isDark ? 'invert(1)' : 'none' }} 
+              className="w-full h-full object-contain"
+              style={{ filter: isDark ? 'invert(1)' : 'none' }} 
             />
           </motion.div>
         ) : (

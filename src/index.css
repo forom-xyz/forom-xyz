@@ -1,3 +1,6 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
 /* =============================================================================
    FRM - The Infinite Feed Grid
    Global Styles | by Forom
@@ -46,11 +49,7 @@
   font-display: swap;
 }
 
-/* Tailwind CSS */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+/* Tailwind CSS imports moved to top of file */
 /* =============================================================================
    Theme Variables
    ============================================================================= */
