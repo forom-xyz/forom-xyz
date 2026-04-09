@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { Lock } from 'lucide-react'
 import { LoadingScreen } from './components/LoadingScreen'
 import { MoodSelection } from './components/MoodSelection'
 import { CustomEnrollmentFlow } from './components/CustomEnrollmentFlow'
@@ -20,6 +21,7 @@ import { RomapModal } from './components/RomapModal'
 // Import Icons
 import wikiIcon from './assets/icons/wiki.png'
 import rubixViewIcon from './assets/icons/rubix_view.svg'
+import tokensIcon from './assets/icons/tokens.svg'
 
 import { SettingsModal } from './components/SettingsModal'
 import { SettingsFAB } from './components/SettingsFAB'
@@ -65,10 +67,10 @@ function ThemeToggle({
   return (
     <motion.button
       onClick={onToggle}
-      className="relative flex items-center justify-between rounded-full p-1 cursor-pointer"
+      className="relative flex flex-col items-center justify-between rounded-full p-1 cursor-pointer"
       style={{
-        width: '56px',
-        height: '28px',
+        width: '28px',
+        height: '56px',
         backgroundColor: isDark ? '#3b82f6' : '#e5e7eb',
         border: '2px solid',
         borderColor: isDark ? '#2563eb' : '#d1d5db',
@@ -78,14 +80,14 @@ function ThemeToggle({
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {/* Sun icon */}
-      <span className="text-xs" style={{ opacity: isDark ? 0.4 : 1 }}>☀️</span>
+      <span className="text-xs" style={{ opacity: isDark ? 0.4 : 1, marginTop: '2px' }}>☀️</span>
       {/* Moon icon */}
-      <span className="text-xs" style={{ opacity: isDark ? 1 : 0.4 }}>🌙</span>
+      <span className="text-xs" style={{ opacity: isDark ? 1 : 0.4, marginBottom: '2px' }}>🌙</span>
       {/* Toggle knob */}
       <motion.div
         className="absolute rounded-full bg-white shadow-md"
-        style={{ width: '20px', height: '20px', top: '2px' }}
-        animate={{ left: isDark ? '32px' : '2px' }}
+        style={{ width: '20px', height: '20px', left: '2px' }}
+        animate={{ top: isDark ? '32px' : '2px' }}
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
       />
     </motion.button>
@@ -112,7 +114,7 @@ function App() {
     Array.from({ length: 8 }, () => 'FRM-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase())
   )
   const [activeCategory, setActiveCategory] = useState('E')
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(true)
   const [isRubixView, setIsRubixView] = useState(false)
 
   // OIDC Redirect Callback Logic
@@ -304,9 +306,27 @@ function App() {
       {/* Right Column Stack: Theme, Settings */}
       <div 
         className="fixed z-50 flex flex-col items-center"
-        style={{ bottom: '48px', right: '3%', gap: '3vh' }}
+        style={{ bottom: '48px', right: '3%', gap: '2vh' }}
       >
         <ThemeToggle isDark={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
+        
+        {/* Quest Hub */}
+        <motion.button
+          onClick={isPhantomMode ? undefined : modals.openQuest}
+          whileHover={isPhantomMode ? {} : { scale: 1.12 }}
+          whileTap={isPhantomMode ? {} : { scale: 0.92 }}
+          className={`rounded-full flex items-center justify-center border-2 border-transparent hover:border-orange-500 transition-colors duration-300 ${isPhantomMode ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+          style={{ width: '36px', height: '36px', backgroundColor: 'transparent' }}
+          title={isPhantomMode ? "Locked (Phantom Mode)" : "Quest"}
+          aria-label="Quest"
+        >
+          {isPhantomMode ? (
+            <Lock size={16} color="#ffffff" />
+          ) : (
+            <img src={tokensIcon} alt="Quest" className="w-full h-full object-contain" />
+          )}
+        </motion.button>
+
         {isSuperModerator && (
           <SettingsFAB onClick={modals.openSettings} />
         )}
@@ -314,7 +334,6 @@ function App() {
 
       <Header 
         onTokenClick={modals.openWallet}
-        onSupportClick={modals.openQuest}
         onUserClick={modals.openUser}
         onRomapClick={modals.openRomap}
         seasonPhase={seasonPhase}
@@ -336,11 +355,11 @@ function App() {
       {/* Bottom Left - Heart + Wiki stacked */}
       <div
         className="fixed z-50 flex flex-col items-center"
-        style={{ bottom: '48px', left: '3%', gap: '3vh' }}
+        style={{ bottom: '48px', left: '3%', gap: '12px' }}
       >
-        <HeartFAB fixed={false} />
+        <HeartFAB fixed={false} count={1} />
         <motion.a
-          href="https://wiki.etsmtl.club/share/8cnz7bzxf3/p/services-offerts-j8LxYBFxrs"
+          href="https://en.wikipedia.org/wiki/Main_Page"
           target="_blank"
           rel="noopener noreferrer"
           className={`${cornerIconStyle}`}
