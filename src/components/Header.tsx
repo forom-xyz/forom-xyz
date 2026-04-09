@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
 import cedilleIcon from '../assets/icons/cedille.png'
-import etsIcon from '../assets/icons/ets.jpg'
-import githubIcon from '../assets/icons/github.png'
 import chromaNotesIcon from '../assets/icons/chroma_portal.svg'
-import parameterIcon from '../assets/icons/parameter.png'
+import parameterIcon from '../assets/icons/parameter.svg'
 import ghostWhtIcon from '../assets/icons/ghost_wht.svg'
+import carmelIcon from '../assets/icons/carmel.svg'
 
 // =============================================================================
 // CONSTANTS
@@ -49,7 +48,6 @@ function RomapLogo({ size = 36 }: { size?: number }) {
 
 interface HeaderProps {
   onTokenClick: () => void
-  onSupportClick: () => void
   onUserClick: () => void
   onLobbyClick?: () => void
   onRomapClick?: () => void
@@ -59,7 +57,7 @@ interface HeaderProps {
   seasonPhase?: 'V1' | 'V2' | 'V3'
 }
 
-export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick, onRomapClick, isDark = false, mission, isPhantom = false, seasonPhase = 'V1' }: HeaderProps) {
+export function Header({ onTokenClick, onUserClick, onLobbyClick, onRomapClick, isDark = false, mission, isPhantom = false, seasonPhase = 'V1' }: HeaderProps) {
   const [isSearchActive, setIsSearchActive] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isArchiveDropdownOpen, setIsArchiveDropdownOpen] = useState(false)
@@ -88,10 +86,10 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
       className="px-[3%] relative z-50 flex items-center transition-colors duration-300"
       style={{ paddingTop: '2.2vh', paddingBottom: '1.6vh', backgroundColor: mission === 'Club étudiants ÉTS' && !isDark ? '#E3022C' : 'var(--color-bg)' }}
     >
-      {/* ---- Left group: ETS, Search, FOROM ---- */}
-      <div className="flex items-center" style={{ gap: '5%', flex: 1 }}>
-        {/* Left Icons Group */}
-        <div className="flex items-center shrink-0" style={{ gap: '2vw' }}>
+      {/* ---- Left group: Top Left Stack ---- */}
+      <div className="flex items-start" style={{ gap: '5%', flex: 1 }}>
+        {/* Top Left Stack: Chroma Portal, ROMAP */}
+        <div className="flex flex-col items-center shrink-0" style={{ gap: '12px' }}>
           <motion.button
             onClick={onLobbyClick}
             whileHover={{ scale: 1.1 }}
@@ -113,46 +111,7 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
           >
             <RomapLogo size={36} />
           </motion.button>
-
-          <motion.a
-            href="https://www.etsmtl.ca/experience-etudiante/clubs-etudiants"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center justify-center shrink-0 rounded-full overflow-hidden"
-            style={{ width: '36px', height: '36px' }}
-          >
-            <img src={etsIcon} alt="ÉTS Montréal" className="w-full h-full object-cover" />
-          </motion.a>
-
-          <motion.a
-            href="https://github.com/Forom-ets/forom"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center justify-center shrink-0 rounded-full overflow-hidden"
-            style={{ width: '36px', height: '36px' }}
-          >
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                backgroundColor: '#0066FF',
-                WebkitMaskImage: `url(${githubIcon})`,
-                WebkitMaskSize: 'contain',
-                WebkitMaskRepeat: 'no-repeat',
-                WebkitMaskPosition: 'center',
-                maskImage: `url(${githubIcon})`,
-                maskSize: 'contain',
-                maskRepeat: 'no-repeat',
-                maskPosition: 'center',
-              }}
-            />
-          </motion.a>
         </div>
-
       </div>
 
       {/* ---- Center ---- */}
@@ -401,123 +360,65 @@ export function Header({ onTokenClick, onSupportClick, onUserClick, onLobbyClick
         )}
       </div>
 
-      {/* ---- Right: Mail, Pixel Wallet ($), Help Hub (?), User ---- */}
-      <div className="flex items-center justify-end" style={{ gap: '5%', flex: 1 }}>
-        {/* Mail / Contact */}
-        <motion.a
-          href="https://discord.gg/MdeNvRs5R9"
-          target="_blank"
-          rel="noopener noreferrer"
-          whileHover={{ scale: 1.12 }}
-          whileTap={{ scale: 0.9 }}
-          className="rounded-full flex items-center justify-center cursor-pointer border-2"
-          style={{
-            width: '36px',
-            height: '36px',
-            backgroundColor: '#881FA0',
-            borderColor: isDark ? '#5b1470' : '#6b1a80',
-          }}
-          title="Contact Us"
-        >
-          <Mail size={18} strokeWidth={2} color="#ffffff" />
-        </motion.a>
-
-        {/* Pixel Wallet ($) — solid green circle */}
-        <motion.button
-          onClick={isPhantom ? undefined : onTokenClick}
-          whileHover={isPhantom ? {} : { scale: 1.12 }}
-          whileTap={isPhantom ? {} : { scale: 0.92 }}
-          className={`rounded-full flex items-center justify-center border-2 transition-colors duration-300 ${isPhantom ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-          style={{
-            width: '36px',
-            height: '36px',
-            backgroundColor: '#007F36',
-            borderColor: isDark ? '#004d20' : '#005c28',
-          }}
-          title={isPhantom ? "Locked (Phantom Mode)" : "Pixel Wallet"}
-          aria-label="Pixel Wallet"
-        >
+      {/* ---- Right: User Top Stack ---- */}
+      <div className="flex items-start justify-end" style={{ gap: '5%', flex: 1 }}>
+        {/* Top Right Stack: User Profile, Pixel Wallet (Carmel) */}
+        <div className="flex flex-col items-center" style={{ gap: '12px' }}>
+          {/* User Profile / Phantom */}
           {isPhantom ? (
-            <Lock size={16} color="#ffffff" />
-          ) : (
-            <span
-              style={{
-                fontFamily: "'Jersey 15', Montserrat, sans-serif",
-                fontWeight: 900,
-                fontSize: '20px',
-                lineHeight: 1,
-                color: '#ffffff',
-              }}
+            <motion.div
+              onClick={onLobbyClick}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center justify-center cursor-pointer transition-transform"
+              style={{ width: '36px', height: '36px' }}
+              title="Return to Sign In"
             >
-              $
-            </span>
-          )}
-        </motion.button>
-
-        {/* Help Hub (?) — solid orange circle */}
-        <motion.button
-          onClick={isPhantom ? undefined : onSupportClick}
-          whileHover={isPhantom ? {} : { scale: 1.12 }}
-          whileTap={isPhantom ? {} : { scale: 0.92 }}
-          className={`rounded-full flex items-center justify-center border-2 transition-colors duration-300 ${isPhantom ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-          style={{
-            width: '36px',
-            height: '36px',
-            backgroundColor: '#FE6C17',
-            borderColor: isDark ? '#b84a0f' : '#d45610',
-          }}
-          title={isPhantom ? "Locked (Phantom Mode)" : "Quest"}
-          aria-label="Quest"
-        >
-          {isPhantom ? (
-            <Lock size={16} color="#ffffff" />
+              <img 
+                src={ghostWhtIcon} 
+                alt="Phantom Mode" 
+                className="w-full h-full object-contain"
+                style={{ filter: isDark ? 'invert(1)' : 'none' }} 
+              />
+            </motion.div>
           ) : (
-            <span
-              style={{
-                fontFamily: "'Jersey 15', Montserrat, sans-serif",
-                fontWeight: 900,
-                fontSize: '20px',
-                lineHeight: 1,
-                color: '#ffffff',
-              }}
+            <motion.div
+              onClick={onUserClick}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center justify-center cursor-pointer rounded-full overflow-hidden border-2 border-transparent hover:border-blue-500 transition-colors"
+              style={{ width: '36px', height: '36px' }}
             >
-              ?
-            </span>
+              <img
+                src={parameterIcon}
+                alt="User Settings"
+                className="w-full h-full object-contain"
+                style={{ filter: isDark ? 'invert(1)' : 'none' }}
+              />
+            </motion.div>
           )}
-        </motion.button>
 
-        {/* User Profile / Phantom */}
-        {isPhantom ? (
-          <motion.div
-            onClick={onLobbyClick}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center justify-center cursor-pointer rounded-full overflow-hidden border-2 border-transparent hover:border-gray-500 transition-colors bg-gray-200 dark:bg-gray-800"
-            style={{ width: '36px', height: '36px' }}
-            title="Return to Sign In"
+          {/* Pixel Wallet (Carmel) */}
+          <motion.button
+            onClick={isPhantom ? undefined : onTokenClick}
+            whileHover={isPhantom ? {} : { scale: 1.12 }}
+            whileTap={isPhantom ? {} : { scale: 0.92 }}
+            className={`rounded-full flex items-center justify-center border-2 border-transparent hover:border-red-500 transition-colors duration-300 ${isPhantom ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+            style={{
+              width: '40px',
+              height: '40px',
+              backgroundColor: 'transparent',
+            }}
+            title={isPhantom ? "Locked (Phantom Mode)" : "Pixel Wallet"}
+            aria-label="Pixel Wallet"
           >
-            <img 
-              src={ghostWhtIcon} 
-              alt="Phantom Mode" 
-              style={{ width: '20px', height: '20px', filter: isDark ? 'invert(1)' : 'none' }} 
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            onClick={onUserClick}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center justify-center cursor-pointer rounded-full overflow-hidden border-2 border-transparent hover:border-blue-500 transition-colors"
-            style={{ width: '36px', height: '36px' }}
-          >
-            <img
-              src={parameterIcon}
-              alt="User Settings"
-              className="w-full h-full object-contain"
-              style={{ filter: isDark ? 'invert(1)' : 'none' }}
-            />
-          </motion.div>
-        )}
+            {isPhantom ? (
+              <Lock size={16} color="#ffffff" />
+            ) : (
+              <img src={carmelIcon} alt="Pixel Wallet" className="w-full h-full object-contain" />
+            )}
+          </motion.button>
+        </div>
       </div>
     </motion.header>
   )

@@ -24,7 +24,6 @@ interface CarouselGridProps {
   categoryLabels?: Record<string, string>
   personalQuests?: Array<{ id: string; category: string; question: string | null; title: string; completed?: boolean }>
   isEmptyGrid?: boolean
-  isEtsForom?: boolean
 }
 
 // =============================================================================
@@ -62,7 +61,6 @@ export function CarouselGrid({
   categoryLabels = {},
   personalQuests = [],
   isEmptyGrid = false,
-  isEtsForom = false,
 }: CarouselGridProps) {
   // Start at horizontal index 5 so that the center tile (5 + activeIndex*10) hits 46 when paired with category E
   const [horizontalIndex, setHorizontalIndex] = useState(5)
@@ -631,7 +629,6 @@ export function CarouselGrid({
           activeId={currentMemory?.question || ''}
           onSelect={handleQuestionClick}
           isDark={isDark}
-          isEtsForom={isEtsForom}
         />
       )}
 

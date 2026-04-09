@@ -140,10 +140,6 @@ export function RomOnboarding({ currentUser, isCreateSelected, onPhaseChange }: 
 
       {/* Unified Golden Snitch Wrapper */}
       <motion.div
-        animate={{
-          x: phase === 'public_tour' ? '-24vw' : phase === 'login_tour' ? '28vw' : '0vw',
-          y: phase === 'public_tour' ? '22vh' : phase === 'login_tour' ? '5vh' : '0vh',
-        }}
         transition={{ type: 'spring', damping: 14, stiffness: 120 }}
         style={{ 
           zIndex: 100, 
@@ -199,29 +195,36 @@ export function RomOnboarding({ currentUser, isCreateSelected, onPhaseChange }: 
                 position: 'absolute',
                 bottom: '100%',
                 marginBottom: phase === 0 ? '16px' : (phase === 'public_tour' || phase === 'login_tour' ? '0px' : '30px'),
-                backgroundColor: '#f8f8f8',
-                border: '6px solid #4a4a4a',
+                backgroundColor: '#e6e6e6',
+                border: '4px solid #4a4a4a',
                 borderRadius: '16px',
-                padding: (phase === 0 || phase === 'public_tour' || phase === 'login_tour') ? '16px 20px' : '16px 24px',
-                width: phase === 0 ? '260px' : (phase === 'public_tour' || phase === 'login_tour' ? '320px' : '95vw'),
-                maxWidth: phase === 0 ? '260px' : (phase === 'public_tour' || phase === 'login_tour' ? '320px' : '880px'),
-                height: phase === 0 ? '90px' : (phase === 'public_tour' ? '150px' : (phase === 'login_tour' ? '110px' : (phase === 1 || phase === 2 ? '100px' : '140px'))),
-                boxShadow: 'inset 0 0 0 4px #e0e0e0, 0 16px 32px rgba(0,0,0,0.6)', 
+                padding: '24px 20px 48px 20px',
+                width: phase === 0 ? '200px' : '260px',
+                maxWidth: phase === 0 ? '200px' : '260px',
+                minHeight: phase === 0 ? '90px' : '150px',
+                boxShadow: 'inset 0 0 0 3px rgba(255,255,255,0.7), 0 16px 32px rgba(0,0,0,0.6)', 
                 zIndex: 10,
                 pointerEvents: 'auto',
                 display: 'flex',
                 flexDirection: 'column',
-                fontFamily: "'Jersey 15', sans-serif",
+                fontFamily: "'Bytesize', monospace",
                 color: '#1a1a1a',
-                fontSize: phase === 0 ? 'clamp(22px, 2vw, 26px)' : 'clamp(18px, 1.5vw, 22px)',
-                lineHeight: 1.4,
+                fontSize: phase === 0 ? 'clamp(22px, 2vw, 26px)' : 'clamp(14px, 1.4vw, 16px)',
+                lineHeight: 1.6,
                 letterSpacing: '0.05em',
               }}
             >
+              {/* Close X mark */}
+              {phase !== 0 && (
+                <div onClick={handleSkip} style={{ position: 'absolute', top: -14, right: -10, backgroundColor: '#c5c5c5', border: '3px solid #484848', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}>
+                  <span style={{ color: '#e85c5c', fontSize: 16, fontWeight: 900, lineHeight: 1 }}>×</span>
+                </div>
+              )}
+
               {/* Outer Triangle Tail */}
-              <div style={{ position: 'absolute', bottom: '-22px', left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '18px solid transparent', borderRight: '18px solid transparent', borderTop: '18px solid #4a4a4a', zIndex: 1 }} />
+              <div style={{ position: 'absolute', bottom: '-22px', left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '14px solid transparent', borderRight: '14px solid transparent', borderTop: '18px solid #4a4a4a', zIndex: 1 }} />
               {/* Inner Triangle Fill */}
-              <div style={{ position: 'absolute', bottom: '-13px', left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '13px solid transparent', borderRight: '13px solid transparent', borderTop: '13px solid #f8f8f8', zIndex: 2 }} />
+              <div style={{ position: 'absolute', bottom: '-13px', left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderTop: '13px solid #e6e6e6', zIndex: 2 }} />
 
               <div style={{ flex: 1, whiteSpace: 'pre-wrap', display: 'flex', flexDirection: 'column', justifyContent: phase === 0 ? 'center' : 'flex-start', alignItems: phase === 0 ? 'center' : 'flex-start', textAlign: phase === 0 ? 'center' : 'left' }}>
                 <TypewriterText text={getPhaseText()} onComplete={() => setIsTyping(false)} />
@@ -234,45 +237,37 @@ export function RomOnboarding({ currentUser, isCreateSelected, onPhaseChange }: 
                   animate={{ opacity: 1 }}
                   style={{
                     position: 'absolute',
-                    bottom: phase === 0 ? '-14px' : '-20px',
+                    bottom: '12px',
                     left: 0,
                     right: 0,
-                    padding: phase === 0 ? '0 16px' : '0 24px',
+                    padding: '0 24px',
                     display: 'flex',
                     justifyContent: 'space-between',
                     pointerEvents: 'none'
                   }}
                 >
                   {/* LEFT ACTIONS */}
-                  <div style={{ pointerEvents: 'auto', display: 'flex', gap: phase === 0 ? '8px' : '12px' }}>
+                  <div style={{ pointerEvents: 'auto', display: 'flex', gap: '8px' }}>
                     {phase === 0 && (
                       <button
                         onClick={handleSkip}
-                        style={{ padding: '4px 16px', borderRadius: '8px', border: '3px solid #1a1a1a', backgroundColor: '#e0e0e0', color: '#1a1a1a', fontSize: '18px', fontFamily: "'Jersey 15', sans-serif", cursor: 'pointer', boxShadow: '0 4px 0 #1a1a1a' }}
+                        style={{ padding: '6px 14px', borderRadius: '4px', border: '3px solid #1a1a1a', backgroundColor: '#e0e0e0', color: '#1a1a1a', fontSize: '14px', fontWeight: 900, fontFamily: "'Bytesize', monospace", cursor: 'pointer', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.4)' }}
                       >
-                        No
+                        no
                       </button>
                     )}
-                    {(phase === 'public_tour' || phase === 'login_tour') && (
+                    {(phase === 'public_tour' || phase === 'login_tour' || (typeof phase === 'number' && phase > 1)) && (
                       <button
                         onClick={handleBack}
-                        style={{ padding: '6px 16px', borderRadius: '8px', border: '3px solid #1a1a1a', backgroundColor: '#e0e0e0', color: '#1a1a1a', fontSize: '18px', fontFamily: "'Jersey 15', sans-serif", cursor: 'pointer', boxShadow: '0 4px 0 #1a1a1a' }}
+                        style={{ padding: '6px 14px', borderRadius: '4px', border: '3px solid #1a1a1a', backgroundColor: '#5bc0de', color: '#fff', fontSize: '14px', fontWeight: 900, fontFamily: "'Bytesize', monospace", cursor: 'pointer', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.4)', textShadow: '1px 1px 0 #000' }}
                       >
-                        &lt; Back
-                      </button>
-                    )}
-                    {typeof phase === 'number' && phase > 1 && (
-                      <button
-                        onClick={handleBack}
-                        style={{ padding: '6px 16px', borderRadius: '8px', border: '3px solid #1a1a1a', backgroundColor: '#e0e0e0', color: '#1a1a1a', fontSize: '20px', fontFamily: "'Jersey 15', sans-serif", cursor: 'pointer', boxShadow: '0 4px 0 #1a1a1a' }}
-                      >
-                        &lt; Back
+                        back
                       </button>
                     )}
                   </div>
 
                   {/* RIGHT ACTIONS */}
-                  <div style={{ pointerEvents: 'auto', display: 'flex', gap: phase === 0 ? '8px' : '12px' }}>
+                  <div style={{ pointerEvents: 'auto', display: 'flex', gap: '8px' }}>
                     {phase === 0 && (
                       <button
                         onClick={() => { 
@@ -281,29 +276,26 @@ export function RomOnboarding({ currentUser, isCreateSelected, onPhaseChange }: 
                           setPhase(1)
                           setIsTyping(true)
                         }}
-                        style={{ padding: '4px 16px', borderRadius: '8px', border: '3px solid #1a1a1a', backgroundColor: '#e85c5c', color: '#fff', fontSize: '18px', fontFamily: "'Jersey 15', sans-serif", cursor: 'pointer', boxShadow: '0 4px 0 #1a1a1a' }}
+                        style={{ padding: '6px 14px', borderRadius: '4px', border: '3px solid #1a1a1a', backgroundColor: '#e85c5c', color: '#fff', fontSize: '14px', fontWeight: 900, fontFamily: "'Bytesize', monospace", cursor: 'pointer', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.4)', textShadow: '1px 1px 0 #000' }}
                       >
-                        Yes
+                        yes
                       </button>
                     )}
                     {(phase === 1 || phase === 'public_tour' || phase === 'login_tour') && (
                       <button
                         onClick={handleNext}
-                        style={{ padding: (phase === 'public_tour' || phase === 'login_tour') ? '6px 20px' : '6px 20px', borderRadius: '8px', border: '3px solid #1a1a1a', backgroundColor: '#e85c5c', color: '#fff', fontSize: (phase === 'public_tour' || phase === 'login_tour') ? '18px' : '20px', fontFamily: "'Jersey 15', sans-serif", cursor: 'pointer', boxShadow: '0 4px 0 #1a1a1a' }}
+                        style={{ padding: '6px 14px', borderRadius: '4px', border: '3px solid #1a1a1a', backgroundColor: '#e85c5c', color: '#fff', fontSize: '14px', fontWeight: 900, fontFamily: "'Bytesize', monospace", cursor: 'pointer', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.4)', textShadow: '1px 1px 0 #000' }}
                       >
-                        {phase === 'login_tour' ? 'Finish' : 'Next >'}
+                        {phase === 'login_tour' ? 'finish' : 'next'}
                       </button>
                     )}
                     {typeof phase === 'number' && phase > 1 && (
                       <>
-                        {phase === 2 && (
-                          <button onClick={handleSkip} style={{ padding: '6px 16px', borderRadius: '8px', border: '3px solid #1a1a1a', backgroundColor: '#e0e0e0', color: '#1a1a1a', fontSize: '20px', fontFamily: "'Jersey 15', sans-serif", cursor: 'pointer', boxShadow: '0 4px 0 #1a1a1a' }}>Skip</button>
-                        )}
                         {phase < 4 && (
-                          <button onClick={handleNext} style={{ padding: '6px 16px', borderRadius: '8px', border: '3px solid #1a1a1a', backgroundColor: '#e85c5c', color: '#fff', fontSize: '20px', fontFamily: "'Jersey 15', sans-serif", cursor: 'pointer', boxShadow: '0 4px 0 #1a1a1a' }}>Next &gt;</button>
+                          <button onClick={handleNext} style={{ padding: '6px 14px', borderRadius: '4px', border: '3px solid #1a1a1a', backgroundColor: '#e85c5c', color: '#fff', fontSize: '14px', fontWeight: 900, fontFamily: "'Bytesize', monospace", cursor: 'pointer', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.4)', textShadow: '1px 1px 0 #000' }}>next</button>
                         )}
                         {phase === 4 && (
-                          <button onClick={handleSkip} style={{ padding: '6px 16px', borderRadius: '8px', border: '3px solid #1a1a1a', backgroundColor: '#5B9F65', color: '#fff', fontSize: '20px', fontFamily: "'Jersey 15', sans-serif", cursor: 'pointer', boxShadow: '0 4px 0 #1a1a1a' }}>Finish</button>
+                          <button onClick={handleSkip} style={{ padding: '6px 14px', borderRadius: '4px', border: '3px solid #1a1a1a', backgroundColor: '#5B9F65', color: '#fff', fontSize: '14px', fontWeight: 900, fontFamily: "'Bytesize', monospace", cursor: 'pointer', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.4)', textShadow: '1px 1px 0 #000' }}>finish</button>
                         )}
                       </>
                     )}
