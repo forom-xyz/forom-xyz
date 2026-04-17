@@ -29,7 +29,7 @@ interface AppStore {
 }
 
 export const useAppStore = create<AppStore>((set, _get) => ({ // eslint-disable-line @typescript-eslint/no-unused-vars
-  phase: 'loading',
+  phase: (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('code')) ? 'lobby' : 'loading',
   language: 'fr',
   selectedColor: null,
   joinRule: null,
