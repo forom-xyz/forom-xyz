@@ -298,7 +298,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
     }
   }, [isHovering, phase])
 
-  const handleInit = () => {
+  function handleInit() {
     setPhase('blackwipe')
     setTimeout(() => {
       const audio = new Audio(bonjourHiSnd)
@@ -379,7 +379,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                   </motion.div>
                 )}
               </AnimatePresence>
-              
+
               {/* Middle Left — Info Button + POURQUOI */}
               <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(8px, 1.5vw, 18px)', pointerEvents: 'auto' }}>
                 <InfoButton isActive={leftInfoOpen} onClick={() => setLeftInfoOpen(!leftInfoOpen)} />
@@ -580,9 +580,9 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
               {/* Spinning Track Indicator */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', opacity: isHovering ? 0.9 : 0.3, transition: 'opacity 0.4s ease', marginTop: '4px' }}>
-                <motion.svg 
+                <motion.svg
                   viewBox="0 0 24 24" width="10" height="10"
-                  animate={{ rotate: 360 }} 
+                  animate={{ rotate: 360 }}
                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                 >
                   <circle cx="12" cy="12" r="11" fill="#111" stroke="#555" strokeWidth="2" />
