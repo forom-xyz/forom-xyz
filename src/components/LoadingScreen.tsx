@@ -261,6 +261,18 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [rightInfoOpen, setRightInfoOpen] = useState(false)
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
 
+  const handleInit = useCallback(() => {
+    setPhase('blackwipe')
+    setTimeout(() => {
+      const audio = new Audio(bonjourHiSnd)
+      audio.play().catch(e => console.warn('Audio autoplay prevented by browser', e))
+    }, 600)
+    setTimeout(() => setPhase('split'), 700)
+    setTimeout(() => setPhase('logo'), 1100)
+    setTimeout(() => setPhase('exit'), 2000)
+    setTimeout(onComplete, 2700)
+  }, [onComplete])
+
   // Handle spacebar press
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -271,7 +283,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [phase])
+  }, [phase, handleInit])
 
   useEffect(() => {
     if (!hoverAudioRef.current) {
@@ -298,17 +310,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
     }
   }, [isHovering, phase])
 
-  function handleInit() {
-    setPhase('blackwipe')
-    setTimeout(() => {
-      const audio = new Audio(bonjourHiSnd)
-      audio.play().catch(e => console.warn('Audio autoplay prevented by browser', e))
-    }, 600)
-    setTimeout(() => setPhase('split'), 700)
-    setTimeout(() => setPhase('logo'), 1100)
-    setTimeout(() => setPhase('exit'), 2000)
-    setTimeout(onComplete, 2700)
-  }
+
 
   return (
     <div style={{
