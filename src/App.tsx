@@ -104,7 +104,10 @@ function App() {
   const { phase, setPhase } = useAppStore();
   const modals = useModalStore();
 
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return !params.has('code');
+  })
   const [isPhantomMode, setIsPhantomMode] = useState(false)
   const [currentUser, setCurrentUser] = useState<string | null>(null)
   const [mission, setMission] = useState(DEFAULT_PUBLIC_FOROM_MISSION)
@@ -197,7 +200,7 @@ function App() {
             setPhase('profile-setup');
           } else {
             const clientId = "forom-web-app";
-            const redirectUri = encodeURIComponent("https://forom.xyz/callback");
+            const redirectUri = encodeURIComponent(`${window.location.origin}/callback`);
             const scope = encodeURIComponent("openid profile email forom_data");
             const authUrl = `https://auth.forom.xyz/application/o/authorize/?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}`;
             window.location.href = authUrl;
@@ -214,7 +217,7 @@ function App() {
           const authUrl = new URL("https://auth.forom.xyz/application/o/authorize/");
           authUrl.searchParams.append("client_id", "forom-web-app");
           authUrl.searchParams.append("response_type", "code");
-          authUrl.searchParams.append("redirect_uri", "https://forom.xyz/callback");
+          authUrl.searchParams.append("redirect_uri", `${window.location.origin}/callback`);
           authUrl.searchParams.append("scope", "openid profile email forom_data");
           authUrl.searchParams.append("flow", "enrollement-flow");
           
@@ -312,7 +315,7 @@ function App() {
         
         {/* Quest Hub */}
         <motion.button
-          onClick={isPhantomMode ? undefined : modals.openQuest}
+          onClick={isPhantomMode ? undefined : () => modals.openQuest()}
           whileHover={isPhantomMode ? {} : { scale: 1.12 }}
           whileTap={isPhantomMode ? {} : { scale: 0.92 }}
           className={`rounded-full flex items-center justify-center border-2 border-transparent hover:border-orange-500 transition-colors duration-300 ${isPhantomMode ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
