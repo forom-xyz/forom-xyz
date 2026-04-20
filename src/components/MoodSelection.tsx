@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore, type AppLanguage } from '../stores/useAppStore'
 import chromaPortalIcon from '../assets/icons/chroma_portal.svg'
@@ -128,13 +128,33 @@ export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) 
     }
   }, [])
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     if (selected === 'couleur') {
       setIsSignInOpen(true);
     } else if (selected === 'fantome') {
       onGhost();
     }
-  }
+  }, [selected, onGhost])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isSignInOpen) return;
+
+      if (e.code === 'KeyC' || e.key === 'c' || e.key === 'C') {
+        setSelected('couleur');
+      } else if (e.code === 'KeyG' || e.key === 'g' || e.key === 'G') {
+        setSelected('fantome');
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        if (selected) {
+          handleConfirm();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selected, isSignInOpen, handleConfirm]);
 
   return (
     <motion.div

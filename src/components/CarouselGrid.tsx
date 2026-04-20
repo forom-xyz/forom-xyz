@@ -67,8 +67,16 @@ export function CarouselGrid({
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [memoryUpdateKey, setMemoryUpdateKey] = useState(0) // For triggering re-renders
+  const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth)
   const activeIndex = categories.indexOf(activeCategory)
   const gridRef = useRef<HTMLDivElement | null>(null)
+
+  // Track window dimensions for responsive grid layout
+  useEffect(() => {
+    const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Grid swipe-drag state
   const [isGridDragging, setIsGridDragging] = useState(false)
@@ -381,22 +389,26 @@ export function CarouselGrid({
     },
   }
 
-  const renderRow = (rowOffset: number, opacity: number, gap: string = '32px') => {
+  const renderRow = (rowOffset: number, opacity: number) => {
+    // Dynamic columns based on portrait vs landscape
+    const colsArray = isPortrait ? [-2, -1, 0, 1, 2] : [-3, -2, -1, 0, 1, 2, 3]
+    const colGap = isPortrait ? 'min(4vw, 24px)' : 'min(3vw, 32px)';
+
     return (
       <div
         key={rowOffset}
         className="flex items-center justify-center transition-opacity duration-200"
-        style={{ gap, opacity }}
+        style={{ gap: colGap, opacity }}
       >
         <AnimatePresence mode="popLayout" custom={slideDirection}>
-          {[-2, -1, 0, 1, 2].map((col) => {
+          {colsArray.map((col) => {
             // Center box of the middle row gets special treatment
             const isCentered = rowOffset === 0 && col === 0
             const globalIndex = getGlobalIndex(rowOffset, col)
             let memory = getMemoryForPosition(rowOffset, col)
 
             // Determine if there is a quest assigned to this slot
-            const itemBorderColor = memory ? mixColors(CATEGORY_COLORS[memory.category] || '#ffffff', memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888') : '#555555';
+            const itemBorderColor = memory ? mixColors(CATEGORY_COLORS[memory.category] || '#ffffff', memory.question ? (QUESTION_COLORS[memory.question] || '#888888') : '#888888') : '#e5e7eb';
             let customBgColor: string | undefined = undefined;
             if (memory) {
               const catColor = CATEGORY_COLORS[memory.category] || '#ffffff';
@@ -428,9 +440,26 @@ export function CarouselGrid({
             const absRow = Math.abs(rowOffset)
             const absCol = Math.abs(col)
 
-            // Make outer columns smaller to enhance depth effect
-            const isExtraSmall = absRow === 1 && absCol === 2
-            const isSmall = (absRow === 1 && absCol === 1) || (absRow === 0 && absCol === 2)
+            // Scale factor logic: dynamically assign based on distance. 
+            let isExtraSmall = false;
+            let isSmall = false;
+
+            if (isPortrait) {
+              if ((absRow === 2 && absCol >= 1) || (absRow === 1 && absCol === 2)) {
+                isExtraSmall = true;
+              } else if ((absRow === 2 && absCol === 0) || (absRow === 0 && absCol === 2) || (absRow === 1 && absCol === 1)) {
+                isSmall = true;
+              }
+            } else {
+              if (absCol >= 3 || (absRow === 1 && absCol >= 2)) {
+                isExtraSmall = true;
+              } else if (absCol === 2 || (absRow === 1 && absCol === 1)) {
+                isSmall = true;
+              }
+            }
+
+            const categoryName = memory ? (categoryLabels[memory.category] || memory.category) : undefined
+            const tagName = memory?.question ? (questionLabels[memory.question] || memory.question) : undefined
 
             return (
               <motion.div
@@ -454,7 +483,9 @@ export function CarouselGrid({
                   isLocked={isLocked}
                   onClick={() => handleBoxClick(rowOffset, col)}
                   onInfoClick={isCentered && !isLocked ? () => setIsModalOpen(true) : undefined}
-                  questionLabels={questionLabels}
+                  categoryName={categoryName}
+                  tagName={tagName}
+                  isPortrait={isPortrait}
                 />
               </motion.div>
             )
@@ -544,6 +575,7 @@ export function CarouselGrid({
                       isDark={isDark}
                       isLocked={cellIsLocked}
                       isRubixView={true}
+                      isPortrait={isPortrait}
                     />
                   </motion.div>
                 )
@@ -606,16 +638,23 @@ export function CarouselGrid({
         onClickCapture={(e) => { if (gridDragMoved.current) { e.stopPropagation(); gridDragMoved.current = false } }}
         style={{ cursor: isGridDragging ? 'grabbing' : 'grab', userSelect: 'none' }}
       >
-        {/* 3x5 Grid - centered */}
-        <div className="flex flex-col items-center" style={{ gap: '32px' }}>
-          {/* Top Row (-1) */}
-          {renderRow(-1, 0.7)}
-
-          {/* Middle Row (0) - Active with larger center box */}
-          {renderRow(0, 1)}
-
-          {/* Bottom Row (+1) */}
-          {renderRow(1, 0.7)}
+        <div className="flex flex-col items-center" style={{ gap: isPortrait ? 'min(6vh, 48px)' : '32px' }}>
+          {/* Dynamic Rows based on Portrait Mode */}
+          {isPortrait ? (
+            <>
+              {renderRow(-2, 0.4)}
+              {renderRow(-1, 0.7)}
+              {renderRow(0, 1)}
+              {renderRow(1, 0.7)}
+              {renderRow(2, 0.4)}
+            </>
+          ) : (
+            <>
+              {renderRow(-1, 0.7)}
+              {renderRow(0, 1)}
+              {renderRow(1, 0.7)}
+            </>
+          )}
         </div>
 
 

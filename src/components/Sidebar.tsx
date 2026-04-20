@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { CATEGORY_COLORS } from '../data/memories'
 
 // =============================================================================
@@ -38,6 +38,16 @@ const CURVE_INTENSITY = 12
 export function Sidebar({ items, activeId, onSelect, isDark = false, position = 'left' }: SidebarProps) {
   const wheelRef = useRef<HTMLDivElement>(null)
   const activeIndex = items.findIndex((item) => item.id === activeId)
+  
+  // Responsive Scale Factor for overlap resolution
+  const [scaleFactor, setScaleFactor] = useState(0.50)
+  
+  useEffect(() => {
+    const handleResize = () => setScaleFactor(window.innerHeight > window.innerWidth ? 0.35 : 0.50)
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Handle mouse wheel scrolling for navigation
   useEffect(() => {
@@ -112,14 +122,14 @@ export function Sidebar({ items, activeId, onSelect, isDark = false, position = 
   let targetAnim = {}
 
   if (position === 'left') {
-    initialAnim = { opacity: 0, scale: 0.50, x: '-50%', y: '-50%' }
-    targetAnim = { opacity: 1, scale: 0.50, x: '-50%', y: '-50%' }
+    initialAnim = { opacity: 0, scale: scaleFactor, x: '-50%', y: '-50%' }
+    targetAnim = { opacity: 1, scale: scaleFactor, x: '-50%', y: '-50%' }
   } else if (position === 'right') {
-    initialAnim = { opacity: 0, scale: 0.50, x: '50%', y: '-50%' }
-    targetAnim = { opacity: 1, scale: 0.50, x: '50%', y: '-50%' }
+    initialAnim = { opacity: 0, scale: scaleFactor, x: '50%', y: '-50%' }
+    targetAnim = { opacity: 1, scale: scaleFactor, x: '50%', y: '-50%' }
   } else if (position === 'bottom') {
-    initialAnim = { opacity: 0, scale: 0.50, x: '-50%', y: '50%' }
-    targetAnim = { opacity: 1, scale: 0.50, x: '-50%', y: '50%' }
+    initialAnim = { opacity: 0, scale: scaleFactor, x: '-50%', y: '50%' }
+    targetAnim = { opacity: 1, scale: scaleFactor, x: '-50%', y: '50%' }
   }
 
   return (

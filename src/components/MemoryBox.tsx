@@ -1,5 +1,4 @@
 import { memo } from 'react'
-import { QUESTION_COLORS } from '../data/memories'
 import type { Memory } from '../data/memories'
 
 // =============================================================================
@@ -18,20 +17,11 @@ export interface MemoryBoxProps {
   isRubixView?: boolean
   onClick?: () => void
   onInfoClick?: () => void
-  questionLabels?: Record<string, string>
   customBgColor?: string
+  categoryName?: string
+  tagName?: string
+  isPortrait?: boolean
 }
-
-// =============================================================================
-// DIMENSION PRESETS (computed once, not on every render)
-// =============================================================================
-
-const DIMENSIONS = {
-  centered: { width: 'clamp(100px, min(35vw, 35vh), 400px)', height: 'clamp(100px, min(35vw, 35vh), 400px)', minWidth: '100px', minHeight: '100px' },
-  default: { width: 'clamp(60px, min(15vw, 15vh), 180px)', height: 'clamp(60px, min(15vw, 15vh), 180px)', minWidth: '60px', minHeight: '60px' },
-  small: { width: 'clamp(20px, min(5.5vw, 6vh), 120px)', height: 'clamp(20px, min(5.5vw, 6vh), 120px)', minWidth: '20px', minHeight: '20px' },
-  extraSmall: { width: 'clamp(15px, min(4vw, 4vh), 80px)', height: 'clamp(15px, min(4vw, 4vh), 80px)', minWidth: '15px', minHeight: '15px' },
-} as const
 
 // =============================================================================
 // COMPONENT
@@ -49,17 +39,35 @@ export const MemoryBox = memo(function MemoryBox({
   isRubixView = false,
   onClick,
   onInfoClick,
-  questionLabels = {},
   customBgColor,
+  categoryName,
+  tagName,
+  isPortrait = false,
 }: MemoryBoxProps) {
-  // Get dimensions from presets
-  const dimensions = isCentered 
-    ? DIMENSIONS.centered 
-    : isExtraSmall 
-      ? DIMENSIONS.extraSmall 
-      : isSmall 
-        ? DIMENSIONS.small 
-        : DIMENSIONS.default
+  // Get dimensions dynamically based on mode format
+  const getDimensions = () => {
+    // Escape hatch for Rubix View to keep the small rigid grid squares (legacy sizes)
+    if (isRubixView) {
+      if (isCentered) return { width: 'clamp(100px, min(35vw, 35vh), 400px)', height: 'clamp(100px, min(35vw, 35vh), 400px)', minWidth: '100px', minHeight: '100px' };
+      if (isSmall)    return { width: 'clamp(20px, min(5.5vw, 6vh), 120px)', height: 'clamp(20px, min(5.5vw, 6vh), 120px)', minWidth: '20px', minHeight: '20px' };
+      if (isExtraSmall) return { width: 'clamp(15px, min(4vw, 4vh), 80px)', height: 'clamp(15px, min(4vw, 4vh), 80px)', minWidth: '15px', minHeight: '15px' };
+      return { width: 'clamp(60px, min(15vw, 15vh), 180px)', height: 'clamp(60px, min(15vw, 15vh), 180px)', minWidth: '60px', minHeight: '60px' };
+    }
+
+    if (isPortrait) {
+      if (isCentered) return { width: 'clamp(150px, 35vw, 400px)', height: 'clamp(150px, 35vw, 400px)', minWidth: '150px', minHeight: '150px' };
+      if (isSmall)    return { width: 'clamp(60px, 12vw, 150px)', height: 'clamp(60px, 12vw, 150px)', minWidth: '60px', minHeight: '60px' };
+      if (isExtraSmall) return { width: 'clamp(30px, 7vw, 90px)', height: 'clamp(30px, 7vw, 90px)', minWidth: '30px', minHeight: '30px' };
+      return { width: 'clamp(90px, 18vw, 240px)', height: 'clamp(90px, 18vw, 240px)', minWidth: '90px', minHeight: '90px' };
+    } else {
+      if (isCentered) return { width: 'clamp(150px, 38vmin, 450px)', height: 'clamp(150px, 38vmin, 450px)', minWidth: '150px', minHeight: '150px' };
+      if (isSmall)    return { width: 'clamp(50px, 12vmin, 160px)', height: 'clamp(50px, 12vmin, 160px)', minWidth: '50px', minHeight: '50px' };
+      if (isExtraSmall) return { width: 'clamp(30px, 8vmin, 100px)', height: 'clamp(30px, 8vmin, 100px)', minWidth: '30px', minHeight: '30px' };
+      return { width: 'clamp(90px, 22vmin, 280px)', height: 'clamp(90px, 22vmin, 280px)', minWidth: '90px', minHeight: '90px' };
+    }
+  }
+
+  const dimensions = getDimensions();
 
   // Hide box if no memory AND no display number
   if (memory === null && displayNumber === null) {
@@ -67,7 +75,6 @@ export const MemoryBox = memo(function MemoryBox({
   }
 
   const title = memory?.title ?? 'Sans titre'
-  const question = memory?.question ?? null
   const isFilled = memory?.isFilled ?? false
 
   // For centered empty boxes, clicking should open the modal to create a memory
@@ -92,7 +99,7 @@ export const MemoryBox = memo(function MemoryBox({
         className="relative overflow-hidden flex items-center justify-center transition-transform duration-150 hover:scale-105"
         onClick={handleBoxClick}
         style={{
-          border: `3px solid ${isLocked ? (isDark ? '#444' : '#d1d5db') : borderColor}`,
+          border: `3px solid ${isLocked ? (isDark ? '#444' : '#d1d5db') : (isDark ? '#FFFFFF' : '#000000')}`,
           backgroundColor: customBgColor ? customBgColor : (isDark ? '#27272a' : '#fefefe'),
           ...dimensions,
           cursor: isLocked ? 'not-allowed' : (onClick || (isCentered && !isFilled && onInfoClick) ? 'pointer' : 'default'),
@@ -109,46 +116,51 @@ export const MemoryBox = memo(function MemoryBox({
           </div>
         )}
         {isFilled ? (
-          // Filled memory display (no thumbnail)
-          <div className="absolute inset-0 w-full h-full flex flex-col pt-3" style={{ zIndex: 3 }}>
+          // Filled memory display
+          <div className="absolute inset-0 w-full h-full flex flex-col" style={{ zIndex: 3 }}>
             {/* Dark overlay only for non-centered items (if not using custom background) */}
             {!isCentered && !customBgColor && (
               <div className="absolute inset-0 bg-black/10" style={{ zIndex: -1 }} />
             )}
             
-            {/* Title — centered in the box */}
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
-              <span
-                className={`text-center font-bold uppercase w-full ${customBgColor ? 'text-white' : (isDark ? 'text-white' : 'text-black')}`}
-                style={{
-                  fontFamily: "'Jersey 15', sans-serif",
-                  fontSize: isCentered ? 'clamp(18px, 3vw, 36px)' : isSmall ? 'clamp(9px, 1.2vw, 15px)' : isExtraSmall ? 'clamp(7px, 0.9vw, 9px)' : 'clamp(12px, 1.8vw, 20px)',
-                  lineHeight: 1.05,
-                  wordBreak: 'break-word',
-                  textShadow: customBgColor ? '2px 2px 4px rgba(0,0,0,0.5)' : 'none',
-                }}
-              >
-                {title}
-              </span>
-            </div>
+            {/* Render text only if Centered and not Rubix View */}
+            {isCentered && !isRubixView && (
+              <div className="absolute inset-0 flex flex-col justify-between items-center py-[8%]" style={{ zIndex: 10 }}>
+                {/* Category block */}
+                <span style={{ 
+                  color: '#DADADA', 
+                  fontFamily: "'Jersey 15', sans-serif", 
+                  fontSize: 'clamp(14px, 2.5vw, 24px)',
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase'
+                }}>
+                  {categoryName || memory?.category}
+                </span>
 
-            {/* Badge — pinned to bottom center */}
-            {question && !isRubixView && (
-              <div style={{ paddingBottom: '10px', display: 'flex', justifyContent: 'center' }}>
+                {/* Main Title block */}
                 <span
-                  className="flex items-center justify-center font-bold text-white uppercase shadow-sm"
+                  className={`text-center font-bold uppercase w-full ${customBgColor ? 'text-white' : (isDark ? 'text-white' : 'text-black')}`}
                   style={{
                     fontFamily: "'Jersey 15', sans-serif",
-                    fontSize: isCentered ? 'clamp(12px, 2vw, 22px)' : isSmall ? 'clamp(8px, 1vw, 12px)' : isExtraSmall ? '8px' : 'clamp(10px, 1.5vw, 16px)',
-                    backgroundColor: question ? (QUESTION_COLORS[question] || borderColor) : borderColor,
-                    padding: isCentered ? '6px 24px' : '2px 10px',
-                    borderRadius: isCentered ? '12px' : '4px',
-                    border: isCentered ? '3px solid #111' : `2px solid ${borderColor}`,
-                    letterSpacing: isCentered ? '1px' : 'normal',
-                    whiteSpace: 'nowrap',
+                    fontSize: 'clamp(18px, 3.5vw, 42px)',
+                    lineHeight: 1.05,
+                    wordBreak: 'break-word',
+                    textShadow: customBgColor ? '2px 2px 4px rgba(0,0,0,0.5)' : 'none',
+                    padding: '0 10px'
                   }}
                 >
-                  {questionLabels[question] || question}
+                  {title}
+                </span>
+
+                {/* Tag block */}
+                <span style={{ 
+                  color: '#DADADA', 
+                  fontFamily: "'Jersey 15', sans-serif", 
+                  fontSize: 'clamp(14px, 2.5vw, 24px)',
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase'
+                }}>
+                  {tagName || memory?.question}
                 </span>
               </div>
             )}
