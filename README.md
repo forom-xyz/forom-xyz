@@ -180,7 +180,7 @@
   Once you breach Level 10, you unlock access to the <b>Pixels Ecosystem</b>—a series of companion applications designed to accelerate your ascension. 
   <br/><br/>
   From the meditative art of <b>Pixels</b> to the strategic wars of <b>Age of Pixels</b>, each app serves as a bridge to the next rank: 
-  <b>Mage (Lvl 25) $\rightarrow$ Light (Lvl 50) $\rightarrow$ Legend (Lvl 75) $\rightarrow$ Soul (Lvl 100).</b>
+  <b>Mage (Lvl 25) $\rightarrow$ Light (Lvl 50) / Legend (Lvl 75) / Soul (Lvl 100).</b>
   <br/><br/>
   The path is long, the data is vast, and the reward is the awakening of your own personal R.O.M.
 </div>
