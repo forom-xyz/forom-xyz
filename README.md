@@ -77,7 +77,7 @@
   </tr>
   <tr>
     <td align="center" width="20%">🔄<br><b>Iterations</b></td>
-    <td align="left">Memos evolve through a 3-iteration cycle (<b>V1 $\rightarrow$ V2 $\rightarrow$ V3</b>), internally referred to as <b>A.M.E.</b>, to reach absolute quality.</td>
+    <td align="left">Memos evolve through a 3-iteration cycle (<b>V1 / V2 / V3</b>), internally referred to as <b>A.M.E.</b>, to reach absolute quality.</td>
   </tr>
 </table>
 
