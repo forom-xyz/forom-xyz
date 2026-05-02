@@ -1,5 +1,6 @@
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import ReactModal from 'react-modal'
+import parameterIcon from '../assets/icons/parameter.svg'
 import type { ForomColor } from '../utils/foromColors'
 import type { UserRole } from '../App'
 
@@ -13,34 +14,7 @@ const CameraIcon = () => (
   </svg>
 )
 
-export const ParameterIcon = ({ width = 60, height = 60 }: { width?: number | string, height?: number | string }) => (
-  <svg width={width} height={height} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Background slightly rounded */}
-    <rect width="100" height="100" rx="20" fill="#000" />
-    {/* Sliders base */}
-    <rect x="25" y="20" width="6" height="60" rx="3" fill="#D1D5DB" />
-    <rect x="42" y="20" width="6" height="60" rx="3" fill="#D1D5DB" />
-    <rect x="59" y="20" width="6" height="60" rx="3" fill="#D1D5DB" />
-    <rect x="76" y="20" width="6" height="60" rx="3" fill="#D1D5DB" />
-    
-    {/* Knobs */}
-    {/* Yellow left */}
-    <circle cx="28" cy="65" r="9" fill="#FCD34D" />
-    <circle cx="28" cy="65" r="5" fill="#FFF" />
-    
-    {/* Blue middle-left */}
-    <circle cx="45" cy="35" r="9" fill="#93C5FD" />
-    <circle cx="45" cy="35" r="5" fill="#FFF" />
-    
-    {/* Red middle-right */}
-    <circle cx="62" cy="70" r="9" fill="#FCA5A5" />
-    <circle cx="62" cy="70" r="5" fill="#FFF" />
-    
-    {/* Grey right */}
-    <circle cx="79" cy="30" r="9" fill="#9CA3AF" />
-    <circle cx="79" cy="30" r="5" fill="#FFF" />
-  </svg>
-)
+// Removed inline ParameterIcon as per user request to use SVG asset
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -137,7 +111,7 @@ export function LobbyUserModal({
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
             title="Paramètres"
           >
-            <ParameterIcon />
+            <img src={parameterIcon} alt="Paramètres" style={{ width: 60, height: 60, filter: 'invert(1)' }} />
           </button>
 
           <motion.div

@@ -64,7 +64,7 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     title: 'CHOISI TON MOOD',
     couleur: 'COULEUR',
     fantome: 'FANTÔME',
-    confirmer: 'Confirmer',
+    confirmer: 'ESPACE',
     couleurTitle: 'Couleur',
     fantomeTitle: 'Fantôme',
     couleurText:
@@ -76,7 +76,7 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     title: 'CHOOSE YOUR MOOD',
     couleur: 'COLOR',
     fantome: 'GHOST',
-    confirmer: 'Confirm',
+    confirmer: 'SPACE',
     couleurTitle: 'Color',
     fantomeTitle: 'Ghost',
     couleurText:
@@ -88,7 +88,7 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     title: 'ELIGE TU MODO',
     couleur: 'COLOR',
     fantome: 'FANTASMA',
-    confirmer: 'Confirmar',
+    confirmer: 'ESPACIO',
     couleurTitle: 'Color',
     fantomeTitle: 'Fantasma',
     couleurText:

@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Lock } from 'lucide-react'
-import cedilleIcon from '../assets/icons/cedille.png'
 import chromaNotesIcon from '../assets/icons/chroma_portal.svg'
 import parameterIcon from '../assets/icons/parameter.svg'
 import ghostWhtIcon from '../assets/icons/ghost_wht.svg'
 import carmelIcon from '../assets/icons/carmel.svg'
+import SearchKnob from './SearchKnob'
 
 // =============================================================================
 // CONSTANTS
@@ -58,25 +58,10 @@ interface HeaderProps {
 }
 
 export function Header({ onTokenClick, onUserClick, onLobbyClick, onRomapClick, isDark = false, mission, isPhantom = false, seasonPhase = 'V1' }: HeaderProps) {
-  const [isSearchActive, setIsSearchActive] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const [isArchiveDropdownOpen, setIsArchiveDropdownOpen] = useState(false)
-  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const isEtsLight = mission === 'Club étudiants ÉTS' && !isDark;
   const phaseColor = isEtsLight ? '#ffffff' : (seasonPhase === 'V1' ? '#EF4444' : seasonPhase === 'V2' ? '#22C55E' : '#3B82F6');
-
-  // Auto-focus search input when it appears
-  useEffect(() => {
-    if (isSearchActive && searchInputRef.current) {
-      searchInputRef.current.focus()
-    }
-  }, [isSearchActive])
-
-  const handleCloseSearch = () => {
-    setIsSearchActive(false)
-    setSearchQuery('')
-  }
 
   return (
     <motion.header
@@ -84,7 +69,7 @@ export function Header({ onTokenClick, onUserClick, onLobbyClick, onRomapClick, 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="px-[3%] relative z-50 flex items-center transition-colors duration-300"
-      style={{ paddingTop: '2.2vh', paddingBottom: '1.6vh', backgroundColor: mission === 'Club étudiants ÉTS' && !isDark ? '#E3022C' : 'var(--color-bg)' }}
+      style={{ paddingTop: '2.2vh', paddingBottom: '1.6vh', background: isDark ? 'linear-gradient(to bottom, #0D0D0F 1%, transparent 100%)' : 'linear-gradient(to bottom, #ffffff 1%, transparent 100%)' }}
     >
       {/* ---- Left group: Top Left Stack ---- */}
       <div className="flex items-start" style={{ gap: '5%', flex: 1 }}>
@@ -143,59 +128,11 @@ export function Header({ onTokenClick, onUserClick, onLobbyClick, onRomapClick, 
               right: 'calc(100% + 14px)',
               top: '50%',
               transform: 'translateY(-50%)',
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: '8px',
               zIndex: 1,
               pointerEvents: 'auto',
             }}
           >
-            {/* Expanding input — grows to the LEFT of the button */}
-            <AnimatePresence>
-              {isSearchActive && (
-                <motion.div
-                  key="search-inp-wrap"
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: 240, opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  transition={{ duration: 0.32, ease: 'easeInOut' }}
-                  style={{ overflow: 'hidden', flexShrink: 0 }}
-                >
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Escape' && handleCloseSearch()}
-                    placeholder="Search FOROM..."
-                    aria-label="Search"
-                    style={{
-                      width: '240px',
-                      background: 'transparent',
-                      border: 'none',
-                      borderBottom: '2px solid var(--color-text)',
-                      outline: 'none',
-                      fontSize: '20px',
-                      fontWeight: 600,
-                      fontFamily: 'Montserrat, sans-serif',
-                      color: 'var(--color-text)',
-                      caretColor: 'var(--color-text)',
-                      paddingBottom: '2px',
-                    }}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Search / Close button */}
-            <button
-              type="button"
-              className={`forom-search-btn${isSearchActive ? ' forom-search-close' : ''}`}
-              onClick={() => isSearchActive ? handleCloseSearch() : setIsSearchActive(true)}
-              style={{ flexShrink: 0 }}
-              aria-label={isSearchActive ? 'Close search' : 'Open search'}
-            />
+            <SearchKnob isDark={isEtsLight ? false : isDark} />
           </div>
 
           {/* Versions Dropdown */}
@@ -283,30 +220,7 @@ export function Header({ onTokenClick, onUserClick, onLobbyClick, onRomapClick, 
             </AnimatePresence>
           </div>
 
-          {/* Cedille easter egg — always visible */}
-          <a
-            href="https://cedille.etsmtl.ca/"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Cedille"
-            style={{
-              position: 'absolute',
-              left: 'calc(100% + 4px)',
-              top: '22%',
-              width: '14px',
-              height: '14px',
-              display: 'block',
-              zIndex: 2,
-              cursor: 'pointer',
-              pointerEvents: 'auto',
-            }}
-          >
-            <img
-              src={cedilleIcon}
-              alt="Cedille"
-              style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-            />
-          </a>
+
 
           {/* FOROM letters — always visible, never animate out */}
           <div

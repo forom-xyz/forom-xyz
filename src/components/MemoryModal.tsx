@@ -102,7 +102,7 @@ export function MemoryModal({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [videoCurrentTime, setVideoCurrentTime] = useState(0)
   const [videoDuration, setVideoDuration] = useState(0)
-  const ytPlayerRef = useRef<any>(null)
+  const ytPlayerRef = useRef<any>(null)  
   const ytTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const ytIframeRef = useRef<HTMLIFrameElement>(null)
   const [formData, setFormData] = useState<FormData>({
@@ -116,7 +116,7 @@ export function MemoryModal({
   useEffect(() => {
     if (memory) {
       const defaultEmptyTitle = memory.title.startsWith('Emplacement ') ? '' : memory.title;
-      setFormData({
+      setFormData({  
         question: memory.question,
         title: memory.isFilled ? memory.title : defaultEmptyTitle,
         videoUrl: memory.videoUrl || '',
@@ -144,7 +144,7 @@ export function MemoryModal({
       if (ytTimerRef.current) { clearInterval(ytTimerRef.current); ytTimerRef.current = null }
       if (ytPlayerRef.current?.destroy) ytPlayerRef.current.destroy()
       ytPlayerRef.current = null
-      setVideoCurrentTime(0)
+      setVideoCurrentTime(0)  
       setVideoDuration(0)  
       return
     }
@@ -152,6 +152,7 @@ export function MemoryModal({
     const startPlayer = () => {
       if (!ytIframeRef.current) return
       if (ytPlayerRef.current) return
+       
       ytPlayerRef.current = new (window as any).YT.Player(ytIframeRef.current, {
         events: {
           onReady: () => {
@@ -166,6 +167,7 @@ export function MemoryModal({
       })
     }
 
+     
     const w = window as any
     if (w.YT?.Player) {
       setTimeout(startPlayer, 300)

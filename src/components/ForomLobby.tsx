@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '../stores/useAppStore'
 import { useModalStore } from '../stores/useModalStore'
-import { ParameterIcon } from './LobbyUserModal'
+import parameterIcon from '../assets/icons/parameter.svg'
 import tutoIcon from '../assets/icons/TUTO.svg'
 import etsIcon from '../assets/icons/ets.jpg'
 import githubIcon from '../assets/icons/github.png'
@@ -186,7 +186,7 @@ export function ForomLobby({ onConfirm, onSkip, onSignIn, currentUser, onBackToL
           }}
           title={currentUser ? "Paramètres" : "Ghost"}
         >
-          {currentUser ? <ParameterIcon width="48" height="48" /> : <img src={ghostWhtIcon} alt="Ghost" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />}
+          {currentUser ? <img src={parameterIcon} alt="Paramètres" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'invert(1)' }} /> : <img src={ghostWhtIcon} alt="Ghost" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />}
         </button>
       )}
 

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect } from 'react'
 import { CATEGORY_COLORS } from '../data/memories'
 
 // =============================================================================
@@ -38,16 +38,6 @@ const CURVE_INTENSITY = 12
 export function Sidebar({ items, activeId, onSelect, isDark = false, position = 'left' }: SidebarProps) {
   const wheelRef = useRef<HTMLDivElement>(null)
   const activeIndex = items.findIndex((item) => item.id === activeId)
-  
-  // Responsive Scale Factor for overlap resolution
-  const [scaleFactor, setScaleFactor] = useState(0.50)
-  
-  useEffect(() => {
-    const handleResize = () => setScaleFactor(window.innerHeight > window.innerWidth ? 0.35 : 0.50)
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   // Handle mouse wheel scrolling for navigation
   useEffect(() => {
@@ -104,32 +94,38 @@ export function Sidebar({ items, activeId, onSelect, isDark = false, position = 
 
   if (position === 'left') {
     containerStyle = { ...containerStyle, left: '0px', top: '50%' }
-    listStyle = { left: '440px', top: '50%', transform: 'translateY(-50%)' }
+    listStyle = { left: '420px', top: '50%', transform: 'translateY(-50%)' } // Offset so text is always visible
     listClassName += "flex-col items-start"
   } else if (position === 'right') {
     containerStyle = { ...containerStyle, right: '0px', top: '50%' }
-    listStyle = { right: '440px', top: '50%', transform: 'translateY(-50%)' }
+    listStyle = { right: '420px', top: '50%', transform: 'translateY(-50%)' } // Offset so text is always visible
     listClassName += "flex-col items-end"
   } else if (position === 'bottom') {
     containerStyle = { ...containerStyle, bottom: '0px', left: '50%' }
-    // Text container anchored above the circle. 240px physical from center -> 120px visual from center.
-    listStyle = { bottom: '440px', left: '50%', transform: 'translateX(-50%)', width: '800px' } 
+    // Text container anchored above the circle
+    listStyle = { bottom: '420px', left: '50%', transform: 'translateX(-50%)', width: '800px' } 
     listClassName += "flex-row justify-center items-end gap-12"
   }
 
   // Initial animation
-  let initialAnim = {}
-  let targetAnim = {}
+  // Determine initial off-screen positioning to show a only a sliver of the circle (10%)
+  // On hover, we reveal up to 50% of the circle by sliding it out
+  let initialAnim: any = {}
+  let targetAnim: any = {}
+  let hoverAnim: any = {}
 
   if (position === 'left') {
-    initialAnim = { opacity: 0, scale: scaleFactor, x: '-50%', y: '-50%' }
-    targetAnim = { opacity: 1, scale: scaleFactor, x: '-50%', y: '-50%' }
+    initialAnim = { opacity: 0, scale: 0.5, x: '-65%', y: '-50%' }
+    targetAnim = { opacity: 1, scale: 0.5, x: '-65%', y: '-50%' }
+    hoverAnim = { scale: 0.6, x: '-50%' }
   } else if (position === 'right') {
-    initialAnim = { opacity: 0, scale: scaleFactor, x: '50%', y: '-50%' }
-    targetAnim = { opacity: 1, scale: scaleFactor, x: '50%', y: '-50%' }
+    initialAnim = { opacity: 0, scale: 0.5, x: '65%', y: '-50%' }
+    targetAnim = { opacity: 1, scale: 0.5, x: '65%', y: '-50%' }
+    hoverAnim = { scale: 0.6, x: '50%' }
   } else if (position === 'bottom') {
-    initialAnim = { opacity: 0, scale: scaleFactor, x: '-50%', y: '50%' }
-    targetAnim = { opacity: 1, scale: scaleFactor, x: '-50%', y: '50%' }
+    initialAnim = { opacity: 0, scale: 0.5, x: '-50%', y: '65%' }
+    targetAnim = { opacity: 1, scale: 0.5, x: '-50%', y: '65%' }
+    hoverAnim = { scale: 0.6, y: '50%' }
   }
 
   return (
@@ -137,7 +133,7 @@ export function Sidebar({ items, activeId, onSelect, isDark = false, position = 
       ref={wheelRef}
       initial={initialAnim}
       animate={targetAnim}
-      whileHover={{ scale: 0.8 }}
+      whileHover={hoverAnim}
       transition={{ duration: 0.3, type: 'spring', damping: 18 }}
       className={containerClassName}
       style={containerStyle}
@@ -149,7 +145,7 @@ export function Sidebar({ items, activeId, onSelect, isDark = false, position = 
           border: `3px solid ${isDark ? '#52525b' : '#9ca3af'}`,
           background: isDark 
             ? 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)' 
-            : 'linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)',
+            : '#ffffff',
         }}
       />
 
