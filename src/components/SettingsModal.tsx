@@ -85,7 +85,7 @@ export function SettingsModal({
 
   useEffect(() => {
     if (isOpen) {
-      setLocalCategoryLabels({ ...currentCategoryLabels })
+      setLocalCategoryLabels({ ...currentCategoryLabels })  
       setLocalQuestionLabels({ ...currentQuestionLabels })  
     }
   }, [isOpen, currentCategoryLabels, currentQuestionLabels])

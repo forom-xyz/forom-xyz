@@ -18,15 +18,20 @@ interface ModalStore {
   isMemoryOpen: boolean;
   isVideoOpen: boolean;
 
+  // Global quest tracking state
+  sentRequests: number[];
+  addSentRequest: (index: number) => void;
+
   // Selected Payloads (Data displayed inside the active modal)
   selectedQuest: Quest | null;
+  questInitialIndex: number | null;
   selectedUserId: string | null;
   selectedMemory: Memory | null;
   selectedVideo: VideoData | null;
 
   // Open Actions
   openWallet: () => void;
-  openQuest: (quest?: Quest) => void;
+  openQuest: (quest?: Quest, initialIndex?: number) => void;
   openUser: (userId?: string) => void;
   openRomap: () => void;
   openSettings: () => void;
@@ -56,7 +61,11 @@ export const useModalStore = create<ModalStore>((set, _get) => ({ // eslint-disa
   isMemoryOpen: false,
   isVideoOpen: false,
 
+  sentRequests: [],
+  addSentRequest: (index: number) => set((state) => ({ sentRequests: [...state.sentRequests, index] })),
+
   selectedQuest: null,
+  questInitialIndex: null,
   selectedUserId: null,
   selectedMemory: null,
   selectedVideo: null,
@@ -65,8 +74,8 @@ export const useModalStore = create<ModalStore>((set, _get) => ({ // eslint-disa
   openWallet: () => set({ isWalletOpen: true }),
   closeWallet: () => set({ isWalletOpen: false }),
 
-  openQuest: (quest?: Quest) => set({ isQuestOpen: true, selectedQuest: quest ?? null }),
-  closeQuest: () => set({ isQuestOpen: false, selectedQuest: null }),
+  openQuest: (quest?: Quest, initialIndex?: number) => set({ isQuestOpen: true, selectedQuest: quest ?? null, questInitialIndex: initialIndex ?? null }),
+  closeQuest: () => set({ isQuestOpen: false, selectedQuest: null, questInitialIndex: null }),
 
   openUser: (userId?: string) => set({ isUserOpen: true, selectedUserId: userId ?? null }),
   closeUser: () => set({ isUserOpen: false, selectedUserId: null }),
@@ -92,6 +101,7 @@ export const useModalStore = create<ModalStore>((set, _get) => ({ // eslint-disa
     isMemoryOpen: false,
     isVideoOpen: false,
     selectedQuest: null,
+    questInitialIndex: null,
     selectedUserId: null,
     selectedMemory: null,
     selectedVideo: null,

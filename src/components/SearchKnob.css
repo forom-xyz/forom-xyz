@@ -1,0 +1,45 @@
+.search-knob {
+  position: relative;
+  width: 240px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.knob-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* so input can be clicked */
+}
+
+.knob-svg path {
+  pointer-events: auto; /* make paths clickable */
+}
+
+/* Animations are now handled by Framer Motion */
+
+.search-knob-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(100% - 40px); /* Leave space for the circle */
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding-left: 24px; /* Shift text to the right so it starts inside the line (which starts at x=20) */
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  transition: opacity 0.3s ease 0.1s;
+  transform: translateY(-10px); /* Shift text up above the horizontal line */
+}
+
+.search-knob-input::placeholder {
+  color: inherit;
+  opacity: 0.5;
+}

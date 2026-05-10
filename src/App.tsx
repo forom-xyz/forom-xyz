@@ -57,12 +57,12 @@ const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 // =============================================================================
 
 /** Modern Theme Toggle Switch */
-function ThemeToggle({ 
-  isDark, 
-  onToggle 
-}: { 
+function ThemeToggle({
+  isDark,
+  onToggle
+}: {
   isDark: boolean
-  onToggle: () => void 
+  onToggle: () => void
 }) {
   return (
     <motion.button
@@ -109,6 +109,7 @@ function App() {
     return !params.has('code');
   })
   const [isPhantomMode, setIsPhantomMode] = useState(false)
+  const [isTuto, setIsTuto] = useState(false)
   const [currentUser, setCurrentUser] = useState<string | null>(null)
   const [mission, setMission] = useState(DEFAULT_PUBLIC_FOROM_MISSION)
   const [foromColor, setForomColor] = useState<ForomColor | null>('creation')
@@ -124,11 +125,11 @@ function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
-    
+
     if (code) {
       // 1. Clean the URL so the authorization code isn't left hanging.
       window.history.replaceState({}, document.title, window.location.pathname);
-      
+
       // 2. MOCK: Return user to lobby
       setCurrentUser("rom"); // We'd get this from the backend token normally
       setPhase('lobby');
@@ -190,7 +191,7 @@ function App() {
 
   if (phase === 'mood') {
     return (
-      <MoodSelection 
+      <MoodSelection
         onGhost={() => {
           setIsPhantomMode(true);
           setPhase('lobby');
@@ -206,6 +207,7 @@ function App() {
             window.location.href = authUrl;
           }
         }}
+        onBack={() => setIsLoading(true)}
       />
     );
   }
@@ -220,12 +222,12 @@ function App() {
           authUrl.searchParams.append("redirect_uri", `${window.location.origin}/callback`);
           authUrl.searchParams.append("scope", "openid profile email forom_data");
           authUrl.searchParams.append("flow", "enrollement-flow");
-          
+
           // Append the custom enrollment data to query string
           Object.entries(data).forEach(([key, value]) => {
             authUrl.searchParams.append(key, value);
           });
-          
+
           window.location.href = authUrl.toString();
         }}
         onClose={() => setPhase('mood')}
@@ -236,10 +238,11 @@ function App() {
   if (phase === 'lobby') {
     return (
       <>
-        <ForomLobby 
-          onConfirm={() => setPhase('creation-flow')} 
+        <ForomLobby
+          onConfirm={() => setPhase('creation-flow')}
           onSkip={() => {
             setIsPhantomMode(!currentUser)
+            setIsTuto(true)
             setPhase('grid')
           }}
           onBackToLoading={() => setIsLoading(true)}
@@ -283,6 +286,7 @@ function App() {
         onComplete={(m, color) => {
           setMission(m)
           setForomColor(color)
+          setIsTuto(false)
           setPhase('grid')
           setIsPhantomMode(false)
           // A user-created forom always starts with the base A–J / 0–9 format.
@@ -302,17 +306,17 @@ function App() {
   }
 
   return (
-    <div 
+    <div
       className="h-screen overflow-hidden relative transition-colors duration-300"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       {/* Right Column Stack: Theme, Settings */}
-      <div 
+      <div
         className="fixed z-50 flex flex-col items-center"
         style={{ bottom: '48px', right: '3%', gap: '2vh' }}
       >
         <ThemeToggle isDark={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
-        
+
         {/* Quest Hub */}
         <motion.button
           onClick={isPhantomMode ? undefined : () => modals.openQuest()}
@@ -335,13 +339,14 @@ function App() {
         )}
       </div>
 
-      <Header 
+      <Header
         onTokenClick={modals.openWallet}
         onUserClick={modals.openUser}
         onRomapClick={modals.openRomap}
         seasonPhase={seasonPhase}
         onLobbyClick={() => {
           setPhase('lobby')
+          setIsTuto(false)
           if (isPhantomMode) {
             setIsPhantomMode(false)
           }
@@ -375,9 +380,9 @@ function App() {
       </div>
 
       {/* Bottom Center - Rubix View Toggle */}
-      <div 
+      <div
         className="fixed z-50 flex justify-center items-center pointer-events-none"
-        style={{ bottom: '15px', left: '0', right: '0' }}
+        style={{ bottom: '5px', left: '0', right: '0' }}
       >
         <motion.button
           onClick={() => setIsRubixView(prev => !prev)}
@@ -426,7 +431,7 @@ function App() {
         }}
         questionLabels={questionLabels}
         personalQuests={personalQuests}
-        isEmptyGrid={false}
+        isEmptyGrid={isTuto}
       />
 
       {/* --------------------------------------------------------------------------
@@ -494,7 +499,7 @@ function App() {
           if (pixels < cost) return;
           // Deduct
           setPixels(p => Math.max(0, p - cost));
-          
+
           setPersonalQuests(prev => {
             return [...prev, { id: Date.now().toString(), title, reward, question, category }]
           })

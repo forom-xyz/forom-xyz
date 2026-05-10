@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore, type AppLanguage } from '../stores/useAppStore'
 import chromaPortalIcon from '../assets/icons/chroma_portal.svg'
@@ -64,7 +64,7 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     title: 'CHOISI TON MOOD',
     couleur: 'COULEUR',
     fantome: 'FANTÔME',
-    confirmer: 'Confirmer',
+    confirmer: 'ESPACE',
     couleurTitle: 'Couleur',
     fantomeTitle: 'Fantôme',
     couleurText:
@@ -76,7 +76,7 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     title: 'CHOOSE YOUR MOOD',
     couleur: 'COLOR',
     fantome: 'GHOST',
-    confirmer: 'Confirm',
+    confirmer: 'SPACE',
     couleurTitle: 'Color',
     fantomeTitle: 'Ghost',
     couleurText:
@@ -88,7 +88,7 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
     title: 'ELIGE TU MODO',
     couleur: 'COLOR',
     fantome: 'FANTASMA',
-    confirmer: 'Confirmar',
+    confirmer: 'ESPACIO',
     couleurTitle: 'Color',
     fantomeTitle: 'Fantasma',
     couleurText:
@@ -128,13 +128,33 @@ export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) 
     }
   }, [])
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     if (selected === 'couleur') {
       setIsSignInOpen(true);
     } else if (selected === 'fantome') {
       onGhost();
     }
-  }
+  }, [selected, onGhost])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isSignInOpen) return;
+
+      if (e.code === 'KeyC' || e.key === 'c' || e.key === 'C') {
+        setSelected('couleur');
+      } else if (e.code === 'KeyG' || e.key === 'g' || e.key === 'G') {
+        setSelected('fantome');
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        if (selected) {
+          handleConfirm();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selected, isSignInOpen, handleConfirm]);
 
   return (
     <motion.div
