@@ -4,7 +4,7 @@ import chromaPortalIcon from '../assets/icons/chroma_portal.svg'
 import foromLogoBlk from '../assets/icons/forom_logo_blk.png'
 
 interface CustomEnrollmentFlowProps {
-  onSubmit: (data: { username: string; email: string; color: string; town: string }) => void
+  onSubmit: (data: { username: string; email: string; password: string; color: string; town: string }) => void
   onClose: () => void
 }
 
@@ -14,9 +14,11 @@ export function CustomEnrollmentFlow({ onSubmit, onClose }: CustomEnrollmentFlow
   const [email, setEmail] = useState('')
   const [selectedColor, setSelectedColor] = useState<string | null>(null)
   const [town, setTown] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleNext = () => {
-    if (step < 4) setStep(step + 1)
+    if (step < 5) setStep(step + 1)
   }
 
   const handlePrev = () => {
@@ -27,6 +29,7 @@ export function CustomEnrollmentFlow({ onSubmit, onClose }: CustomEnrollmentFlow
     onSubmit({
       username: username.trim(),
       email: email.trim(),
+      password: password,
       color: selectedColor || 'Social',
       town: town.trim() || 'Quelque part dans l\'univers...'
     })
@@ -37,7 +40,8 @@ export function CustomEnrollmentFlow({ onSubmit, onClose }: CustomEnrollmentFlow
       case 1: return '#2b2b2b'
       case 2: return '#555555'
       case 3: return '#888888'
-      case 4: return '#e0e0e0'
+      case 4: return '#777777'
+      case 5: return '#e0e0e0'
       default: return '#2b2b2b'
     }
   }
@@ -56,7 +60,7 @@ export function CustomEnrollmentFlow({ onSubmit, onClose }: CustomEnrollmentFlow
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        color: step === 4 ? 'black' : 'white',
+        color: step === 5 ? 'black' : 'white',
         overflow: 'hidden',
       }}
     >
@@ -361,10 +365,102 @@ export function CustomEnrollmentFlow({ onSubmit, onClose }: CustomEnrollmentFlow
           </motion.div>
         )}
 
-        {/* STEP 4: Welcome */}
+        {/* STEP 4: Password (asked before sending to authentik) */}
         {step === 4 && (
           <motion.div
-            key="step4"
+            key="step4-password"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: 'auto', width: '100%', maxWidth: '600px' }}>
+              <h2 style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '14px', fontWeight: 'bold', letterSpacing: '0.1em', marginBottom: '16px' }}>
+                Choisis un mot de passe
+              </h2>
+
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Mot de passe"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoFocus
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  textAlign: 'center',
+                  fontSize: 'clamp(18px, 4vw, 32px)',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: 'white',
+                  width: '100%',
+                  marginBottom: '24px',
+                }}
+              />
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: "'Montserrat', sans-serif", fontSize: '12px', opacity: 0.9 }}>
+                <input type="checkbox" checked={showPassword} onChange={() => setShowPassword(!showPassword)} /> Montrer le mot de passe
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '60px' }}>
+              <motion.button
+                onClick={handlePrev}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                style={{
+                  width: '40px', height: '40px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.1)', border: 'none',
+                  color: 'white', fontSize: '18px', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}
+              >
+                {'<'}
+              </motion.button>
+
+              <motion.button
+                onClick={handleNext}
+                disabled={!password}
+                whileHover={password ? { scale: 1.05 } : {}}
+                whileTap={password ? { scale: 0.95 } : {}}
+                style={{
+                  background: '#06b6d4',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '999px',
+                  padding: '16px 48px',
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 'bold',
+                  fontSize: '16px',
+                  cursor: password ? 'pointer' : 'not-allowed',
+                  opacity: password ? 1 : 0.5,
+                  boxShadow: '0 8px 16px rgba(6,182,212,0.2)'
+                }}
+              >
+                Suivant
+              </motion.button>
+
+              <motion.button
+                onClick={onClose}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                style={{
+                  width: '40px', height: '40px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.1)', border: 'none',
+                  color: 'white', fontSize: '18px', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}
+              >
+                ✕
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* STEP 5: Welcome */}
+        {step === 5 && (
+          <motion.div
+            key="step5"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.1 }}
