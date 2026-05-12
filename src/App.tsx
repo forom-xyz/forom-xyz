@@ -215,20 +215,39 @@ function App() {
   if (phase === 'profile-setup') {
     return (
       <CustomEnrollmentFlow
-        onSubmit={(data) => {
-          const authUrl = new URL("https://auth.forom.xyz/application/o/authorize/");
-          authUrl.searchParams.append("client_id", "forom-web-app");
-          authUrl.searchParams.append("response_type", "code");
-          authUrl.searchParams.append("redirect_uri", `${window.location.origin}/callback`);
-          authUrl.searchParams.append("scope", "openid profile email forom_data");
-          authUrl.searchParams.append("flow", "enrollement-flow");
+        onSubmit={async (data) => {
+          try {
+            // 1. Send data to your Jetson Nano "Boss" API
+            // Replace 'your-jetson-ip' with the actual IP of your Nano
+            const response = await fetch('http://your-jetson-ip:3000/api/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                username: data.username,
+                email: data.email,
+                password: data.password,
+                color: data.color, // Blue, Yellow, or Red
+                city: data.town, // City name
+              }),
+            });
 
-          // Append the custom enrollment data to query string
-          Object.entries(data).forEach(([key, value]) => {
-            authUrl.searchParams.append(key, value);
-          });
+            if (!response.ok) {
+              const errData = await response.json();
+              throw new Error(errData.error || 'Registration failed');
+            }
 
-          window.location.href = authUrl.toString();
+            // 2. If successful, now we redirect them to Authentik to finish the OIDC flow/Login
+            const authUrl = new URL("https://auth.forom.xyz/application/o/authorize/");
+            authUrl.searchParams.append("client_id", "forom-web-app");
+            authUrl.searchParams.append("response_type", "code");
+            authUrl.searchParams.append("redirect_uri", `${window.location.origin}/callback`);
+            authUrl.searchParams.append("scope", "openid profile email forom_data");
+
+            window.location.href = authUrl.toString();
+          } catch (error: any) {
+            alert(`Error creating account: ${error.message}`);
+            // You could add a more pretty error state here instead of an alert
+          }
         }}
         onClose={() => setPhase('mood')}
       />
