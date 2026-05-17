@@ -1,6 +1,6 @@
-﻿import ReactModal from 'react-modal'
+import ReactModal from 'react-modal'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import userIcon from '../assets/icons/user.png'
 import type { ForomColor } from '../utils/foromColors'
 import type { UserRole } from '../App'
@@ -226,6 +226,27 @@ export function UserModal({
   const [sosVotes, setSosVotes] = useState(24)
 
   const randomMembersCount = useMemo(() => Math.floor(Math.random() * 3) + 2, [])
+  const [dbUsers, setDbUsers] = useState<any[]>([])
+
+  useEffect(() => {
+    if (isOpen && userRole === 'S-MODS') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetch('http://192.168.18.23:8080/api/users', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            setDbUsers(data);
+          } else if (data && Array.isArray(data.users)) {
+            setDbUsers(data.users);
+          }
+        })
+        .catch(console.error);
+      }
+    }
+  }, [isOpen, userRole]);
 
   const copyKey = useCallback((key: string) => {
     navigator.clipboard.writeText(key).then(() => {
@@ -718,11 +739,17 @@ export function UserModal({
                   overflow: 'hidden',
                 }}
               >
-                <div style={{ padding: '20px 18px 12px', borderBottom: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: 'white', letterSpacing: '0.12em', fontFamily: "'Jersey 15', sans-serif", marginBottom: 12 }}>
-                    DATABASE
+                {userRole !== 'S-MODS' ? (
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ff4444', fontFamily: "'Jersey 15', sans-serif", fontSize: '48px', textTransform: 'uppercase' }}>
+                    Access Denied
                   </div>
-                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                ) : (
+                  <>
+                    <div style={{ padding: '20px 18px 12px', borderBottom: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: 'white', letterSpacing: '0.12em', fontFamily: "'Jersey 15', sans-serif", marginBottom: 12 }}>
+                        DATABASE
+                      </div>
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                     {TABS.map(tab => {
                       const current  = tab.id === 'S-MODS' ? 1 : 0
                       const isActive = activeTab === tab.id
@@ -767,20 +794,40 @@ export function UserModal({
                 <div className="ld-members" style={{ flex: 1, overflowY: 'auto' }}>
                   {(() => {
                     const getActiveList = () => {
+                      if (dbUsers && dbUsers.length > 0) {
+                        const formatted = dbUsers.map(u => ({
+                          id: u.id,
+                          name: u.username,
+                          quests: u.quests || 0,
+                          pixels: u.currency || u.xp || 0,
+                          missions: u.missions || 0,
+                          level: u.level || 1,
+                          isBot: false,
+                          key: u.invite_key || null,
+                          team: u.team || undefined,
+                          role: u.role
+                        }));
+                        if (activeTab === 'S-MODS') return formatted.filter(u => u.role === 'S-mod');
+                        if (activeTab === 'MODS') return formatted.filter(u => u.role === 'Mod');
+                        if (activeTab === 'CREATOR') return formatted.filter(u => u.role === 'Editor');
+                        if (activeTab === 'ASSOCIES') return formatted.filter(u => u.role === 'Associate');
+                      }
+
+                      // Fallback logic if API failed or no users
                       if (activeTab === 'S-MODS') return supermods;
                       if (activeTab === 'MODS') return [
-                         { id: 1, name: 'ZYLO', quests: 8, pixels: 0, missions: 2, level: 3, isBot: false, key: 'MOD-99F1', team: 'ROUGE' },
-                         { id: 2, name: 'ROBOM', quests: 2, pixels: 100, missions: 0, level: 1, isBot: true, key: null, team: 'BLEU' },
-                         { id: 3, name: 'XOROM', quests: 12, pixels: 250, missions: 5, level: 4, isBot: true, key: null, team: 'VERT' },
-                         { id: 4, name: 'TOROM', quests: 10, pixels: 0, missions: 10, level: 5, isBot: true, key: null, team: 'BLEU' }
+                         { id: 1, name: 'ZYLO', quests: 8, pixels: 0, missions: 2, level: 3, isBot: false, key: 'MOD-99F1', team: 'ROUGE', role: 'Mod' },
+                         { id: 2, name: 'ROBOM', quests: 2, pixels: 100, missions: 0, level: 1, isBot: true, key: null, team: 'BLEU', role: 'Mod' },
+                         { id: 3, name: 'XOROM', quests: 12, pixels: 250, missions: 5, level: 4, isBot: true, key: null, team: 'VERT', role: 'Mod' },
+                         { id: 4, name: 'TOROM', quests: 10, pixels: 0, missions: 10, level: 5, isBot: true, key: null, team: 'BLEU', role: 'Mod' }
                       ];
                       if (activeTab === 'CREATOR') return [
-                         { id: 1, name: 'BYLO', quests: 15, pixels: 500, missions: 0, level: 5, isBot: false },
-                         { id: 2, name: 'CR-ALPHA', quests: 5, pixels: 150, missions: 0, level: 2, isBot: true },
+                         { id: 1, name: 'BYLO', quests: 15, pixels: 500, missions: 0, level: 5, isBot: false, role: 'Editor' },
+                         { id: 2, name: 'CR-ALPHA', quests: 5, pixels: 150, missions: 0, level: 2, isBot: true, role: 'Editor' },
                       ];
                       if (activeTab === 'ASSOCIES') return [
-                         { id: 1, name: 'DYLO', quests: 3, pixels: 500, missions: 0, level: 1, isBot: false },
-                         { id: 2, name: 'AS-BETA', quests: 7, pixels: 250, missions: 0, level: 2, isBot: true },
+                         { id: 1, name: 'DYLO', quests: 3, pixels: 500, missions: 0, level: 1, isBot: false, role: 'Associate' },
+                         { id: 2, name: 'AS-BETA', quests: 7, pixels: 250, missions: 0, level: 2, isBot: true, role: 'Associate' },
                       ];
                       return [];
                     };
@@ -875,6 +922,8 @@ export function UserModal({
                     });
                   })()}
                 </div>
+                </>
+                )}
               </div>
 
             </div>

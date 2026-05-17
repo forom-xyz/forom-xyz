@@ -553,6 +553,21 @@ function App() {
           setPersonalQuests(prev => prev.map(q => q.id === id ? { ...q, taken: false } : q))
           if (acceptedQuestId === id) setAcceptedQuestId(null)
         }}
+        onProfileUpdate={(profileData) => {
+          if (profileData) {
+            const userObj = profileData.player || profileData;
+            if (userObj.xp !== undefined) {
+               setXp(userObj.xp);
+               if (userObj.currency === undefined && userObj.pixels === undefined) {
+                  setPixels(userObj.xp);
+               }
+            }
+            if (userObj.currency !== undefined) setPixels(userObj.currency);
+            else if (userObj.pixels !== undefined) setPixels(userObj.pixels);
+            
+            if (userObj.role !== undefined) setCurrentUserRole(userObj.role);
+          }
+        }}
       />
 
     </div>

@@ -44,6 +44,7 @@ export interface QuestModalProps {
   onCancelQuest: (id: string) => void
   userRole?: UserRole
   initialWheelIndex?: number | null
+  onProfileUpdate?: (profileData: any) => void
 }
 
 // =============================================================================
@@ -116,7 +117,8 @@ export function QuestModal({
   canCreateQuest,
   onCreateQuest,
   onAcceptQuest,
-  initialWheelIndex
+  initialWheelIndex,
+  onProfileUpdate
 }: QuestModalProps) {
   
   // To avoid un-used checks
@@ -488,8 +490,33 @@ export function QuestModal({
                         <div 
                           className="flex flex-col items-center" 
                           style={{ cursor: canSend ? 'pointer' : 'not-allowed', opacity: canSend ? 1 : 0.5 }}
-                          onClick={() => {
+                          onClick={async () => {
                             if (canSend) {
+                              try {
+                                const token = localStorage.getItem('token');
+                                if (token) {
+                                  const reqRes = await fetch('http://192.168.18.23:8080/api/requests', {
+                                    method: 'POST',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                      'Authorization': `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({ requestText, category: currentCategory, tag: currentTag })
+                                  });
+                                  if (reqRes.ok) {
+                                    const profileRes = await fetch('http://192.168.18.23:8080/api/profile', {
+                                      headers: { 'Authorization': `Bearer ${token}` }
+                                    });
+                                    if (profileRes.ok) {
+                                      const profileData = await profileRes.json();
+                                      if (onProfileUpdate) onProfileUpdate(profileData);
+                                    }
+                                  }
+                                }
+                              } catch (e) {
+                                console.error('Error submitting request:', e);
+                              }
+                              
                               addSentRequest(wheelIndex);
                               setIsRequestMode(false);
                             }
