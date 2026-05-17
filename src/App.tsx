@@ -40,14 +40,13 @@ import { getLevelAndTitle } from './utils/leveling'
 
 export type UserRole = 'S-MODS' | 'MODS' | 'CREATEURS' | 'ASSOCIES' | null;
 
-export const getUserRole = (username: string | null): UserRole => {
-  if (!username) return null;
-  const lower = username.toLowerCase();
-  if (lower === 'xylo') return 'S-MODS';
-  if (lower === 'zylo') return 'MODS';
-  if (lower === 'bylo') return 'CREATEURS';
-  if (lower === 'dylo') return 'ASSOCIES';
-  return null;
+export const getUserRole = (roleFromDb: string | null): UserRole => {
+  if (!roleFromDb) return null;
+  if (roleFromDb === 'S-mod') return 'S-MODS';
+  if (roleFromDb === 'Mod') return 'MODS';
+  if (roleFromDb === 'Editor') return 'CREATEURS';
+  if (roleFromDb === 'Associate') return 'ASSOCIES';
+  return 'ASSOCIES'; // Default to lowest role
 }
 
 /** Available categories for the application */
@@ -112,6 +111,7 @@ function App() {
   const [isPhantomMode, setIsPhantomMode] = useState(false)
   const [isTuto, setIsTuto] = useState(false)
   const [currentUser, setCurrentUser] = useState<string | null>(null)
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null)
   const [mission, setMission] = useState(DEFAULT_PUBLIC_FOROM_MISSION)
   const [foromColor, setForomColor] = useState<ForomColor | null>('creation')
   const [foromRules] = useState<string[]>(['Honnêteté', '', '', '', '', '', '', '', '', 'Curiosité'])
@@ -146,7 +146,7 @@ function App() {
   )
 
   // Detect roles
-  const userRole = getUserRole(currentUser)
+  const userRole = getUserRole(currentUserRole)
   const isSuperModerator = userRole === 'S-MODS'
   const isModerator = userRole === 'MODS'
 
@@ -211,6 +211,7 @@ function App() {
             const resData = await response.json();
             localStorage.setItem('token', resData.token);
             setCurrentUser(resData.player.username);
+            setCurrentUserRole(resData.player.role);
             setPixels(resData.player.xp || 0);
             setPhase('lobby');
           } catch (e: any) {
@@ -276,11 +277,15 @@ function App() {
             setCurrentUser(username)
             setIsPhantomMode(false)
             if (username === 'xylo') {
+              setCurrentUserRole('S-mod')
               setPixels(500)
               setInVault(5000)
             } else if (username === 'zylo') {
+              setCurrentUserRole('Mod')
               setPixels(0)
             } else if (['bylo', 'dylo', 'ets'].includes(username)) {
+              if (username === 'bylo') setCurrentUserRole('Editor')
+              else setCurrentUserRole('Associate')
               setPixels(500)
             }
           }}
