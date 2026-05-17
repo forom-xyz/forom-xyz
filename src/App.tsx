@@ -219,7 +219,7 @@ function App() {
           try {
             // 1. Send data to your Jetson Nano "Boss" API
             // Replace 'your-jetson-ip' with the actual IP of your Nano
-            const response = await fetch('http://your-jetson-ip:3000/api/register', {
+            const response = await fetch('http://your-jetson-ip:8080/api/register', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
