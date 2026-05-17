@@ -100,13 +100,14 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 
 interface MoodSelectionProps {
   onGhost: () => void
-  onColor: (action: 'login' | 'register') => void
+  onLogin: () => void
+  onRegister: () => void
   onBack?: () => void
 }
 
 
 
-export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) {
+export function MoodSelection({ onGhost, onLogin, onRegister, onBack }: MoodSelectionProps) {
   const { language } = useAppStore()
   const t = TRANSLATIONS[language] || TRANSLATIONS.en
   const [selected, setSelected] = useState<'couleur' | 'fantome' | null>(null)
@@ -528,7 +529,7 @@ export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) 
 
                 {/* Standard Login */}
                 <motion.button
-                  onClick={() => onColor('login')}
+                  onClick={onLogin}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   style={{
@@ -550,7 +551,7 @@ export function MoodSelection({ onGhost, onColor, onBack }: MoodSelectionProps) 
 
                 {/* Create Account - Pointing to Enrollment Flow */}
                 <motion.button
-                  onClick={() => onColor('register')}
+                  onClick={onRegister}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   style={{

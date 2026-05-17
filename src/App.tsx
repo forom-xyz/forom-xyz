@@ -4,6 +4,7 @@ import { Lock } from 'lucide-react'
 import { LoadingScreen } from './components/LoadingScreen'
 import { MoodSelection } from './components/MoodSelection'
 import { CustomEnrollmentFlow } from './components/CustomEnrollmentFlow'
+import { LoginFlow } from './components/LoginFlow'
 import { ForomLobby } from './components/ForomLobby'
 import { ForomCreationFlow } from './components/ForomCreationFlow'
 import { type ForomColor } from './utils/foromColors'
@@ -121,20 +122,7 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [isRubixView, setIsRubixView] = useState(false)
 
-  // OIDC Redirect Callback Logic
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-
-    if (code) {
-      // 1. Clean the URL so the authorization code isn't left hanging.
-      window.history.replaceState({}, document.title, window.location.pathname);
-
-      // 2. MOCK: Return user to lobby
-      setCurrentUser("rom"); // We'd get this from the backend token normally
-      setPhase('lobby');
-    }
-  }, [setPhase]);
+  const [loginError, setLoginError] = useState<string | null>(null)
 
   // Economy & Leveling State
   const [pixels, setPixels] = useState(0)
@@ -196,20 +184,45 @@ function App() {
           setIsPhantomMode(true);
           setPhase('lobby');
         }}
-        onColor={(action) => {
-          if (action === 'register') {
-            setPhase('profile-setup');
-          } else {
-            const clientId = "forom-web-app";
-            const redirectUri = encodeURIComponent(`${window.location.origin}/callback`);
-            const scope = encodeURIComponent("openid profile email forom_data");
-            const authUrl = `https://auth.forom.xyz/application/o/authorize/?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}`;
-            window.location.href = authUrl;
-          }
-        }}
+        onLogin={() => setPhase('login')}
+        onRegister={() => setPhase('profile-setup')}
         onBack={() => setIsLoading(true)}
       />
     );
+  }
+
+  if (phase === 'login') {
+    return (
+      <LoginFlow
+        error={loginError}
+        onSubmit={async (data) => {
+          setLoginError(null);
+          try {
+            const response = await fetch('http://192.168.18.23:8080/api/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username: data.username, password: data.password })
+            });
+
+            if (!response.ok) {
+              throw new Error('Invalid username or password');
+            }
+
+            const resData = await response.json();
+            localStorage.setItem('token', resData.token);
+            setCurrentUser(resData.player.username);
+            setPixels(resData.player.xp || 0);
+            setPhase('lobby');
+          } catch (e: any) {
+            setLoginError(e.message || 'Login failed');
+          }
+        }}
+        onClose={() => {
+          setLoginError(null);
+          setPhase('mood');
+        }}
+      />
+    )
   }
 
   if (phase === 'profile-setup') {
@@ -219,7 +232,7 @@ function App() {
           try {
             // 1. Send data to your Jetson Nano "Boss" API
             // Replace 'your-jetson-ip' with the actual IP of your Nano
-            const response = await fetch('http://your-jetson-ip:8080/api/register', {
+            const response = await fetch('http://192.168.18.23:8080/api/register', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -236,14 +249,8 @@ function App() {
               throw new Error(errData.error || 'Registration failed');
             }
 
-            // 2. If successful, now we redirect them to Authentik to finish the OIDC flow/Login
-            const authUrl = new URL("https://auth.forom.xyz/application/o/authorize/");
-            authUrl.searchParams.append("client_id", "forom-web-app");
-            authUrl.searchParams.append("response_type", "code");
-            authUrl.searchParams.append("redirect_uri", `${window.location.origin}/callback`);
-            authUrl.searchParams.append("scope", "openid profile email forom_data");
-
-            window.location.href = authUrl.toString();
+            // 2. If successful, redirect them to the login flow
+            setPhase('login');
           } catch (error: any) {
             alert(`Error creating account: ${error.message}`);
             // You could add a more pretty error state here instead of an alert
