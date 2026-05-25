@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import ReactModal from 'react-modal'
 import parameterIcon from '../assets/icons/parameter.svg'
 import type { ForomColor } from '../utils/foromColors'
 import type { UserRole } from '../App'
+import { API_BASE_URL } from '../config/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Icons
@@ -80,6 +82,39 @@ export function LobbyUserModal({
 }: LobbyUserModalProps) {
   
   const displayName  = currentUser ? currentUser.toLowerCase() : 'xylo'
+
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [passwordMessage, setPasswordMessage] = useState('')
+  const [isSubmittingPassword, setIsSubmittingPassword] = useState(false)
+
+  const handlePasswordChange = async () => {
+    if (!newPassword || !currentUser) return;
+    setIsSubmittingPassword(true);
+    setPasswordMessage('');
+    try {
+      const response = await fetch(`${API_BASE_URL}/change-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: currentUser, newPassword })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur réseau');
+      }
+      
+      setPasswordMessage('Mot de passe mis à jour !');
+      setTimeout(() => {
+        setIsChangingPassword(false);
+        setNewPassword('');
+        setPasswordMessage('');
+      }, 2000);
+    } catch (e) {
+      setPasswordMessage('Erreur, vérifiez votre backend');
+    } finally {
+      setIsSubmittingPassword(false);
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -236,6 +271,91 @@ export function LobbyUserModal({
 
                 <div style={{ fontSize: '12px', fontFamily: "'Montserrat', sans-serif", color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em' }}>
                   montréal
+                </div>
+
+                {/* Password Change Section */}
+                <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', minHeight: '80px' }}>
+                  {!isChangingPassword ? (
+                    <button 
+                      onClick={() => setIsChangingPassword(true)}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: '8px',
+                        backgroundColor: 'transparent',
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        color: 'rgba(255,255,255,0.8)',
+                        cursor: 'pointer',
+                        fontSize: '10px',
+                        fontFamily: "'Montserrat', sans-serif",
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = 'white'; e.currentTarget.style.color = 'white'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; e.currentTarget.style.color = 'rgba(255,255,255,0.8)'; }}
+                    >
+                      Changer mot de passe
+                    </button>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+                      <input 
+                        type="password"
+                        placeholder="Nouveau mot de passe"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        style={{
+                          background: 'rgba(0,0,0,0.3)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          color: 'white',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          fontFamily: "'JetBrains Mono', monospace",
+                          textAlign: 'center',
+                          outline: 'none'
+                        }}
+                      />
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button 
+                          onClick={handlePasswordChange}
+                          disabled={!newPassword || isSubmittingPassword}
+                          style={{
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            backgroundColor: newPassword && !isSubmittingPassword ? '#22C55E' : '#555',
+                            color: 'white',
+                            border: 'none',
+                            cursor: newPassword && !isSubmittingPassword ? 'pointer' : 'not-allowed',
+                            fontSize: '10px',
+                            fontFamily: "'Montserrat', sans-serif",
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {isSubmittingPassword ? '...' : 'Valider'}
+                        </button>
+                        <button 
+                          onClick={() => { setIsChangingPassword(false); setNewPassword(''); setPasswordMessage(''); }}
+                          style={{
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            backgroundColor: 'transparent',
+                            color: 'rgba(255,255,255,0.6)',
+                            border: '1px solid rgba(255,255,255,0.3)',
+                            cursor: 'pointer',
+                            fontSize: '10px',
+                            fontFamily: "'Montserrat', sans-serif"
+                          }}
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                      {passwordMessage && (
+                        <div style={{ fontSize: '10px', color: passwordMessage.includes('Erreur') ? '#EF4444' : '#22C55E', fontFamily: "'Montserrat', sans-serif" }}>
+                          {passwordMessage}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Portefeuille */}
