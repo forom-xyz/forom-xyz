@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react'
 import userIcon from '../assets/icons/user.png'
 import type { ForomColor } from '../utils/foromColors'
 import type { UserRole } from '../App'
+import { API_BASE_URL } from '../config/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -232,7 +233,7 @@ export function UserModal({
     if (isOpen && userRole === 'S-MODS') {
       const token = localStorage.getItem('token');
       if (token) {
-        fetch('http://192.168.18.23:8080/api/users', {
+        fetch(`${API_BASE_URL}/users`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(res => res.json())

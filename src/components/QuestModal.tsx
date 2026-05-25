@@ -9,6 +9,7 @@ import type { UserRole } from '../App'
 import tokenIcon from '../assets/icons/tokens.svg'
 
 import { useModalStore } from '../stores/useModalStore'
+import { API_BASE_URL } from '../config/api'
 
 // Category band colors removed because we now use mixColors
 
@@ -495,7 +496,7 @@ export function QuestModal({
                               try {
                                 const token = localStorage.getItem('token');
                                 if (token) {
-                                  const reqRes = await fetch('http://192.168.18.23:8080/api/requests', {
+                                  const reqRes = await fetch(`${API_BASE_URL}/requests`, {
                                     method: 'POST',
                                     headers: {
                                       'Content-Type': 'application/json',
@@ -504,7 +505,7 @@ export function QuestModal({
                                     body: JSON.stringify({ requestText, category: currentCategory, tag: currentTag })
                                   });
                                   if (reqRes.ok) {
-                                    const profileRes = await fetch('http://192.168.18.23:8080/api/profile', {
+                                    const profileRes = await fetch(`${API_BASE_URL}/profile`, {
                                       headers: { 'Authorization': `Bearer ${token}` }
                                     });
                                     if (profileRes.ok) {

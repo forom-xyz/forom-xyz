@@ -33,6 +33,7 @@ import { DEFAULT_PUBLIC_FOROM_MISSION, getInitialQuestsForMission } from './data
 import { useAppStore } from './stores/useAppStore'
 import { useModalStore } from './stores/useModalStore'
 import { getLevelAndTitle } from './utils/leveling'
+import { API_BASE_URL } from './config/api'
 
 // =============================================================================
 // TYPES & CONSTANTS
@@ -198,7 +199,7 @@ function App() {
         onSubmit={async (data) => {
           setLoginError(null);
           try {
-            const response = await fetch('http://192.168.18.23:8080/api/login', {
+            const response = await fetch(`${API_BASE_URL}/login`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ username: data.username, password: data.password })
@@ -233,7 +234,7 @@ function App() {
           try {
             // 1. Send data to your Jetson Nano "Boss" API
             // Replace 'your-jetson-ip' with the actual IP of your Nano
-            const response = await fetch('http://192.168.18.23:8080/api/register', {
+            const response = await fetch(`${API_BASE_URL}/register`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
