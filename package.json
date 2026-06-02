@@ -24,10 +24,12 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
+    "pocketbase": "^0.27.0",
     "postcss": "^8.5.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-modal": "^3.16.3",
+    "react-router-dom": "^7.15.1",
     "tailwindcss": "^4.1.18",
     "uuid": "^13.0.0",
     "zustand": "^5.0.11"

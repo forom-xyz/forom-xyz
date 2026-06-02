@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore, type AppLanguage } from '../stores/useAppStore'
 import chromaPortalIcon from '../assets/icons/chroma_portal.svg'
 import ghostWhtIcon from '../assets/icons/ghost_wht.svg'
-import interceptorSnd from '../assets/sons/interceptor.mov'
+import elevatorMoodSnd from '../assets/sons/Elevator_mood.mp3'
 
 // Typewriter with optional start delay
 function TypewriterText({ text, delayMs = 15, startDelay = 0 }: { text: string; delayMs?: number; startDelay?: number }) {
@@ -119,7 +119,8 @@ export function MoodSelection({ onGhost, onLogin, onRegister, onBack }: MoodSele
 
   // Play interceptor sound on mount
   useEffect(() => {
-    const audio = new Audio(interceptorSnd)
+    const audio = new Audio(elevatorMoodSnd)
+    audio.loop = true
     audio.volume = 0.4
     audioRef.current = audio
     audio.play().catch((e) => console.warn('Interceptor sound blocked:', e))

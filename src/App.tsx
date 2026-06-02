@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Lock } from 'lucide-react'
 import { LoadingScreen } from './components/LoadingScreen'
@@ -34,6 +34,9 @@ import { useAppStore } from './stores/useAppStore'
 import { useModalStore } from './stores/useModalStore'
 import { getLevelAndTitle } from './utils/leveling'
 import { API_BASE_URL } from './config/api'
+import elevatorMoodSnd from './assets/sons/Elevator_mood.mp3'
+import arcadeLobbySnd from './assets/sons/Arcade_lobby.mp3'
+import matrixForomSnd from './assets/sons/Matrix_forom.mp3'
 
 // =============================================================================
 // TYPES & CONSTANTS
@@ -104,6 +107,7 @@ function ThemeToggle({
 function App() {
   const { phase, setPhase } = useAppStore();
   const modals = useModalStore();
+  const backgroundAudioRef = useRef<HTMLAudioElement | null>(null)
 
   const [isLoading, setIsLoading] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -160,6 +164,47 @@ function App() {
       document.documentElement.classList.remove('dark')
     }
   }, [isDarkMode])
+
+  useEffect(() => {
+    const currentAudio = backgroundAudioRef.current
+    if (currentAudio) {
+      currentAudio.pause()
+      currentAudio.currentTime = 0
+      backgroundAudioRef.current = null
+    }
+
+    let trackSrc: string | null = null
+    let trackVolume = 0.5
+
+    if (phase === 'mood') {
+      trackSrc = elevatorMoodSnd
+      trackVolume = 0.4
+    } else if (phase === 'lobby') {
+      trackSrc = arcadeLobbySnd
+      trackVolume = 0.5
+    } else if (phase === 'grid') {
+      trackSrc = matrixForomSnd
+      trackVolume = 0.5
+    } else {
+      return
+    }
+
+    const audio = new Audio(trackSrc)
+    audio.loop = true
+    audio.volume = trackVolume
+    backgroundAudioRef.current = audio
+    audio.play().catch((error) => {
+      console.warn('Background audio blocked:', error)
+    })
+
+    return () => {
+      audio.pause()
+      audio.currentTime = 0
+      if (backgroundAudioRef.current === audio) {
+        backgroundAudioRef.current = null
+      }
+    }
+  }, [phase])
 
   // Map categories to sidebar items
   const sidebarItems = CATEGORIES.map((category) => ({

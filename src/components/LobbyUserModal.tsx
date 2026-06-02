@@ -109,7 +109,7 @@ export function LobbyUserModal({
         setNewPassword('');
         setPasswordMessage('');
       }, 2000);
-    } catch (e) {
+    } catch {
       setPasswordMessage('Erreur, vérifiez votre backend');
     } finally {
       setIsSubmittingPassword(false);

@@ -5,7 +5,7 @@ import foromLogoBlk from '../assets/icons/forom_logo_blk.png'
 import foromLogoWht from '../assets/icons/forom_logo_wht.png'
 import wipIcon from '../assets/icons/WIP_icon.svg'
 import bonjourHiSnd from '../assets/sons/bonjourhi.mp3'
-import mantisseSnd from '../assets/sons/explore.mp3'
+import cinemaIntroSnd from '../assets/sons/Cinema_intro.mp3'
 
 function TypewriterText({ text, delayMs = 15, startDelay = 0 }: { text: string, delayMs?: number, startDelay?: number }) {
   const [displayed, setDisplayed] = useState('')
@@ -287,7 +287,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
   useEffect(() => {
     if (!hoverAudioRef.current) {
-      hoverAudioRef.current = new Audio(mantisseSnd)
+      hoverAudioRef.current = new Audio(cinemaIntroSnd)
       hoverAudioRef.current.loop = true
       hoverAudioRef.current.volume = 0.5
     }
@@ -592,7 +592,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
                   <circle cx="12" cy="12" r="1.5" fill="#111" />
                 </motion.svg>
                 <span style={{ fontSize: 'clamp(8px, 1.2vw, 11px)', color: '#fff', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.05em' }}>
-                  Tricot the Wiz - Explore
+                  FOROM - Cinéma
                 </span>
               </div>
             </div>

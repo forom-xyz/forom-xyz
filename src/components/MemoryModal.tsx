@@ -354,8 +354,14 @@ export function MemoryModal({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
           {/* MODIFIER */}
           <button
-            onClick={() => setIsEditing(true)}
-            style={{ background: 'white', border: '3px solid black', borderRadius: '12px', padding: '8px 22px', fontFamily: 'monospace', fontWeight: 700, fontSize: '14px', cursor: 'pointer', boxShadow: '2px 2px 0 black', textTransform: 'uppercase', transition: 'transform 0.1s, box-shadow 0.1s' }}
+            onClick={() => {
+              if (localStorage.getItem('session_type') === 'guest') {
+                alert("Vous ne pouvez pas modifier de mémoire en mode Fantôme ! Veuillez vous connecter pour participer.");
+                return;
+              }
+              setIsEditing(true);
+            }}
+            style={{ background: 'white', border: '3px solid black', borderRadius: '12px', padding: '8px 22px', fontFamily: 'monospace', fontWeight: 700, fontSize: '14px', cursor: 'pointer', boxShadow: '2px 2px 0 black', textTransform: 'uppercase', transition: 'transform 0.1s, box-shadow 0.1s', opacity: localStorage.getItem('session_type') === 'guest' ? 0.5 : 1 }}
             onMouseOver={e => { e.currentTarget.style.transform = 'translateY(1px)'; e.currentTarget.style.boxShadow = '1px 1px 0 black' }}
             onMouseOut={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 black' }}
           >

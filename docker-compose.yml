@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  pocketbase:
+    build:
+      context: ./pocketbase
+      dockerfile: Dockerfile
+    container_name: forom_pocketbase
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./pb_data:/pb/pb_data
+    restart: unless-stopped
+    # Jetson / ARM64 friendly environment settings can be added here if needed
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: forom_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - pocketbase
+    restart: unless-stopped

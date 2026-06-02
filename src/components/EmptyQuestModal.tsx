@@ -106,12 +106,17 @@ export function EmptyQuestModal({
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
+                  const isPhantomMode = localStorage.getItem('session_type') === 'guest';
+                  if (isPhantomMode) {
+                    alert("Vous ne pouvez pas entrer dans le terminal en mode Fantôme ! Veuillez vous connecter pour participer.");
+                    return;
+                  }
                   if (onTokenClick) {
                     onTokenClick()
                   }
                 }}
                 className="hover:scale-110 transition-transform cursor-pointer outline-none mt-2 relative"
-                style={{ background: 'transparent', border: 'none', padding: 0, zIndex: 100, pointerEvents: 'auto' }}
+                style={{ background: 'transparent', border: 'none', padding: 0, zIndex: 100, pointerEvents: 'auto', opacity: localStorage.getItem('session_type') === 'guest' ? 0.5 : 1 }}
               >
                 <img 
                   src={tokensIcon} 
