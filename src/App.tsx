@@ -38,6 +38,8 @@ import elevatorMoodSnd from './assets/sons/Elevator_mood.mp3'
 import arcadeLobbySnd from './assets/sons/Arcade_lobby.mp3'
 import matrixForomSnd from './assets/sons/Matrix_forom.mp3'
 
+import { pb } from './lib/pocketbase'
+
 // =============================================================================
 // TYPES & CONSTANTS
 // =============================================================================
@@ -244,21 +246,12 @@ function App() {
         onSubmit={async (data) => {
           setLoginError(null);
           try {
-            const response = await fetch(`${API_BASE_URL}/login`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ username: data.username, password: data.password })
-            });
-
-            if (!response.ok) {
-              throw new Error('Invalid username or password');
-            }
-
-            const resData = await response.json();
-            localStorage.setItem('token', resData.token);
-            setCurrentUser(resData.player.username);
-            setCurrentUserRole(resData.player.role);
-            setPixels(resData.player.xp || 0);
+            const authData = await pb.collection('users').authWithPassword(data.username, data.password);
+            
+            localStorage.setItem('token', pb.authStore.token);
+            setCurrentUser(authData.record.username);
+            setCurrentUserRole(authData.record.role || null);
+            setPixels(authData.record.xp || authData.record.pixels || 0);
             setPhase('lobby');
           } catch (e: any) {
             setLoginError(e.message || 'Login failed');
@@ -277,24 +270,16 @@ function App() {
       <CustomEnrollmentFlow
         onSubmit={async (data) => {
           try {
-            // 1. Send data to your Jetson Nano "Boss" API
-            // Replace 'your-jetson-ip' with the actual IP of your Nano
-            const response = await fetch(`${API_BASE_URL}/register`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                username: data.username,
-                email: data.email,
-                password: data.password,
-                color: data.color, // Blue, Yellow, or Red
-                city: data.town, // City name
-              }),
+            // Use PocketBase for registration
+            const record = await pb.collection('users').create({
+              username: data.username,
+              email: data.email,
+              password: data.password,
+              passwordConfirm: data.password,
+              color: data.color,
+              city: data.town,
+              name: data.username
             });
-
-            if (!response.ok) {
-              const errData = await response.json();
-              throw new Error(errData.error || 'Registration failed');
-            }
 
             // 2. If successful, redirect them to the login flow
             setPhase('login');

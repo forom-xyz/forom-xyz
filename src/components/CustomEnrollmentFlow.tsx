@@ -193,8 +193,8 @@ export function CustomEnrollmentFlow({ onSubmit, onClose }: CustomEnrollmentFlow
               <div style={{ display: 'flex', gap: 'clamp(20px, 4vw, 40px)', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 'clamp(40px, 8vh, 80px)' }}>
                 {[
                   { id: 'Social', color: '#3b00ff', text: 'Social', textCol: 'white' },
-                  { id: 'Créatif', color: '#ffdd44', text: 'Créatif', textCol: 'black' },
-                  { id: 'Sécurité', color: '#ff3333', text: 'Sécurité', textCol: 'white' },
+                  { id: 'Creative', color: '#ffdd44', text: 'Créatif', textCol: 'black' },
+                  { id: 'Protector', color: '#ff3333', text: 'Protecteur', textCol: 'white' },
                 ].map((c) => (
                   <motion.div
                     key={c.id}

@@ -1,17 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { ForomLobby } from '../components/ForomLobby';
 import { LoginFlow } from '../components/LoginFlow';
+import { LobbyUserModal } from '../components/LobbyUserModal';
 import { AnimatePresence } from 'framer-motion';
+import { useModalStore } from '../stores/useModalStore';
+import { pb } from '../lib/pocketbase';
 
 export function Lobby() {
   const navigate = useNavigate();
   const sessionType = localStorage.getItem('session_type');
+  
+  // Use PocketBase directly if logged in, otherwise use mock session logic or null
   const [currentUser, setCurrentUser] = useState<string | null>(
-    sessionType === 'authenticated' ? 'User' : null
+    pb.authStore.isValid ? pb.authStore.model?.username : (sessionType === 'authenticated' ? 'User' : null)
   );
+
+  const isUserOpen = useModalStore((state) => state.isUserOpen);
+  const closeUser = useModalStore((state) => state.closeUser);
   
   const [showLoginFlow, setShowLoginFlow] = useState(false);
+
+  useEffect(() => {
+    return pb.authStore.onChange((token, model) => {
+      setCurrentUser(model ? model.username : null);
+    });
+  }, []);
 
   const handleSignInClick = () => {
     setShowLoginFlow(true);
@@ -45,15 +59,6 @@ export function Lobby() {
         currentUser={currentUser}
         onBackToLoading={handleBackToLoading}
       />
-      
-      <div style={{ position: 'absolute', top: '32px', left: '50%', transform: 'translateX(-50%)', zIndex: 90, display: 'flex', gap: '20px' }}>
-         <button 
-           onClick={() => navigate('/lobby/dashboard')}
-           style={{ padding: '8px 16px', borderRadius: '20px', backgroundColor: '#333', color: 'white', border: '1px solid #555', cursor: 'pointer' }}
-         >
-           View Dashboard
-         </button>
-      </div>
 
       <AnimatePresence>
         {showLoginFlow && (
@@ -63,6 +68,16 @@ export function Lobby() {
           />
         )}
       </AnimatePresence>
+
+      <LobbyUserModal
+        isOpen={isUserOpen}
+        onClose={closeUser}
+        currentUser={pb.authStore.model?.username || currentUser}
+        pixels={pb.authStore.model?.pixels || 0}
+        xp={pb.authStore.model?.xp || 0}
+        level={Math.floor((pb.authStore.model?.xp || 0) / 100) + 1}
+        userRole={pb.authStore.model?.role || 'Associate'}
+      />
 
       <Outlet />
     </div>
